@@ -121,8 +121,8 @@ describe('parseGrouped', () => {
     expect(inv).toEqual({ BRA1: 1 })
   })
 
-  it('parses special 00 sticker in grouped lines', () => {
+  it('parses special 00 sticker in grouped lines (emits standalone 00)', () => {
     const inv = parseGrouped('FWC: 3, 00')
-    expect(inv).toEqual({ FWC00: 1, FWC3: 1 })
+    expect(inv).toEqual({ '00': 1, FWC3: 1 })
   })
 })

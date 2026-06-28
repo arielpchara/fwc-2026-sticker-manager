@@ -28,7 +28,7 @@ All test files live in `src/tests/` and are named `<module>.test.ts`.
 ## Required test cases per module
 
 ### sticker.test.ts
-- Valid: `BRA1`, `BRA20`, `BRA00`, `ARG1`, `FWC3`, `00`
+- Valid: `BRA1`, `BRA20`, `ARG1`, `FWC3`, `00`
 - Invalid: `BRA0`, `BRA21`, `BR1`, `BRAA1`, `1BRA`, `bra1`, `123`, empty string
 - Normalization: lowercase input (`bra1`) uppercased before validation
 

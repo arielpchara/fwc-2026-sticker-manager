@@ -11,8 +11,8 @@ A small TypeScript tool to manage trading World Cup stickers:
 
 Valid code = `[A-Z]{3}` + number `1–20`, plus the special standalone `00`.
 
-- Regex: `^([A-Z]{3}(?:[1-9]|1[0-9]|20)|[A-Z]{3}00|00)$`
-- Examples valid: `BRA1`, `BRA12`, `ARG1`, `FWC3`, `BRA00`, `00`
+- Regex: `^([A-Z]{3}(?:[1-9]|1[0-9]|20)|00)$`
+- Examples valid: `BRA1`, `BRA12`, `ARG1`, `FWC3`, `00`
 - Examples invalid: `BRA0`, `BRA21`, `br1`, `BRAA1`, `1BRA`
 - Input is normalized to uppercase before validation.
 - Team codes: any 3 uppercase letters accepted (no fixed team list).
@@ -70,7 +70,7 @@ Entry: `src/cli/index.ts`, built to `dist/cli.js`, exposed as `sticker-trade` bi
 
 ```
 # Upload/update my stickers
-sticker-trade own --text "BRA1,BRA2,ARG00"
+sticker-trade own --text "BRA1,BRA2,00"
 sticker-trade own --file my-stickers.txt
 echo "BRA1 BRA2" | sticker-trade own
 
@@ -78,7 +78,7 @@ echo "BRA1 BRA2" | sticker-trade own
 sticker-trade own --list
 
 # Compare: show stickers other person has that I don't
-sticker-trade compare --text "BRA1,BRA3,ARG00"
+sticker-trade compare --text "BRA1,BRA3,00"
 sticker-trade compare --file their-stickers.txt
 echo "BRA1 BRA3" | sticker-trade compare
 ```
@@ -130,7 +130,7 @@ MCP client config (stdio):
 
 | File | Cases |
 |---|---|
-| `sticker.test.ts` | Valid: `BRA1`, `BRA20`, `BRA00`, `00`. Invalid: `BRA0`, `BRA21`, `BR1`, `bra1`, `123`, empty. Normalization: lowercase input uppercased. |
+| `sticker.test.ts` | Valid: `BRA1`, `BRA20`, `00`. Invalid: `BRA0`, `BRA21`, `BR1`, `BRA00`, `bra1`, `123`, empty. Normalization: lowercase input uppercased. |
 | `textParser.test.ts` | Space/comma/newline separation. Mixed garbage tokens ignored. Deduplication. Empty string → []. |
 | `collection.test.ts` | `diff(mine, theirs)` = codes in `theirs` not in `mine`. Both empty. Full overlap → []. No overlap → all theirs. |
 | `ownRepository.test.ts` | Fresh load → empty. Save → reads back. Unchanged hash → no file write (spy). Changed hash → writes `own.json` + `own_YYYYMMDD.json`. |

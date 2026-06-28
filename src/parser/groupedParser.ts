@@ -23,7 +23,7 @@ export function parseGrouped(text: string): Inventory {
       if (!itemMatch) continue
 
       const numStr = itemMatch[1]
-      const code = `${prefix}${numStr}`
+      const code = numStr === '00' ? '00' : `${prefix}${numStr}`
 
       if (parseCode(code) === null) continue
 

@@ -7,7 +7,7 @@ Parse sticker codes from any app's plain text, track your own collection, and fi
 ## Sticker Format
 
 ```
-[A-Z]{3} + 1-20     e.g.  BRA1  BRA12  ARG1  FWC3  BRA00
+[A-Z]{3} + 1-20     e.g.  BRA1  BRA12  ARG1  FWC3
 00                  special standalone sticker
 ```
 
@@ -31,7 +31,7 @@ npm link
 
 ```bash
 # Upload / update your sticker list (parses text, saves to own.json)
-sticker-trade own --text "BRA1,BRA2,ARG00,00"
+sticker-trade own --text "BRA1,BRA2,00"
 sticker-trade own --file my-stickers.txt
 echo "BRA1 BRA2" | sticker-trade own
 
@@ -39,7 +39,7 @@ echo "BRA1 BRA2" | sticker-trade own
 sticker-trade own --list
 
 # Compare: find stickers the OTHER person has that you DON'T
-sticker-trade compare --text "BRA1,BRA3,ARG00,FWC5"
+sticker-trade compare --text "BRA1,BRA3,00,FWC5"
 sticker-trade compare --file their-list.txt
 pbpaste | sticker-trade compare
 ```

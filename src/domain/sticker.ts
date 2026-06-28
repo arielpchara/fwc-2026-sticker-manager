@@ -3,11 +3,10 @@
  *
  * Valid formats:
  *   [A-Z]{3} + 1-20     e.g. BRA1, BRA12, BRA20, ARG1, FWC3
- *   [A-Z]{3} + 00       e.g. BRA00, ARG00  (special team foil)
  *   00                  standalone special sticker
  */
 
-const STICKER_REGEX = /^([A-Z]{3}(?:[1-9]|1[0-9]|20)|[A-Z]{3}00|00)$/
+const STICKER_REGEX = /^([A-Z]{3}(?:[1-9]|1[0-9]|20)|00)$/
 
 /**
  * Normalize a raw token: trim + uppercase.

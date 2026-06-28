@@ -119,8 +119,8 @@ describe('stickerService', () => {
 
     it('handles special codes', async () => {
       await setOwn('BRA1', repo)
-      const result = await compareWith('BRA1 00 ARG00', repo)
-      expect(result.missing).toEqual(['00', 'ARG00'])
+      const result = await compareWith('BRA1 00', repo)
+      expect(result.missing).toEqual(['00'])
     })
   })
 

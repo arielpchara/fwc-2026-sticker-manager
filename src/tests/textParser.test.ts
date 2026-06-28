@@ -32,15 +32,15 @@ describe('parseText', () => {
   it('handles special 00 code', () => {
     expect(parseText('BRA1 00 ARG1')).toEqual(['00', 'ARG1', 'BRA1'])
   })
-  it('handles team+00 codes', () => {
-    expect(parseText('BRA00 ARG00')).toEqual(['ARG00', 'BRA00'])
+  it('rejects team+00 codes (only standalone 00 valid)', () => {
+    expect(parseText('BRA00 ARG00')).toEqual([])
   })
   it('rejects invalid codes silently', () => {
     expect(parseText('BRA0 BRA21 BR1 BRAA1')).toEqual([])
   })
   it('parses a realistic mixed text', () => {
-    const text = 'minha lista: BRA1, BRA2, ARG00, 00 e também FWC3'
-    expect(parseText(text)).toEqual(['00', 'ARG00', 'BRA1', 'BRA2', 'FWC3'])
+    const text = 'minha lista: BRA1, BRA2, 00 e também FWC3'
+    expect(parseText(text)).toEqual(['00', 'BRA1', 'BRA2', 'FWC3'])
   })
 })
 
@@ -91,10 +91,9 @@ describe('parseInventory', () => {
     const inv = parseInventory(text)
     expect(inv).toEqual({ BRA1: 3, BRA2: 1, BRA5: 2 })
   })
-  it('handles special 00 in grouped format (not double-matched as standalone)', () => {
+  it('handles special 00 in grouped format (emits standalone 00)', () => {
     const text = 'FWC: 3, 00'
     const inv = parseInventory(text)
-    expect(inv).toEqual({ FWC00: 1, FWC3: 1 })
-    expect(inv['00']).toBeUndefined()
+    expect(inv).toEqual({ '00': 1, FWC3: 1 })
   })
 })

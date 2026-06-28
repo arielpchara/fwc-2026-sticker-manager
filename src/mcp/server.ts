@@ -11,7 +11,7 @@ const server = new McpServer({
 
 server.tool(
   'upload_own_stickers',
-  'Parse sticker codes from text and save them as your collection. Codes follow the pattern: 3 uppercase letters + 1-20 (e.g. BRA1, ARG12) or special codes BRA00/00. Supports grouped list format and xN quantity suffix.',
+  'Parse sticker codes from text and save them as your collection. Codes follow the pattern: 3 uppercase letters + 1-20 (e.g. BRA1, ARG12) or special code 00. Supports grouped list format and xN quantity suffix.',
   { text: z.string().describe('Free text containing sticker codes') },
   async ({ text }) => {
     const result = await setOwn(text)

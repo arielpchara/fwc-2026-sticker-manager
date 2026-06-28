@@ -20,7 +20,7 @@ mcp/server.ts ──┘              │
 
 ```
 Pattern : ^([A-Z]{3}(?:[1-9]|1[0-9]|20)|[A-Z]{3}00|00)$
-Valid   : BRA1  BRA12  BRA20  ARG00  FWC3  00
+Valid   : BRA1  BRA12  BRA20  FWC3  00
 Invalid : BRA0  BRA21  br1  1BRA  BRAA1
 ```
 

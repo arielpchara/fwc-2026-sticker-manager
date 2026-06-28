@@ -23,8 +23,6 @@ describe('isValid', () => {
       'BRA20',
       'ARG1',
       'FWC3',
-      'BRA00',
-      'ARG00',
       '00',
       'ZZZ1',
       'ZZZ20',
@@ -47,6 +45,8 @@ describe('isValid', () => {
       'BRA',       // no number
       '0',         // single zero
       'BRA001',    // extra digit
+      'BRA00',     // team+00 not allowed
+      'ARG00',
     ])('rejects %s', (code) => {
       expect(isValid(code)).toBe(false)
     })
@@ -68,8 +68,8 @@ describe('parseCode', () => {
   it('handles standalone 00', () => {
     expect(parseCode('00')).toBe('00')
   })
-  it('handles team+00', () => {
-    expect(parseCode('BRA00')).toBe('BRA00')
+  it('rejects team+00 (only standalone 00 is valid)', () => {
+    expect(parseCode('BRA00')).toBeNull()
   })
   it('trims and uppercases before validating', () => {
     expect(parseCode('  bra20  ')).toBe('BRA20')
