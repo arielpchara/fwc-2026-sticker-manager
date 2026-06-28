@@ -1,21 +1,17 @@
-/**
- * Core use cases — orchestrates domain, parser, and storage.
- * Has no knowledge of CLI or MCP transports.
- * Takes an injected repository for testability.
- */
-
-import { parseText } from '../parser/textParser.js'
-import { missing, dedupe } from '../domain/collection.js'
+import { parseText, parseInventory } from '../parser/textParser.js'
+import { missing } from '../domain/collection.js'
+import { codesOf, totalCopies, extras, type Inventory, type ExtraItem } from '../domain/inventory.js'
 import { load, save, type OwnRecord } from '../storage/ownRepository.js'
 
 export interface Repository {
   load(dir?: string): Promise<OwnRecord>
-  save(stickers: string[], dir?: string): Promise<boolean>
+  save(inv: Inventory, dir?: string): Promise<boolean>
 }
 
 export interface SetOwnResult {
   stickers: string[]
   count: number
+  totalCopies: number
   saved: boolean
 }
 
@@ -24,37 +20,44 @@ export interface CompareResult {
   count: number
 }
 
+export interface ExtrasResult {
+  items: ExtraItem[]
+  totalSurplus: number
+  totalUnique: number
+}
+
 const defaultRepo: Repository = { load, save }
 
-/**
- * Parse text and save as the user's own sticker collection.
- * Idempotent: no write if the parsed content matches current state.
- */
 export async function setOwn(
   text: string,
   repo: Repository = defaultRepo,
 ): Promise<SetOwnResult> {
-  const stickers = dedupe(parseText(text))
-  const saved = await repo.save(stickers)
-  return { stickers, count: stickers.length, saved }
+  const inv = parseInventory(text)
+  const stickers = codesOf(inv)
+  const saved = await repo.save(inv)
+  return { stickers, count: stickers.length, totalCopies: totalCopies(inv), saved }
 }
 
-/**
- * Return the current sticker collection.
- */
 export async function getOwn(repo: Repository = defaultRepo): Promise<OwnRecord> {
   return repo.load()
 }
 
-/**
- * Parse another person's text and return stickers they have that the user doesn't.
- */
 export async function compareWith(
   theirText: string,
   repo: Repository = defaultRepo,
 ): Promise<CompareResult> {
   const current = await repo.load()
   const theirs = parseText(theirText)
-  const result = missing(current.stickers, theirs)
+  const result = missing(codesOf(current.inv), theirs)
   return { missing: result, count: result.length }
+}
+
+export async function getExtras(repo: Repository = defaultRepo): Promise<ExtrasResult> {
+  const current = await repo.load()
+  const items = extras(current.inv)
+  return {
+    items,
+    totalSurplus: items.reduce((sum, e) => sum + e.surplus, 0),
+    totalUnique: items.length,
+  }
 }

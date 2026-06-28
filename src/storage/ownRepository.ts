@@ -1,37 +1,28 @@
-/**
- * Persistence layer for the user's own sticker collection.
- *
- * Files:
- *   {DATA_DIR}/own.json             — current state (always up to date)
- *   {DATA_DIR}/own_YYYYMMDD.json    — dated snapshot (written when hash changes)
- *
- * Write policy: only write if the sha256 hash of the sorted sticker list changes.
- */
-
 import { createHash } from 'node:crypto'
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
+import type { Inventory } from '../domain/inventory.js'
 
 export interface OwnRecord {
-  stickers: string[]
+  inv: Inventory
   hash: string
   updatedAt: string
 }
 
-const EMPTY: OwnRecord = { stickers: [], hash: '', updatedAt: '' }
+const EMPTY: OwnRecord = { inv: {}, hash: '', updatedAt: '' }
 
 function dataDir(): string {
   return process.env['DATA_DIR'] ?? './data'
 }
 
-function computeHash(stickers: string[]): string {
+function computeHash(inv: Inventory): string {
+  const sorted = Object.entries(inv).sort(([a], [b]) => a.localeCompare(b))
   return createHash('sha256')
-    .update(JSON.stringify([...stickers].sort()))
+    .update(JSON.stringify(sorted))
     .digest('hex')
 }
 
 function dateSuffix(): string {
-  // YYYYMMDD in local time
   const now = new Date()
   const y = now.getFullYear()
   const m = String(now.getMonth() + 1).padStart(2, '0')
@@ -43,28 +34,46 @@ async function ensureDir(dir: string): Promise<void> {
   await mkdir(dir, { recursive: true })
 }
 
-/**
- * Load the current own.json. Returns EMPTY if file doesn't exist.
- */
+function migrateRecord(raw: Record<string, unknown>): OwnRecord {
+  if (Array.isArray(raw['stickers']) && !raw['inv']) {
+    const stickers = raw['stickers'] as string[]
+    return {
+      inv: Object.fromEntries(stickers.map((s) => [s, 1])),
+      hash: (raw['hash'] as string) ?? '',
+      updatedAt: (raw['updatedAt'] as string) ?? '',
+    }
+  }
+  return {
+    inv: (raw['inv'] as Inventory) ?? {},
+    hash: (raw['hash'] as string) ?? '',
+    updatedAt: (raw['updatedAt'] as string) ?? '',
+  }
+}
+
 export async function load(dir?: string): Promise<OwnRecord> {
   const base = dir ?? dataDir()
   const file = join(base, 'own.json')
   try {
     const raw = await readFile(file, 'utf-8')
-    return JSON.parse(raw) as OwnRecord
+    const parsed = JSON.parse(raw) as Record<string, unknown>
+    return migrateRecord(parsed)
   } catch (err: unknown) {
     if (isNodeError(err) && err.code === 'ENOENT') return { ...EMPTY }
     throw err
   }
 }
 
-/**
- * Save stickers to own.json (and dated snapshot) only if hash has changed.
- * Returns true if written, false if skipped (no change).
- */
-export async function save(stickers: string[], dir?: string): Promise<boolean> {
+function sortedInv(inv: Inventory): Inventory {
+  const sorted: Inventory = {}
+  for (const key of Object.keys(inv).sort()) {
+    sorted[key] = inv[key]
+  }
+  return sorted
+}
+
+export async function save(inv: Inventory, dir?: string): Promise<boolean> {
   const base = dir ?? dataDir()
-  const newHash = computeHash(stickers)
+  const newHash = computeHash(inv)
 
   const current = await load(base)
   if (current.hash === newHash) return false
@@ -72,7 +81,7 @@ export async function save(stickers: string[], dir?: string): Promise<boolean> {
   await ensureDir(base)
 
   const record: OwnRecord = {
-    stickers: [...stickers].sort(),
+    inv: sortedInv(inv),
     hash: newHash,
     updatedAt: new Date().toISOString(),
   }

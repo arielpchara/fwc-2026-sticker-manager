@@ -1,15 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { parseText } from '../parser/textParser.js'
+import { parseText, parseInventory } from '../parser/textParser.js'
 import { setOwn, getOwn, compareWith } from '../core/stickerService.js'
 import type { Repository } from '../core/stickerService.js'
 import type { OwnRecord } from '../storage/ownRepository.js'
+import type { Inventory } from '../domain/inventory.js'
+import { codesOf } from '../domain/inventory.js'
 
-/**
- * Real-world input copied from a Brazilian WhatsApp sticker-trading group.
- * The header says "Faltam 191" — so the parser must extract exactly 191 codes.
- * Noise includes: emojis, country names in Portuguese, URLs, percentages,
- * section headers, punctuation, and app store links.
- */
 const REAL_WORLD_TEXT = `🏆 *Copa 2026* — *❌ Faltam 191* — 803/994 (81%)
 
 🌟 Introdução:
@@ -162,7 +158,6 @@ Android: https://play.google.com/store/apps/details?id=com.igames.cupvi
 
 iOS: https://apps.apple.com/br/app/figurinhas-controle-do-%C3%A1lbum/id6762934579`
 
-// All 191 expected codes, sorted — derived directly from the text above.
 const EXPECTED_CODES = [
   'ALG17','ALG19','ALG5',
   'ARG1','ARG18','ARG7',
@@ -233,7 +228,6 @@ describe('real-world WhatsApp sticker list', () => {
 
     it('ignores Portuguese country names and section headers', () => {
       const codes = parseText(REAL_WORLD_TEXT)
-      // Words like "Brasil", "Copa", "Faltam", "Bora" must not appear
       expect(codes).not.toContain('BRA')
       expect(codes).not.toContain('COP')
       expect(codes).not.toContain('FAL')
@@ -246,7 +240,6 @@ describe('real-world WhatsApp sticker list', () => {
 
     it('ignores app store URLs', () => {
       const codes = parseText(REAL_WORLD_TEXT)
-      // URL tokens like "https", "play.google.com", "apps.apple.com" must not leak in
       expect(codes).not.toContain('APP')
       expect(codes).not.toContain('COM')
     })
@@ -273,18 +266,30 @@ describe('real-world WhatsApp sticker list', () => {
     })
   })
 
+  describe('parseInventory', () => {
+    it('returns all 191 codes with qty 1', () => {
+      const inv = parseInventory(REAL_WORLD_TEXT)
+      const codes = Object.keys(inv).sort()
+      expect(codes).toHaveLength(191)
+      expect(codes).toEqual(EXPECTED_CODES)
+      for (const qty of Object.values(inv)) {
+        expect(qty).toBe(1)
+      }
+    })
+  })
+
   describe('stickerService integration', () => {
     let repo: Repository
 
     beforeEach(() => {
-      let store: OwnRecord = { stickers: [], hash: '', updatedAt: '' }
+      let store: OwnRecord = { inv: {}, hash: '', updatedAt: '' }
       repo = {
-        async load() { return { ...store, stickers: [...store.stickers] } },
-        async save(stickers) {
-          const sorted = [...stickers].sort()
-          const newHash = sorted.join(',')
+        async load() { return { ...store, inv: { ...store.inv } } },
+        async save(inv: Inventory) {
+          const sorted = Object.entries(inv).sort(([a], [b]) => a.localeCompare(b))
+          const newHash = JSON.stringify(sorted)
           if (store.hash === newHash) return false
-          store = { stickers: sorted, hash: newHash, updatedAt: new Date().toISOString() }
+          store = { inv: { ...inv }, hash: newHash, updatedAt: new Date().toISOString() }
           return true
         },
       }
@@ -293,21 +298,20 @@ describe('real-world WhatsApp sticker list', () => {
     it('setOwn saves all 191 codes from real-world text', async () => {
       const result = await setOwn(REAL_WORLD_TEXT, repo)
       expect(result.count).toBe(191)
+      expect(result.totalCopies).toBe(191)
       expect(result.saved).toBe(true)
     })
 
     it('getOwn returns all 191 codes after setOwn', async () => {
       await setOwn(REAL_WORLD_TEXT, repo)
       const record = await getOwn(repo)
-      expect(record.stickers).toHaveLength(191)
-      expect(record.stickers).toEqual(EXPECTED_CODES)
+      expect(codesOf(record.inv)).toHaveLength(191)
+      expect(codesOf(record.inv)).toEqual(EXPECTED_CODES)
     })
 
     it('compareWith returns only codes the other person has that I dont', async () => {
-      // I own BRA codes only
       await setOwn('BRA2, BRA3, BRA6, BRA10, BRA19', repo)
       const result = await compareWith(REAL_WORLD_TEXT, repo)
-      // Should return all 191 except the 5 BRA codes I already have
       expect(result.count).toBe(191 - 5)
       expect(result.missing).not.toContain('BRA2')
       expect(result.missing).not.toContain('BRA19')

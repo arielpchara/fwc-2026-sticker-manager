@@ -1,17 +1,8 @@
-/**
- * MCP adapter — exposes core use cases as MCP tools over stdio.
- * Zero LLM/AI SDK references beyond @modelcontextprotocol/sdk (pure transport).
- *
- * Tools:
- *   upload_own_stickers  — parse text and save as own collection
- *   get_own_stickers     — return current collection
- *   compare_collection   — return stickers they have that I don't
- */
-
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
-import { setOwn, getOwn, compareWith } from '../core/stickerService.js'
+import { setOwn, getOwn, compareWith, getExtras } from '../core/stickerService.js'
+import { codesOf } from '../domain/inventory.js'
 
 const server = new McpServer({
   name: 'sticker-trade',
@@ -20,7 +11,7 @@ const server = new McpServer({
 
 server.tool(
   'upload_own_stickers',
-  'Parse sticker codes from text and save them as your collection. Codes follow the pattern: 3 uppercase letters + 1-20 (e.g. BRA1, ARG12) or special codes BRA00/00.',
+  'Parse sticker codes from text and save them as your collection. Codes follow the pattern: 3 uppercase letters + 1-20 (e.g. BRA1, ARG12) or special codes BRA00/00. Supports grouped list format and xN quantity suffix.',
   { text: z.string().describe('Free text containing sticker codes') },
   async ({ text }) => {
     const result = await setOwn(text)
@@ -29,8 +20,8 @@ server.tool(
         {
           type: 'text',
           text: result.saved
-            ? `Saved ${result.count} stickers: ${result.stickers.join(', ')}`
-            : `No changes — collection unchanged (${result.count} stickers).`,
+            ? `Saved ${result.count} unique stickers (${result.totalCopies} total copies): ${result.stickers.join(', ')}`
+            : `No changes — collection unchanged (${result.count} unique stickers, ${result.totalCopies} total copies).`,
         },
       ],
     }
@@ -39,18 +30,24 @@ server.tool(
 
 server.tool(
   'get_own_stickers',
-  'Return your current sticker collection.',
+  'Return your current sticker collection with quantities.',
   {},
   async () => {
     const record = await getOwn()
+    const stickers = codesOf(record.inv)
+    if (stickers.length === 0) {
+      return { content: [{ type: 'text', text: 'No stickers saved yet.' }] }
+    }
+    const total = Object.values(record.inv).reduce((a, b) => a + b, 0)
+    const lines = stickers.map((c) => {
+      const qty = record.inv[c]
+      return qty > 1 ? `${c} x${qty}` : c
+    })
     return {
       content: [
         {
           type: 'text',
-          text:
-            record.stickers.length === 0
-              ? 'No stickers saved yet.'
-              : `Your stickers (${record.stickers.length}): ${record.stickers.join(', ')}`,
+          text: `Your stickers (${total} copies of ${stickers.length} unique):\n${lines.join(', ')}`,
         },
       ],
     }
@@ -71,6 +68,27 @@ server.tool(
             result.count === 0
               ? 'You already have everything the other person has.'
               : `Stickers you can receive (${result.count}): ${result.missing.join(', ')}`,
+        },
+      ],
+    }
+  },
+)
+
+server.tool(
+  'get_extras',
+  'Return stickers you have duplicates of (quantity >= 2), showing how many you can trade away.',
+  {},
+  async () => {
+    const result = await getExtras()
+    if (result.totalUnique === 0) {
+      return { content: [{ type: 'text', text: 'No extra stickers (all owned in single copies).' }] }
+    }
+    const lines = result.items.map((e) => `${e.code} x${e.qty} (surplus: ${e.surplus})`)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Extra stickers (${result.totalUnique} codes, ${result.totalSurplus} surplus):\n${lines.join('\n')}`,
         },
       ],
     }

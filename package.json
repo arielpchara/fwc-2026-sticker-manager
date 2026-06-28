@@ -6,6 +6,7 @@
     "sticker-trade": "./dist/cli.js"
   },
   "scripts": {
+    "cli": "tsx src/cli/index.ts",
     "dev:cli": "tsx watch src/cli/index.ts",
     "dev:mcp": "tsx watch src/mcp/server.ts",
     "build": "tsup",

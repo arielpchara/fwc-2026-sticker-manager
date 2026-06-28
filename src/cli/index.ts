@@ -1,36 +1,9 @@
-/**
- * CLI adapter — thin layer over core/stickerService.
- * Uses node:util parseArgs — no extra dependencies.
- *
- * Commands:
- *   sticker-trade own [--text "..."] [--file path] [--list]   (stdin fallback)
- *   sticker-trade compare [--text "..."] [--file path]        (stdin fallback)
- */
-
 import { parseArgs } from 'node:util'
 import { readFile } from 'node:fs/promises'
-import { setOwn, getOwn, compareWith } from '../core/stickerService.js'
+import { setOwn, getOwn, compareWith, getExtras } from '../core/stickerService.js'
+import { codesOf } from '../domain/inventory.js'
 
 const [, , command, ...argv] = process.argv
-
-async function readInput(
-  values: Record<string, string | boolean | string[] | undefined>,
-): Promise<string> {
-  if (typeof values['text'] === 'string') return values['text']
-  if (typeof values['file'] === 'string') return readFile(values['file'], 'utf-8')
-  // stdin fallback
-  return readStdin()
-}
-
-function readStdin(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let data = ''
-    process.stdin.setEncoding('utf-8')
-    process.stdin.on('data', (chunk) => (data += chunk))
-    process.stdin.on('end', () => resolve(data))
-    process.stdin.on('error', reject)
-  })
-}
 
 function die(msg: string): never {
   console.error(`Error: ${msg}`)
@@ -40,11 +13,9 @@ function die(msg: string): never {
 function printUsage(): void {
   console.log(`
 Usage:
-  sticker-trade own [--text "BRA1,BRA2"] [--file list.txt]
-  sticker-trade own --list
-  sticker-trade compare [--text "BRA1,BRA3"] [--file their.txt]
-
-  Stdin is used when neither --text nor --file is provided.
+  sticker-trade own --text "BRA1,BRA2" | --file list.txt | --list
+  sticker-trade compare --text "BRA1,BRA3" | --file their.txt
+  sticker-trade extras
 `.trim())
 }
 
@@ -61,22 +32,31 @@ async function cmdOwn(): Promise<void> {
 
   if (values['list']) {
     const record = await getOwn()
-    if (record.stickers.length === 0) {
+    const stickers = codesOf(record.inv)
+    if (stickers.length === 0) {
       console.log('No stickers saved yet.')
     } else {
-      console.log(`Your stickers (${record.stickers.length}):`)
-      console.log(record.stickers.join(', '))
+      const total = Object.values(record.inv).reduce((a, b) => a + b, 0)
+      console.log(`Your stickers (${total} copies of ${stickers.length} unique):`)
+      for (const code of stickers) {
+        const qty = record.inv[code]
+        console.log(`  ${code}${qty > 1 ? ` x${qty}` : ''}`)
+      }
     }
     return
   }
 
-  const text = await readInput(values)
+  const text = typeof values['text'] === 'string'
+    ? values['text']
+    : typeof values['file'] === 'string'
+      ? await readFile(values['file'], 'utf-8')
+      : die('Either --text or --file is required')
   const result = await setOwn(text)
 
   if (!result.saved) {
-    console.log(`No changes — collection unchanged (${result.count} stickers).`)
+    console.log(`No changes — collection unchanged (${result.count} unique stickers, ${result.totalCopies} total copies).`)
   } else {
-    console.log(`Saved ${result.count} stickers:`)
+    console.log(`Saved ${result.count} unique stickers (${result.totalCopies} total copies):`)
     console.log(result.stickers.join(', '))
   }
 }
@@ -91,7 +71,11 @@ async function cmdCompare(): Promise<void> {
     strict: false,
   })
 
-  const text = await readInput(values)
+  const text = typeof values['text'] === 'string'
+    ? values['text']
+    : typeof values['file'] === 'string'
+      ? await readFile(values['file'], 'utf-8')
+      : die('Either --text or --file is required')
   const result = await compareWith(text)
 
   if (result.count === 0) {
@@ -99,6 +83,18 @@ async function cmdCompare(): Promise<void> {
   } else {
     console.log(`Stickers you can receive (${result.count}):`)
     console.log(result.missing.join(', '))
+  }
+}
+
+async function cmdExtras(): Promise<void> {
+  const result = await getExtras()
+  if (result.totalUnique === 0) {
+    console.log('No extra stickers (all owned in single copies).')
+  } else {
+    console.log(`Extra stickers (${result.totalUnique} codes, ${result.totalSurplus} surplus):`)
+    for (const item of result.items) {
+      console.log(`  ${item.code} x${item.qty} (surplus: ${item.surplus})`)
+    }
   }
 }
 
@@ -110,6 +106,9 @@ async function main(): Promise<void> {
     case 'compare':
       await cmdCompare()
       break
+    case 'extras':
+      await cmdExtras()
+      break
     default:
       printUsage()
       if (command && command !== '--help' && command !== '-h') {
@@ -118,7 +117,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  console.error('Unexpected error:', err instanceof Error ? err.message : String(err))
-  process.exit(1)
-})
+main()
+  .then(() => process.exit(0))
+  .catch((err) => {
+    console.error('Unexpected error:', err instanceof Error ? err.message : String(err))
+    process.exit(1)
+  })
