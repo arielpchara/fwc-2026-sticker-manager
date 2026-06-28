@@ -11,7 +11,8 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "mcp:install": "node scripts/install-mcp.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

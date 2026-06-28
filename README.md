@@ -62,32 +62,143 @@ Override the data directory:
 DATA_DIR=/custom/path sticker-trade own --list
 ```
 
-## MCP Server (Docker)
-
-Build the image:
-```bash
-docker build -t sticker-trade .
-```
-
-Add to your MCP client config (stdio transport):
-```json
-{
-  "mcpServers": {
-    "sticker-trade": {
-      "type": "local",
-      "command": ["docker", "run", "--rm", "-i", "-v", "sticker-data:/data", "sticker-trade"]
-    }
-  }
-}
-```
-
-### MCP Tools
+## MCP Tools
 
 | Tool | Description |
 |---|---|
 | `upload_own_stickers` | Parse text and save as your collection |
 | `get_own_stickers` | Return your current sticker list |
 | `compare_collection` | Return stickers the other person has that you don't |
+
+## Install as MCP Server
+
+The installer script builds the Docker image and registers the server with your chosen tool(s). All registrations are **user-global** (not project-scoped) so the server is available in every session.
+
+```bash
+# Build image + register with all supported tools
+npm run mcp:install -- all
+
+# Single tool
+npm run mcp:install -- opencode
+npm run mcp:install -- copilot
+npm run mcp:install -- vscode
+npm run mcp:install -- claude
+npm run mcp:install -- docker
+
+# Skip rebuild (image already built)
+npm run mcp:install -- all --skip-build
+
+# Remove registration
+npm run mcp:install -- all --remove
+
+# Custom image tag or server name
+npm run mcp:install -- all --image sticker-trade:v2 --name sticker-trade
+```
+
+### What gets configured per tool
+
+| Tool | Config location |
+|---|---|
+| **opencode** | `~/.config/opencode/opencode.json` → `mcp.sticker-trade` |
+| **GitHub Copilot CLI** | `~/.copilot/mcp-config.json` (or `$COPILOT_HOME`) → `mcpServers.sticker-trade` |
+| **VS Code** | User `mcp.json` (auto-detected by OS) → `servers.sticker-trade` |
+| **Claude Code** | `claude mcp add --scope user` |
+| **Docker MCP Toolkit** | Custom catalog + gateway (see below) |
+
+After running the installer, **restart your tool** to pick up the change.
+
+---
+
+## Docker MCP Toolkit
+
+The image is a valid stdio MCP server and works with Docker Desktop's [MCP Toolkit](https://docs.docker.com/ai/mcp-catalog-and-toolkit/) (Docker Desktop 4.62+).
+
+The installer's `docker` target automates the steps below.
+
+### Automatic setup via installer
+
+```bash
+npm run mcp:install -- docker
+```
+
+This builds the image, creates a custom catalog named `sticker-trade`, adds the server entry with `/data` volume persistence, and prints the gateway command.
+
+### Manual setup
+
+```bash
+# 1. Build the image
+docker build -t sticker-trade .
+
+# 2. Create a custom catalog and add the server entry
+docker mcp catalog create sticker-trade
+docker mcp catalog add sticker-trade sticker-trade ./docker-mcp/sticker-trade.catalog.yaml --force
+
+# 3. Start the Gateway
+docker mcp gateway run
+```
+
+### Connect a client to the Gateway
+
+Any MCP client (stdio):
+```json
+{
+  "servers": {
+    "MCP_DOCKER": {
+      "type": "stdio",
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"]
+    }
+  }
+}
+```
+
+Claude Desktop:
+```json
+{
+  "mcpServers": {
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"]
+    }
+  }
+}
+```
+
+### Data persistence
+
+The catalog entry (`docker-mcp/sticker-trade.catalog.yaml`) declares:
+```yaml
+volumes:
+  - "sticker-data:/data"
+```
+`own.json` and dated history snapshots persist in the `sticker-data` Docker volume across container restarts.
+
+### Profiles route (alternative, Docker Desktop 4.62+)
+
+If you prefer the newer Profiles UI instead of a custom catalog:
+```bash
+docker mcp profile server add <profile-name> --server file://./docker-mcp/sticker-trade.catalog.yaml
+docker mcp gateway run --profile <profile-name>
+```
+
+### Direct docker run (no Gateway)
+
+```bash
+docker build -t sticker-trade .
+docker run --rm -i -v sticker-data:/data sticker-trade
+```
+
+Then configure your client to run that command directly:
+```json
+{
+  "mcpServers": {
+    "sticker-trade": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "-v", "sticker-data:/data", "sticker-trade"]
+    }
+  }
+}
+```
 
 ## Development
 
@@ -114,6 +225,10 @@ src/
   cli/          index.ts                      (CLI adapter)
   mcp/          server.ts                     (MCP adapter)
   tests/        *.test.ts
+docker-mcp/
+  sticker-trade.catalog.yaml                  (Docker MCP Toolkit catalog entry)
+scripts/
+  install-mcp.mjs                             (MCP installer: all 5 tools + --remove)
 docs/
   plan.md       full implementation spec
 .opencode/
