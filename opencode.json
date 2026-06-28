@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "agent": {
+    "simple-runner": {
+      "mode": "subagent",
+      "description": "Cheap/free mechanical subagent for deterministic tasks: scaffolding tests, formatting commit messages, simple code generation. No model set — inherits main thread model (configure your free/cheap model there)."
+    },
+    "deep-worker": {
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-6",
+      "description": "Capable subagent for non-trivial logic: complex bug fixes, hard type errors, edge-case test design. Uses claude-sonnet-4-6."
+    }
+  }
+}

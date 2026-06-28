@@ -1,0 +1,27 @@
+{
+  "name": "figurinhas-da-copa-troca",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "sticker-trade": "./dist/cli.js"
+  },
+  "scripts": {
+    "dev:cli": "tsx watch src/cli/index.ts",
+    "dev:mcp": "tsx watch src/mcp/server.ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.25.64"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "tsup": "^8.3.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.3"
+  }
+}
