@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { setOwn, getOwn, compareWith, getExtras } from '../core/stickerService.js'
+import { setOwn, getOwn, compareWith, getExtras, addSurplus } from '../core/stickerService.js'
 import type { Repository } from '../core/stickerService.js'
 import type { OwnRecord } from '../storage/ownRepository.js'
 import type { Inventory } from '../domain/inventory.js'
@@ -121,6 +121,56 @@ describe('stickerService', () => {
       await setOwn('BRA1', repo)
       const result = await compareWith('BRA1 00', repo)
       expect(result.missing).toEqual(['00'])
+    })
+  })
+
+  describe('addSurplus', () => {
+    it('adds surplus to existing sticker', async () => {
+      await setOwn('RSA5', repo)
+      const result = await addSurplus('RSA5 (x1)', repo)
+      expect(result.updated).toEqual(['RSA5'])
+      expect(result.count).toBe(1)
+      expect(result.saved).toBe(true)
+      const record = await getOwn(repo)
+      expect(record.inv['RSA5']).toBe(2)
+    })
+
+    it('adds sticker not in collection yet', async () => {
+      const result = await addSurplus('RSA5 (x2)', repo)
+      expect(result.updated).toEqual(['RSA5'])
+      expect(result.saved).toBe(true)
+      const record = await getOwn(repo)
+      expect(record.inv['RSA5']).toBe(3)
+    })
+
+    it('updates multiple stickers', async () => {
+      await setOwn('RSA5', repo)
+      const result = await addSurplus('RSA5 (x1), RSA12 (x1)', repo)
+      expect(result.count).toBe(2)
+      expect(result.saved).toBe(true)
+      const record = await getOwn(repo)
+      expect(record.inv['RSA5']).toBe(2)
+      expect(record.inv['RSA12']).toBe(2)
+    })
+
+    it('is idempotent — same surplus returns saved=false', async () => {
+      await addSurplus('RSA5 (x1)', repo)
+      const result = await addSurplus('RSA5 (x1)', repo)
+      expect(result.count).toBe(0)
+      expect(result.saved).toBe(false)
+    })
+
+    it('does not affect codes not in surplus text', async () => {
+      await setOwn('RSA5 BRA1', repo)
+      await addSurplus('RSA5 (x1)', repo)
+      const record = await getOwn(repo)
+      expect(record.inv['BRA1']).toBe(1)
+    })
+
+    it('handles empty surplus text', async () => {
+      const result = await addSurplus('', repo)
+      expect(result.count).toBe(0)
+      expect(result.saved).toBe(false)
     })
   })
 

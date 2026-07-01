@@ -1,6 +1,6 @@
 import { parseArgs } from 'node:util'
 import { readFile } from 'node:fs/promises'
-import { setOwn, getOwn, compareWith, getExtras } from '../core/stickerService.js'
+import { setOwn, getOwn, compareWith, getExtras, addSurplus } from '../core/stickerService.js'
 import { codesOf } from '../domain/inventory.js'
 
 const [, , command, ...argv] = process.argv
@@ -15,6 +15,7 @@ function printUsage(): void {
 Usage:
   sticker-trade own --text "BRA1,BRA2" | --file list.txt | --list
   sticker-trade compare --text "BRA1,BRA3" | --file their.txt
+  sticker-trade surplus --text "RSA5 (x1)" | --file surplus.txt
   sticker-trade extras
 `.trim())
 }
@@ -86,6 +87,34 @@ async function cmdCompare(): Promise<void> {
   }
 }
 
+async function cmdSurplus(): Promise<void> {
+  const { values } = parseArgs({
+    args: argv,
+    options: {
+      text: { type: 'string' },
+      file: { type: 'string' },
+    },
+    strict: false,
+  })
+
+  const text = typeof values['text'] === 'string'
+    ? values['text']
+    : typeof values['file'] === 'string'
+      ? await readFile(values['file'], 'utf-8')
+      : die('Either --text or --file is required')
+  const result = await addSurplus(text)
+
+  if (result.count === 0) {
+    console.log('No surplus changes — collection unchanged.')
+  } else {
+    console.log(`Updated ${result.count} stickers with surplus:`)
+    for (const code of result.updated) {
+      const record = await getOwn()
+      console.log(`  ${code} x${record.inv[code]}`)
+    }
+  }
+}
+
 async function cmdExtras(): Promise<void> {
   const result = await getExtras()
   if (result.totalUnique === 0) {
@@ -105,6 +134,9 @@ async function main(): Promise<void> {
       break
     case 'compare':
       await cmdCompare()
+      break
+    case 'surplus':
+      await cmdSurplus()
       break
     case 'extras':
       await cmdExtras()

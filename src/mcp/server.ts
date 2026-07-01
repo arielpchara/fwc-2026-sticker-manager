@@ -1,7 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod'
-import { setOwn, getOwn, compareWith, getExtras } from '../core/stickerService.js'
+import { setOwn, getOwn, compareWith, getExtras, addSurplus } from '../core/stickerService.js'
 import { codesOf } from '../domain/inventory.js'
 
 const server = new McpServer({
@@ -68,6 +68,25 @@ server.tool(
             result.count === 0
               ? 'You already have everything the other person has.'
               : `Stickers you can receive (${result.count}): ${result.missing.join(', ')}`,
+        },
+      ],
+    }
+  },
+)
+
+server.tool(
+  'add_surplus',
+  'Parse surplus stickers from text (format: CODE (xN)) and update your collection. Each code gets 1 + N copies total.',
+  { text: z.string().describe('Free text containing surplus sticker codes in CODE (xN) format') },
+  async ({ text }) => {
+    const result = await addSurplus(text)
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result.count === 0
+            ? 'No surplus changes — collection unchanged.'
+            : `Updated ${result.count} stickers with surplus: ${result.updated.join(', ')}`,
         },
       ],
     }

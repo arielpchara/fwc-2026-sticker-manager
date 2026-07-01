@@ -12,6 +12,8 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "dev:web": "npm run dev --prefix web",
+    "build:web": "npm run build --prefix web",
     "test:watch": "vitest",
     "mcp:install": "node scripts/install-mcp.mjs"
   },

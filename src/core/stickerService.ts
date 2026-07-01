@@ -1,4 +1,5 @@
 import { parseText, parseInventory } from '../parser/textParser.js'
+import { parseSurplus } from '../parser/surplusParser.js'
 import { missing } from '../domain/collection.js'
 import { codesOf, totalCopies, extras, type Inventory, type ExtraItem } from '../domain/inventory.js'
 import { load, save, type OwnRecord } from '../storage/ownRepository.js'
@@ -18,6 +19,12 @@ export interface SetOwnResult {
 export interface CompareResult {
   missing: string[]
   count: number
+}
+
+export interface AddSurplusResult {
+  updated: string[]
+  count: number
+  saved: boolean
 }
 
 export interface ExtrasResult {
@@ -50,6 +57,26 @@ export async function compareWith(
   const theirs = parseText(theirText)
   const result = missing(codesOf(current.inv), theirs)
   return { missing: result, count: result.length }
+}
+
+export async function addSurplus(
+  text: string,
+  repo: Repository = defaultRepo,
+): Promise<AddSurplusResult> {
+  const current = await repo.load()
+  const surplus = parseSurplus(text)
+  const updated: string[] = []
+
+  for (const [code, surplusQty] of Object.entries(surplus)) {
+    const newTotal = 1 + surplusQty
+    if (current.inv[code] !== newTotal) {
+      updated.push(code)
+    }
+    current.inv[code] = newTotal
+  }
+
+  const saved = updated.length > 0 ? await repo.save(current.inv) : false
+  return { updated, count: updated.length, saved }
 }
 
 export async function getExtras(repo: Repository = defaultRepo): Promise<ExtrasResult> {

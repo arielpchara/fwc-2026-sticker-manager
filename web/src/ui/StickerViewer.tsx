@@ -1,0 +1,175 @@
+import { useState, useMemo } from 'react'
+import { useOwnStickers } from '../application/useStickers.js'
+import { flagOf, colorOf } from './flags.js'
+import { groupOf, type GroupInfo } from './groups.js'
+import Filter from './Filter.js'
+import StickerCounter from './StickerCounter.js'
+import SortStickers from './SortStickers.js'
+import type { SortMode } from './SortStickers.js'
+
+function prefixOf(code: string): string {
+  return code === '00' ? '00' : code.slice(0, 3)
+}
+
+function suffixNum(code: string): number {
+  return code === '00' ? 0 : parseInt(code.slice(3), 10)
+}
+
+function maxStickers(prefix: string): number {
+  if (prefix === '00') return 1
+  if (prefix === 'FWC') return 19
+  return 20
+}
+
+function StickerCard({ code, qty }: { code: string; qty: number }) {
+  const bg = colorOf(prefixOf(code))
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm font-bold text-xs text-white leading-tight"
+      style={{ backgroundColor: bg }}
+    >
+      <span>{code}</span>
+      <span className="bg-white/80 text-black text-[10px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full">{qty}</span>
+    </span>
+  )
+}
+
+function TeamAccordion({ prefix, items }: { prefix: string; items: [string, number][] }) {
+  const total = maxStickers(prefix)
+  const owned = items.length
+  const pct = owned / total
+  const barColor = pct >= 1 ? 'bg-green-500' : pct >= 0.8 ? 'bg-lime-500' : pct >= 0.6 ? 'bg-yellow-500' : pct >= 0.4 ? 'bg-amber-500' : pct >= 0.2 ? 'bg-orange-500' : 'bg-red-500'
+  return (
+    <details className="group border border-gray-200 rounded-lg overflow-hidden">
+      <summary className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 text-sm font-medium text-gray-700 list-none [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2">
+          <span className="text-base leading-none">{prefix === '00' ? '⭐' : flagOf(prefix)}</span>
+          <span>{prefix === '00' ? 'Special' : prefix}</span>
+        </span>
+        <span className="flex items-center gap-2">
+          {pct < 1 && (
+            <span className="h-1.5 bg-gray-200 rounded-full overflow-hidden w-15 shrink-0">
+              <span className={`block h-full rounded-full transition-all ${barColor}`} style={{ width: `${Math.min(pct * 100, 100)}%` }} />
+            </span>
+          )}
+          {pct >= 1 && <span className="w-15 shrink-0" />}
+          <StickerCounter owned={owned} total={total} />
+          <svg className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-180 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        </span>
+      </summary>
+      <div className="flex flex-wrap gap-2 p-3 border-t border-gray-100">
+        {items.map(([code, qty]) => (
+          <StickerCard key={code} code={code} qty={qty} />
+        ))}
+      </div>
+    </details>
+  )
+}
+
+interface GroupedTeams {
+  group: GroupInfo
+  teams: { prefix: string; items: [string, number][] }[]
+}
+
+export default function StickerViewer() {
+  const { inv, stickers } = useOwnStickers()
+  const [filter, setFilter] = useState('')
+  const [sortMode, setSortMode] = useState<SortMode>('group')
+
+  const q = filter.trim().toUpperCase()
+
+  const byPrefix = useMemo(() => {
+    const map = new Map<string, [string, number][]>()
+    for (const code of stickers) {
+      if (q && !code.includes(q)) continue
+      const key = prefixOf(code)
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push([code, inv[code]])
+    }
+    for (const [, items] of map) {
+      items.sort(([a], [b]) => suffixNum(a) - suffixNum(b))
+    }
+    return map
+  }, [stickers, inv, q])
+
+  const grouped = useMemo(() => {
+    const teamEntries = [...byPrefix.entries()]
+    teamEntries.sort(([a], [b]) => a.localeCompare(b))
+
+    const groupMap = new Map<number, GroupedTeams>()
+    for (const [prefix, items] of teamEntries) {
+      const g = groupOf(prefix)
+      if (!groupMap.has(g.order)) {
+        groupMap.set(g.order, { group: g, teams: [] })
+      }
+      groupMap.get(g.order)!.teams.push({ prefix, items })
+    }
+
+    return [...groupMap.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([, v]) => v)
+  }, [byPrefix])
+
+  const flatTeams = useMemo(() => {
+    const entries = [...byPrefix.entries()]
+    entries.sort(([aPrefix, aItems], [bPrefix, bItems]) => {
+      const aTotal = maxStickers(aPrefix)
+      const bTotal = maxStickers(bPrefix)
+      const aMissing = aTotal - aItems.length
+      const bMissing = bTotal - bItems.length
+      const aDone = aMissing === 0 ? 1 : 0
+      const bDone = bMissing === 0 ? 1 : 0
+      if (aDone !== bDone) return aDone - bDone
+      return aMissing - bMissing
+    })
+    return entries
+  }, [byPrefix])
+
+  const hasAny = sortMode === 'completion' ? flatTeams.length > 0 : grouped.some((g) => g.teams.length > 0)
+
+  if (!hasAny) {
+    return (
+      <div>
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex-1"><Filter value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
+          <SortStickers value={sortMode} onChange={setSortMode} />
+        </div>
+        <p className="text-xs text-gray-400 text-center">No stickers match the filter.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="flex-1"><Filter value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
+        <SortStickers value={sortMode} onChange={setSortMode} />
+      </div>
+
+      <div className="space-y-4">
+        {sortMode === 'completion' ? (
+          <div className="space-y-2">
+            {flatTeams.map(([prefix, items]) => (
+              <TeamAccordion key={prefix} prefix={prefix} items={items} />
+            ))}
+          </div>
+        ) : (
+          grouped.map(({ group, teams }) =>
+            teams.length === 0 ? null : (
+              <div key={group.order}>
+                <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                  {group.label}
+                </h3>
+                <div className="space-y-2">
+                  {teams.map(({ prefix, items }) => (
+                    <TeamAccordion key={prefix} prefix={prefix} items={items} />
+                  ))}
+                </div>
+              </div>
+            ),
+          )
+        )}
+      </div>
+    </div>
+  )
+}
