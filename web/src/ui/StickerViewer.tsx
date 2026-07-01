@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useOwnStickers } from '../application/useStickers.js'
+import { useLocale } from '../i18n/index.js'
 import { flagOf, colorOf } from './flags.js'
 import { groupOf, type GroupInfo } from './groups.js'
 import Filter from './Filter.js'
@@ -35,6 +36,7 @@ function StickerCard({ code, qty }: { code: string; qty: number }) {
 }
 
 function TeamAccordion({ prefix, items }: { prefix: string; items: [string, number][] }) {
+  const { t } = useLocale()
   const total = maxStickers(prefix)
   const owned = items.length
   const pct = owned / total
@@ -44,7 +46,7 @@ function TeamAccordion({ prefix, items }: { prefix: string; items: [string, numb
       <summary className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 text-sm font-medium text-gray-700 list-none [&::-webkit-details-marker]:hidden">
         <span className="flex items-center gap-2">
           <span className="text-base leading-none">{prefix === '00' ? '⭐' : flagOf(prefix)}</span>
-          <span>{prefix === '00' ? 'Special' : prefix}</span>
+          <span>{prefix === '00' ? t('specialLabel') : prefix}</span>
         </span>
         <span className="flex items-center gap-2">
           {pct < 1 && (
@@ -72,6 +74,7 @@ interface GroupedTeams {
 }
 
 export default function StickerViewer() {
+  const { t } = useLocale()
   const { inv, stickers } = useOwnStickers()
   const [filter, setFilter] = useState('')
   const [sortMode, setSortMode] = useState<SortMode>('group')
@@ -134,7 +137,7 @@ export default function StickerViewer() {
           <div className="flex-1"><Filter value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
           <SortStickers value={sortMode} onChange={setSortMode} />
         </div>
-        <p className="text-xs text-gray-400 text-center">No stickers match the filter.</p>
+        <p className="text-xs text-gray-400 text-center">{t('noMatch')}</p>
       </div>
     )
   }

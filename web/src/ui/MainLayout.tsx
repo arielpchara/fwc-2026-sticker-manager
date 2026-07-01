@@ -2,10 +2,10 @@ import type { ReactNode } from 'react'
 import Header from './Header.js'
 import Footer from './Footer.js'
 
-export default function MainLayout({ children, onOwnClick, onSurplusClick }: { children: ReactNode; onOwnClick?: () => void; onSurplusClick?: () => void }) {
+export default function MainLayout({ children, onOwnClick, onSurplusClick, onCompareClick }: { children: ReactNode; onOwnClick?: () => void; onSurplusClick?: () => void; onCompareClick?: () => void }) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header onOwnClick={onOwnClick} onSurplusClick={onSurplusClick} />
+      <Header onOwnClick={onOwnClick} onSurplusClick={onSurplusClick} onCompareClick={onCompareClick} />
       {children}
       <Footer />
     </div>

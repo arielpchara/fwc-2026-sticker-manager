@@ -1,0 +1,32 @@
+const en = {
+  appTitle: 'Cup 2026 — Sticker Trade',
+  btnOwn: 'Own',
+  btnExtras: 'Extras',
+  btnCompare: 'Compare',
+  dialogOwn: 'Own Stickers',
+  dialogExtras: 'Extras',
+  dialogCompare: 'Compare Collection',
+  description: 'Manage your FIFA World Cup 2026 sticker collection. Add your own stickers or extras, then compare with friends.',
+  filterPlaceholder: 'Filter stickers …',
+  sortGroup: 'Group A→L',
+  sortCompletion: 'By completion',
+  specialLabel: 'Special',
+  noMatch: 'No stickers match the filter.',
+  ownPlaceholder: 'BRA1, BRA2, ARG1, FWC3, 00 …',
+  extrasPlaceholder: 'RSA5 (x1), RSA12 (x1) …',
+  comparePlaceholder: 'BRA1, BRA2, ARG1, FWC3 …',
+  saveBtn: 'Save',
+  addExtrasBtn: 'Add Extras',
+  compareBtn: 'Compare',
+  copyBtn: 'Copy',
+  viewAll: 'View all ({n})',
+  viewInventory: 'View inventory',
+  parseFeedback: 'Parse: {n} codes — {list}',
+  parseMore: '… +{n} more',
+  compareAllOwned: 'You already have all these stickers!',
+  compareCanReceive: 'You can receive {n} sticker(s):',
+  specialGroupLabel: 'Special',
+}
+
+export default en
+export type Translations = typeof en

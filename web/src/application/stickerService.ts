@@ -38,5 +38,11 @@ export function computeExtras(inv: Inventory): ExtraItem[] {
   return extras(inv)
 }
 
+export function compareWith(theirText: string, myInv: Inventory): { missing: string[]; count: number } {
+  const theirs = parseText(theirText)
+  const missing = theirs.filter((code) => !myInv[code])
+  return { missing, count: missing.length }
+}
+
 export { codesOf, totalCopies, parseText }
 export type { Inventory, ExtraItem }

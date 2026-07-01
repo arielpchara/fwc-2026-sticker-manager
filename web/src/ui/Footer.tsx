@@ -1,7 +1,10 @@
+import { useLocale } from '../i18n/index.js'
+
 export default function Footer() {
+  const { t } = useLocale()
   return (
-    <footer className="border-t border-gray-200 px-6 py-4 text-center text-xs text-gray-400">
-      Cup 2026 — Sticker Trade
+    <footer className="text-center text-xs text-gray-400 py-4 border-t border-gray-200">
+      {t('appTitle')}
     </footer>
   )
 }

@@ -1,9 +1,6 @@
-export type SortMode = 'group' | 'completion'
+import { useLocale } from '../i18n/index.js'
 
-const SORTS: { value: SortMode; label: string }[] = [
-  { value: 'group', label: 'Group A→L' },
-  { value: 'completion', label: 'By completion' },
-]
+export type SortMode = 'group' | 'completion'
 
 export default function SortStickers({
   value,
@@ -12,9 +9,14 @@ export default function SortStickers({
   value: SortMode
   onChange: (mode: SortMode) => void
 }) {
+  const { t } = useLocale()
+  const sorts: { value: SortMode; label: string }[] = [
+    { value: 'group', label: t('sortGroup') },
+    { value: 'completion', label: t('sortCompletion') },
+  ]
   return (
     <div className="flex flex-wrap gap-1.5">
-      {SORTS.map((s) => (
+      {sorts.map((s) => (
         <button
           key={s.value}
           onClick={() => onChange(s.value)}
