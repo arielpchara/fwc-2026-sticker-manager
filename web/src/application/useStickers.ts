@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '../storage/hooks.js'
 import { setOwn, addSurplus } from '../storage/stickerSlice.js'
+import { upsertEntry, removeEntry, type CompareEntry } from '../storage/compareSlice.js'
 import { parseOwnText, parseSurplusText, computeExtras } from './stickerService.js'
 
 export function useOwnStickers() {
@@ -32,4 +33,25 @@ export function useSurplusStickers() {
   )
 
   return { addSurplusText }
+}
+
+export function useCompareHistory() {
+  const entries = useAppSelector((s) => s.compare?.entries ?? [])
+  const dispatch = useAppDispatch()
+
+  const saveEntry = useCallback(
+    (entry: CompareEntry) => {
+      dispatch(upsertEntry(entry))
+    },
+    [dispatch],
+  )
+
+  const deleteEntry = useCallback(
+    (id: string) => {
+      dispatch(removeEntry(id))
+    },
+    [dispatch],
+  )
+
+  return { entries, saveEntry, deleteEntry }
 }

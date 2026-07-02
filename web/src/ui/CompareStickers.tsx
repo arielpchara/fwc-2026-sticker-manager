@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react'
-import { useOwnStickers } from '../application/useStickers.js'
+import { useOwnStickers, useCompareHistory } from '../application/useStickers.js'
 import { compareWith } from '../application/stickerService.js'
 import { flagOf, colorOf } from './flags.js'
 import { groupOf } from './groups.js'
 import { useLocale } from '../i18n/index.js'
+import type { CompareEntry } from '../storage/compareSlice.js'
+import CompareHistory from './CompareHistory.js'
 
 function prefixOf(code: string) {
   return code === '00' ? '00' : code.slice(0, 3)
@@ -11,35 +13,64 @@ function prefixOf(code: string) {
 
 export default function CompareStickers() {
   const { t } = useLocale()
-  const { inv } = useOwnStickers()
+  const { inv, extras } = useOwnStickers()
+  const { entries, saveEntry, deleteEntry } = useCompareHistory()
   const [text, setText] = useState('')
+  const [label, setLabel] = useState('')
   const [result, setResult] = useState<{ missing: string[]; count: number } | null>(null)
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!text.trim()) return
-    setResult(compareWith(text, inv))
+    const r = compareWith(text, inv)
+    setResult(r)
+    saveEntry({
+      label: label || t('historyUnnamed'),
+      theirText: text,
+      savedAt: Date.now(),
+      missing: r.missing,
+    })
+  }
+
+  function handleReopen(entry: CompareEntry) {
+    setLabel(entry.label)
+    setText(entry.theirText)
+    const r = compareWith(entry.theirText, inv)
+    setResult(r)
   }
 
   const handleCopy = useCallback(() => {
     if (!result) return
-    const grouped = groupMissing(result.missing)
-    const lines = grouped.map(({ prefix, codes }) => {
+    const want = groupMissing(result.missing).map(({ prefix, codes }) => {
       const icon = prefix === '00' ? '⭐' : flagOf(prefix) || prefix
-      const label = prefix === '00' ? t('specialGroupLabel') : prefix
       const list = codes.sort().join(', ')
-      return `${icon} ${label} (${codes.length}): ${list}`
+      return `${icon} ${list}`
     })
+    const lines: string[] = [`${t('copyWantTitle')} (${result!.count})`, ...want, '']
+    if (extras.length > 0) {
+      const groupedExtras = groupExtra(extras).filter((p) => groupOf(p.prefix).order >= 0)
+      const haveTotal = groupedExtras.reduce((sum, g) => sum + g.items.length, 0)
+      const have = groupedExtras.map(({ prefix, items }) => {
+        const list = items.map((i) => i.code).sort().join(', ')
+        return `${flagOf(prefix)} ${list}`
+      })
+      lines.push(`${t('copyHaveTitle')} (${haveTotal})`, ...have)
+    }
     navigator.clipboard.writeText(lines.join('\n'))
-  }, [result, t])
+  }, [result, t, extras])
 
-  const grouped = result
-    ? groupMissing(result.missing)
-    : null
+  const grouped = result ? groupMissing(result.missing) : null
 
   return (
     <div className="space-y-3">
       <form onSubmit={handleSubmit} className="space-y-2">
+        <input
+          type="text"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          placeholder={t('historyLabelPlaceholder')}
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -95,8 +126,32 @@ export default function CompareStickers() {
           )}
         </div>
       )}
+
+      <hr className="border-gray-200" />
+
+      <CompareHistory
+        entries={entries}
+        onReopen={handleReopen}
+        onDelete={deleteEntry}
+      />
     </div>
   )
+}
+
+function groupExtra(items: { code: string; qty: number; surplus: number }[]): { prefix: string; items: { code: string; qty: number; surplus: number }[] }[] {
+  const map = new Map<string, typeof items>()
+  const order = new Map<string, number>()
+  for (const item of items) {
+    const p = prefixOf(item.code)
+    if (!map.has(p)) {
+      map.set(p, [])
+      order.set(p, p === '00' ? -1 : groupOf(p).order)
+    }
+    map.get(p)!.push(item)
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
+    .map(([prefix, items]) => ({ prefix, items }))
 }
 
 function groupMissing(missing: string[]): { prefix: string; codes: string[] }[] {

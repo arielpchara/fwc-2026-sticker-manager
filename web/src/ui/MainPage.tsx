@@ -2,6 +2,7 @@ import { useState } from 'react'
 import MainLayout from './MainLayout.js'
 import Body from './Body.js'
 import Description from './Description.js'
+import Tutorial from './Tutorial.js'
 import StickerViewer from './StickerViewer.js'
 import Modal from './Modal.js'
 import { AddOwnStickers, AddSurplusStickers } from './AddStickers/index.js'
@@ -18,6 +19,7 @@ export default function MainPage() {
     <MainLayout onOwnClick={() => setMode('own')} onSurplusClick={() => setMode('surplus')} onCompareClick={() => setMode('compare')}>
       <Body>
         <Description />
+        <Tutorial />
         <StickerViewer />
       </Body>
 

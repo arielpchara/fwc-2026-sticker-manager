@@ -2,14 +2,21 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import stickerReducer from './stickerSlice.js'
+import compareReducer from './compareSlice.js'
 
-const persistConfig = {
+const stickerPersistConfig = {
   key: 'sticker-trade',
   storage,
 }
 
+const comparePersistConfig = {
+  key: 'sticker-trade-compare',
+  storage,
+}
+
 const rootReducer = combineReducers({
-  sticker: persistReducer(persistConfig, stickerReducer),
+  sticker: persistReducer(stickerPersistConfig, stickerReducer),
+  compare: persistReducer(comparePersistConfig, compareReducer),
 })
 
 export const store = configureStore({
