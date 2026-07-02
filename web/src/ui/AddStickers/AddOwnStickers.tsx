@@ -3,9 +3,11 @@ import { useOwnStickers } from '../../application/useStickers.js'
 import { parseOwnText } from '../../application/stickerService.js'
 import { useLocale } from '../../i18n/index.js'
 
+type Action = 'update' | 'add' | 'remove'
+
 export default function AddOwnStickers() {
   const { t } = useLocale()
-  const { addOwn, stickers, inv } = useOwnStickers()
+  const { updateOwn, addStickers, removeStickers, stickers, inv } = useOwnStickers()
   const [text, setText] = useState('')
   const [preview, setPreview] = useState<{ count: number; stickers: string[] } | null>(null)
 
@@ -14,9 +16,10 @@ export default function AddOwnStickers() {
     setPreview(result.count > 0 ? result : null)
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const result = addOwn(text)
+  function handleAction(action: Action) {
+    if (!text.trim()) return
+    const fn = action === 'update' ? updateOwn : action === 'add' ? addStickers : removeStickers
+    const result = fn(text)
     if (result.count > 0) {
       setText('')
       setPreview(null)
@@ -25,7 +28,7 @@ export default function AddOwnStickers() {
 
   return (
     <div className="space-y-3">
-      <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="space-y-2">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -44,14 +47,28 @@ export default function AddOwnStickers() {
 
         <div className="flex gap-2">
           <button
-            type="submit"
+            onClick={() => handleAction('update')}
             disabled={!text.trim()}
             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
           >
-            {t('saveBtn')}
+            {t('updateBtn')}
+          </button>
+          <button
+            onClick={() => handleAction('add')}
+            disabled={!text.trim()}
+            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+          >
+            {t('addBtn')}
+          </button>
+          <button
+            onClick={() => handleAction('remove')}
+            disabled={!text.trim()}
+            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+          >
+            {t('removeBtn')}
           </button>
         </div>
-      </form>
+      </div>
 
       {stickers.length > 0 && (
         <details className="text-xs text-gray-500">

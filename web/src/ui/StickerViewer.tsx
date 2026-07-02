@@ -78,6 +78,7 @@ export default function StickerViewer() {
   const { inv, stickers } = useOwnStickers()
   const [filter, setFilter] = useState('')
   const [sortMode, setSortMode] = useState<SortMode>('group')
+  const [extrasOnly, setExtrasOnly] = useState(false)
 
   const q = filter.trim().toUpperCase()
 
@@ -85,6 +86,7 @@ export default function StickerViewer() {
     const map = new Map<string, [string, number][]>()
     for (const code of stickers) {
       if (q && !code.includes(q)) continue
+      if (extrasOnly && inv[code] < 2) continue
       const key = prefixOf(code)
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push([code, inv[code]])
@@ -93,7 +95,7 @@ export default function StickerViewer() {
       items.sort(([a], [b]) => suffixNum(a) - suffixNum(b))
     }
     return map
-  }, [stickers, inv, q])
+  }, [stickers, inv, q, extrasOnly])
 
   const grouped = useMemo(() => {
     const teamEntries = [...byPrefix.entries()]
@@ -135,7 +137,19 @@ export default function StickerViewer() {
       <div>
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="flex-1"><Filter value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
-          <SortStickers value={sortMode} onChange={setSortMode} />
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setExtrasOnly((v) => !v)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
+                extrasOnly
+                  ? 'bg-orange-600 text-white border-orange-600'
+                  : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {t('extrasFilter')}
+            </button>
+            <SortStickers value={sortMode} onChange={setSortMode} />
+          </div>
         </div>
         <p className="text-xs text-gray-400 text-center">{t('noMatch')}</p>
       </div>
@@ -146,7 +160,19 @@ export default function StickerViewer() {
     <div>
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="flex-1"><Filter value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
-        <SortStickers value={sortMode} onChange={setSortMode} />
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setExtrasOnly((v) => !v)}
+            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
+              extrasOnly
+                ? 'bg-orange-600 text-white border-orange-600'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+            }`}
+          >
+            {t('extrasFilter')}
+          </button>
+          <SortStickers value={sortMode} onChange={setSortMode} />
+        </div>
       </div>
 
       <div className="space-y-4">

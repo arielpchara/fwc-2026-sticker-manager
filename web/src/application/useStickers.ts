@@ -1,23 +1,44 @@
 import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '../storage/hooks.js'
-import { setOwn, addSurplus } from '../storage/stickerSlice.js'
+import { setOwn, mergeOwn, removeOwn, addSurplus } from '../storage/stickerSlice.js'
 import { upsertEntry, removeEntry, type CompareEntry } from '../storage/compareSlice.js'
-import { parseOwnText, parseSurplusText, computeExtras } from './stickerService.js'
+import { parseOwnText, parseSurplusText, computeExtras, parseText } from './stickerService.js'
+import type { Inventory } from './stickerService.js'
 
 export function useOwnStickers() {
   const inv = useAppSelector((s) => s.sticker.inv)
   const dispatch = useAppDispatch()
 
-  const addOwn = useCallback(
+  const updateOwn = useCallback(
     (text: string) => {
-      const result = parseOwnText(text)
-      dispatch(setOwn(result.inv))
-      return result
+      const codes = parseText(text)
+      const newInv: Inventory = {}
+      for (const c of codes) newInv[c] = 1
+      dispatch(setOwn(newInv))
+      return { count: codes.length, stickers: codes, inv: newInv }
     },
     [dispatch],
   )
 
-  return { inv, addOwn, stickers: Object.keys(inv).sort(), extras: computeExtras(inv) }
+  const addStickers = useCallback(
+    (text: string) => {
+      const codes = parseText(text)
+      dispatch(mergeOwn(codes))
+      return { count: codes.length, stickers: codes }
+    },
+    [dispatch],
+  )
+
+  const removeStickers = useCallback(
+    (text: string) => {
+      const codes = parseText(text)
+      dispatch(removeOwn(codes))
+      return { count: codes.length, stickers: codes }
+    },
+    [dispatch],
+  )
+
+  return { inv, updateOwn, addStickers, removeStickers, stickers: Object.keys(inv).sort(), extras: computeExtras(inv) }
 }
 
 export function useSurplusStickers() {
