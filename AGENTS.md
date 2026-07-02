@@ -6,7 +6,7 @@ Agent guidance for working inside this project. Loaded automatically via `openco
 
 ```
 cli/index.ts  ──┐
-                ├──▶  core/stickerService.ts  ──▶  storage/ownRepository.ts
+                 ├──▶  core/stickerService.ts  ──▶  storage/ownRepository.ts
 mcp/server.ts ──┘              │
                                └──▶  parser/textParser.ts
                                            │
@@ -34,6 +34,21 @@ All input is normalized to uppercase before validation. Unknown tokens in parsed
 - Data directory from `DATA_DIR` env var (default `/data` in container, `./data` locally).
 - **Never** import `fs` or `path` in `domain/` or `core/stickerService.ts` — those layers are IO-free.
 
+## Web App (separate package)
+
+- Located in `web/` with its own `package.json`.
+- React 19 + TypeScript + Vite 6 + Tailwind CSS v4 + Redux Toolkit + redux-persist.
+- ESM-only. Uses shared parsers from `../../src/parser/` (no Node.js deps).
+- Build commands in `web/`:
+  ```bash
+  npm run dev        # vite dev server
+  npm run build      # vite build
+  npm run typecheck  # tsc --noEmit
+  ```
+- i18n at `web/src/i18n/` with `en` and `pt` locales. Use `useLocale()` hook for all user-visible strings.
+- Redux store persisted to localStorage via `redux-persist`. Changes to slices require `storage/store.ts` updates for new persist configs.
+- Compare history stored in `compareSlice.ts`, cap at 10 entries.
+
 ## Persistence Rules
 
 - Hash = `sha256(JSON.stringify(sortedUniqueStickers))`.
@@ -50,7 +65,7 @@ npm run dev:cli       # tsx watch src/cli/index.ts
 npm run dev:mcp       # tsx watch src/mcp/server.ts
 ```
 
-Always run `npm run typecheck && npm test` after any source change.
+Always run `npm run typecheck` (both root and `web/`) after any source change.
 
 ## LLM-Agnostic Boundary
 
@@ -63,6 +78,7 @@ The tool code (`src/`) contains **zero** LLM/AI SDK references beyond `@modelcon
 | `unit-test` | "write/update tests", after src change | `simple-runner` per module (parallel), escalate to `deep-worker` | Generate vitest `*.test.ts` specs |
 | `builder` | "build the project", after code change | `simple-runner` (or `deep-worker` for hard errors) | `typecheck` + `tsup` build, delegate fix on error |
 | `git-commit` | "commit" | `simple-runner` | Conventional commit: `feat\|fix\|chore: subject` |
+| `commit` | After a plan and build | `simple-runner` | Commit changes after planning and building |
 
 ### Subagents
 
@@ -91,3 +107,5 @@ Three MCP tools exposed by `src/mcp/server.ts`:
 - Do not hardcode data paths — always use `DATA_DIR` env var.
 - Do not commit `dist/`, `node_modules/`, or `data/`.
 - Do not introduce new runtime dependencies without updating `Dockerfile`.
+- Do not use dashes (`—`) in user-facing text.
+- Do not add comments to code unless explicitly asked.
