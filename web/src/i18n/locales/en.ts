@@ -51,7 +51,7 @@ const en = {
   historyToday: 'today',
   historyYesterday: 'yesterday',
   historyDaysAgo: '{n} days ago',
-  albumProgress: 'Album: {owned} of {total}, extras {extras}',
+  albumProgress: 'Album: {owned} of {total}, extras {extras}, missing {missing}',
   tradeWith: 'Trade with {name}',
   tradeChroma: 'Chrome',
   tradeRegular: 'Regular',

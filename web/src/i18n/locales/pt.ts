@@ -53,7 +53,7 @@ const pt: Translations = {
   historyToday: 'hoje',
   historyYesterday: 'ontem',
   historyDaysAgo: 'há {n} dias',
-  albumProgress: 'Álbum: {owned} de {total}, repetidas {extras}',
+  albumProgress: 'Álbum: {owned} de {total}, repetidas {extras}, faltando {missing}',
   tradeWith: 'Trocar com {name}',
   tradeChroma: 'Cromo',
   tradeRegular: 'Regular',
