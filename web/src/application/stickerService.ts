@@ -1,6 +1,6 @@
 import { parseInventory, parseText } from '../../../src/parser/textParser.js'
 import { parseSurplus } from '../../../src/parser/surplusParser.js'
-import { codesOf, totalCopies, extras, type Inventory } from '../../../src/domain/inventory.js'
+import { codesOf, totalCopies, extras, type Inventory, totalSurplus } from '../../../src/domain/inventory.js'
 import type { ExtraItem } from '../../../src/domain/inventory.js'
 
 export interface ParseOwnResult {
@@ -36,6 +36,10 @@ export function parseSurplusText(text: string): ParseSurplusResult {
 
 export function computeExtras(inv: Inventory): ExtraItem[] {
   return extras(inv)
+}
+
+export function totalExtras(inv: Inventory): number {
+  return totalSurplus(inv)
 }
 
 export function compareWith(theirText: string, myInv: Inventory): { missing: string[]; count: number } {

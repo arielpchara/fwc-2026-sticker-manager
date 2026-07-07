@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../storage/hooks.js'
 import { setOwn, mergeOwn, removeOwn, addSurplus } from '../storage/stickerSlice.js'
 import { upsertEntry, removeEntry } from '../storage/compareSlice.js'
 import { deleteTrade, setTrade } from '../storage/tradeSlice.js'
-import { parseOwnText, parseSurplusText, computeExtras, parseText } from './stickerService.js'
+import { parseOwnText, parseSurplusText, computeExtras, parseText, totalExtras } from './stickerService.js'
 import type { Inventory } from './stickerService.js'
 import { CompareEntry } from '../type/compare.js'
 import type { TradeBy, Trade } from '../type/trade.js'
@@ -41,7 +41,7 @@ export function useOwnStickers() {
     [dispatch],
   )
 
-  return { inv, updateOwn, addStickers, removeStickers, stickers: Object.keys(inv).sort(), extras: computeExtras(inv) }
+  return { inv, updateOwn, addStickers, removeStickers, stickers: Object.keys(inv).sort(), extras: computeExtras(inv), totalExtras: totalExtras(inv)  }
 }
 
 export function useSurplusStickers() {
