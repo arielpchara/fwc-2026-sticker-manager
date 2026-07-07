@@ -7,7 +7,7 @@ import Tutorial from '../common/Tutorial.js'
 import StickerViewer from '../own/StickerViewer.js'
 import StickerMatrix from '../own/StickerMatrix.js'
 import { useOwnStickers } from '../../application/useStickers.js'
-import { TOTAL_STICKERS } from '../data/stickers.js'
+import { TOTAL_STICKERS } from '../../data/stickers.js'
 import ModalManager from '../common/ModalManager.js'
 
 export default function MainPage() {

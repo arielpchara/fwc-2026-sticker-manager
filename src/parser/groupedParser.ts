@@ -4,7 +4,7 @@ import type { Inventory } from '../domain/inventory.js'
 export const GROUPED_LINE_RE = /^\s*([A-Z]{3})(?![A-Z])[^:\n]*:\s*.+$/gm
 const LINE_RE = /^\s*([A-Z]{3})(?![A-Z])[^:\n]*:\s*(.+)$/gm
 
-const ITEM_RE = /^(\d{1,2})(?:\s*[xX]\s*(\d+))?$/
+const ITEM_RE = /^(\d{1,2})(?:\s*[xX]\s*(\d+)|\(\s*(\d+)\s*[xX]\s*\))?$/
 
 export function parseGrouped(text: string): Inventory {
   const inv: Inventory = {}
@@ -27,7 +27,9 @@ export function parseGrouped(text: string): Inventory {
 
       if (parseCode(code) === null) continue
 
-      const qty = itemMatch[2] !== undefined ? parseInt(itemMatch[2], 10) : 1
+      const qty = itemMatch[2] !== undefined ? parseInt(itemMatch[2], 10)
+        : itemMatch[3] !== undefined ? parseInt(itemMatch[3], 10)
+        : 1
       if (qty < 1) continue
 
       inv[code] = (inv[code] ?? 0) + qty

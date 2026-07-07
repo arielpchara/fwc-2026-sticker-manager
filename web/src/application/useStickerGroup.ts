@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { groupOf } from '../ui/data/groups.js'
+import { groupOf } from '../data/groups.js'
 
 export interface StickerGroup {
   prefix: string

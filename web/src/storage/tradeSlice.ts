@@ -1,40 +1,27 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { Trade, TradeBy, TradeState } from '../type/trade'
 
-export interface TradeEntry {
-  label: string
-  giveItems: string[]
-  receiveItems: string[]
-  savedAt: number
+
+interface UpdateTradePayload {
+  key: string
+  trades: TradeBy[]
 }
-
-export interface TradeState {
-  entries: TradeEntry[]
-}
-
-const MAX_ENTRIES = 10
 
 const tradeSlice = createSlice({
   name: 'trade',
-  initialState: { entries: [] } as TradeState,
+  initialState: { trades: {} } as TradeState,
   reducers: {
-    upsertTrade(state, action: PayloadAction<TradeEntry>) {
-      const idx = state.entries.findIndex(e => e.label === action.payload.label)
-      if (idx !== -1) {
-        state.entries[idx] = action.payload
-      } else {
-        state.entries.push(action.payload)
-      }
-      if (state.entries.length > MAX_ENTRIES) {
-        state.entries = [...state.entries]
-          .sort((a, b) => b.savedAt - a.savedAt)
-          .slice(0, MAX_ENTRIES)
-      }
+    updateTrade(state, action: PayloadAction<TradeBy>) {},
+    setTrade(state, action: PayloadAction<Trade>) {
+      state.trades[action.payload.name] = action.payload
     },
-    removeTrade(state, action: PayloadAction<string>) {
-      state.entries = state.entries.filter(e => e.label !== action.payload)
+    deleteTrade(state, action: PayloadAction<string>) {
+      state.trades = Object.fromEntries(
+        Object.entries(state.trades).filter(([name]) => name !== action.payload),
+      )
     },
   },
 })
 
-export const { upsertTrade, removeTrade } = tradeSlice.actions
+export const { setTrade, deleteTrade } = tradeSlice.actions
 export default tradeSlice.reducer

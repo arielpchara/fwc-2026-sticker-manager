@@ -1,10 +1,12 @@
 import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '../storage/hooks.js'
 import { setOwn, mergeOwn, removeOwn, addSurplus } from '../storage/stickerSlice.js'
-import { upsertEntry, removeEntry, type CompareEntry } from '../storage/compareSlice.js'
-import { upsertTrade, removeTrade, type TradeEntry } from '../storage/tradeSlice.js'
+import { upsertEntry, removeEntry } from '../storage/compareSlice.js'
+import { deleteTrade, setTrade } from '../storage/tradeSlice.js'
 import { parseOwnText, parseSurplusText, computeExtras, parseText } from './stickerService.js'
 import type { Inventory } from './stickerService.js'
+import { CompareEntry } from '../type/compare.js'
+import type { TradeBy, Trade } from '../type/trade.js'
 
 export function useOwnStickers() {
   const inv = useAppSelector((s) => s.sticker.inv)
@@ -57,8 +59,24 @@ export function useSurplusStickers() {
   return { addSurplusText }
 }
 
+export function useTrade() {
+  const trades = useAppSelector((s) => s.trade.trades)
+  const dispatch = useAppDispatch()
+
+  const saveTrade = useCallback((name: string, tradesData: TradeBy[], isLock: boolean) => {
+    const trade: Trade = { name, trades: tradesData, savedAt: new Date(), isLock }
+    dispatch(setTrade(trade))
+  }, [dispatch])
+
+  const removeTrade = useCallback((name: string) => {
+    dispatch(deleteTrade(name))
+  }, [dispatch])
+
+  return { trades, saveTrade, removeTrade }
+}
+
 export function useCompareHistory() {
-  const entries = useAppSelector((s) => s.compare?.entries ?? [])
+  const entries = useAppSelector((s) => s.compare?.entries ?? {})
   const dispatch = useAppDispatch()
 
   const saveEntry = useCallback(
@@ -76,25 +94,4 @@ export function useCompareHistory() {
   )
 
   return { entries, saveEntry, deleteEntry }
-}
-
-export function useTradeHistory() {
-  const entries = useAppSelector((s) => s.trade?.entries ?? [])
-  const dispatch = useAppDispatch()
-
-  const saveTrade = useCallback(
-    (entry: TradeEntry) => {
-      dispatch(upsertTrade(entry))
-    },
-    [dispatch],
-  )
-
-  const deleteTrade = useCallback(
-    (label: string) => {
-      dispatch(removeTrade(label))
-    },
-    [dispatch],
-  )
-
-  return { entries, saveTrade, deleteTrade }
 }

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useOwnStickers, useCompareHistory } from '../../application/useStickers.js'
 import { compareWith, canGive } from '../../application/stickerService.js'
 import { useLocale } from '../../i18n/index.js'
-import type { CompareEntry } from '../../storage/compareSlice.js'
+import type { CompareEntry } from '../../type/compare.js'
 import CompareResult from './CompareResult.js'
 import CompareHistory from './CompareHistory.js'
 
@@ -24,20 +24,20 @@ export default function CompareStickers() {
       const r = compareWith(text, inv)
       setResult({ missing: r.missing, offer: [], count: r.count })
       saveEntry({
-        label: label || t('historyUnnamed'),
-        theirText: text,
+        name: label || t('historyUnnamed'),
+        text,
         savedAt: Date.now(),
-        missing: r.missing,
+        stickers: r.missing,
         mode: 'receive',
       })
     } else {
       const r = canGive(text, extras)
       setResult({ missing: [], offer: r.offer, count: r.count })
       saveEntry({
-        label: label || t('historyUnnamed'),
-        theirText: text,
+        name: label || t('historyUnnamed'),
+        text,
         savedAt: Date.now(),
-        missing: r.offer,
+        stickers: r.offer,
         mode: 'give',
       })
     }
@@ -45,13 +45,13 @@ export default function CompareStickers() {
 
   function handleReopen(entry: CompareEntry) {
     setMode(entry.mode)
-    setLabel(entry.label)
-    setText(entry.theirText)
+    setLabel(entry.name)
+    setText(entry.text)
     if (entry.mode === 'receive') {
-      const r = compareWith(entry.theirText, inv)
+      const r = compareWith(entry.text, inv)
       setResult({ missing: r.missing, offer: [], count: r.count })
     } else {
-      const r = canGive(entry.theirText, extras)
+      const r = canGive(entry.text, extras)
       setResult({ missing: [], offer: r.offer, count: r.count })
     }
   }
@@ -125,7 +125,7 @@ export default function CompareStickers() {
       <hr className="border-gray-200" />
 
       <CompareHistory
-        entries={entries}
+        entries={Object.values(entries)}
         onTradeNavigate={(label) => navigate(`/compare/${label}`)}
         onReopen={handleReopen}
         onDelete={deleteEntry}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { flagOf } from '../data/flags.js'
+import { flagOf } from '../../data/flags.js'
 import { useLocale } from '../../i18n/index.js'
 import Sticker from './Sticker.js'
 import type { StickerGroup } from '../../application/useStickerGroup.js'

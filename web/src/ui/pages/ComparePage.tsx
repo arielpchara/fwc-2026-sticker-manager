@@ -1,5 +1,5 @@
 import { useOwnStickers } from '../../application/useStickers.js'
-import { TOTAL_STICKERS } from '../data/stickers.js'
+import { TOTAL_STICKERS } from '../../data/stickers.js'
 import MainLayout from '../common/MainLayout.js'
 import Body from '../common/Body.js'
 import CompareStickers from '../compare/CompareStickers.js'

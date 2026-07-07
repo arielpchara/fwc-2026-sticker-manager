@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useOwnStickers } from '../../application/useStickers.js'
-import { flagOf, colorOf } from '../data/flags.js'
-import { GROUPS } from '../data/groups.js'
-import { maxStickers } from '../data/stickers.js'
+import { flagOf, colorOf } from '../../data/flags.js'
+import { GROUPS } from '../../data/groups.js'
+import { maxStickers } from '../../data/stickers.js'
 
 export default function StickerMatrix() {
   const { inv } = useOwnStickers()

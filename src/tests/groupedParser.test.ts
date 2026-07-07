@@ -116,6 +116,16 @@ describe('parseGrouped', () => {
     expect(inv).toEqual({ BRA1: 3, BRA2: 1, BRA5: 2 })
   })
 
+  it('parses (Nx) count suffix in grouped lines', () => {
+    const inv = parseGrouped('QAT: 9(1x), 10(1x), 13(1x), 14(1x)')
+    expect(inv).toEqual({ QAT9: 1, QAT10: 1, QAT13: 1, QAT14: 1 })
+  })
+
+  it('parses mixed xN and (Nx) formats', () => {
+    const inv = parseGrouped('BRA: 1x2, 3(3x), 5')
+    expect(inv).toEqual({ BRA1: 2, BRA3: 3, BRA5: 1 })
+  })
+
   it('ignores invalid numbers (0, 21, 99)', () => {
     const inv = parseGrouped('BRA: 0, 21, 99, 1')
     expect(inv).toEqual({ BRA1: 1 })
