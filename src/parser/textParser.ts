@@ -2,14 +2,16 @@ import { parseCode } from '../domain/sticker.js'
 import type { Inventory } from '../domain/inventory.js'
 import { parseGrouped, GROUPED_LINE_RE } from './groupedParser.js'
 import { mergeCounts, codesOf } from '../domain/inventory.js'
+import { cleanText } from './cleaner.js'
 
 const TOKEN_SCAN_RE = /(?<![A-Za-z0-9])([A-Za-z]{3}(?:[1-9]|1[0-9]|20)|00)(?:\s*[xX]\s*(\d+))?(?![A-Za-z0-9])/g
 
 export function parseInventory(text: string): Inventory {
+  
   if (!text || text.trim() === '') return {}
 
   const grouped = parseGrouped(text)
-
+  text = cleanText(text)
   const cleaned = text.replace(GROUPED_LINE_RE, '')
 
   const tokenInv: Inventory = {}

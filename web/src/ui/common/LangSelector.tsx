@@ -6,14 +6,22 @@ export default function LangSelector() {
     <div className="flex items-center gap-0.5 text-xs font-medium">
       <button
         onClick={() => setLocale('pt')}
-        className={`px-1.5 py-0.5 rounded transition ${locale === 'pt' ? 'bg-white/30 text-white' : 'text-white/60 hover:text-white'}`}
+        className={`px-1.5 py-0.5 rounded transition ${
+          locale === 'pt'
+            ? 'bg-purple-100 text-purple-700'
+            : 'text-gray-400 hover:text-gray-700'
+        }`}
       >
         PT
       </button>
-      <span className="text-white/30">|</span>
+      <span className="text-gray-300">|</span>
       <button
         onClick={() => setLocale('en')}
-        className={`px-1.5 py-0.5 rounded transition ${locale === 'en' ? 'bg-white/30 text-white' : 'text-white/60 hover:text-white'}`}
+        className={`px-1.5 py-0.5 rounded transition ${
+          locale === 'en'
+            ? 'bg-purple-100 text-purple-700'
+            : 'text-gray-400 hover:text-gray-700'
+        }`}
       >
         EN
       </button>

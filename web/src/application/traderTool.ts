@@ -55,8 +55,17 @@ export function updateTrade(trades: TradeBy[], index: number, newTrade: TradeBy)
   return updated
 }
 
+
 export function trader(give: string[], receive: string[]): TradeBy[] {
     const { chroma: giveChroma, normal: giveNormal} = stickerGroupByType(give)
     const { chroma: receiveChroma, normal: receiveNormal} = stickerGroupByType(receive)
     return [...trade(giveChroma, receiveChroma), ...trade(giveNormal, receiveNormal)]
+}
+
+export function countGiveTradedStickers(trades: TradeBy[]): number {
+    return trades.reduce((count, trade) => count + trade.give.length, 0)
+}
+
+export function countReceiveTradedStickers(trades: TradeBy[]): number {
+    return trades.reduce((count, trade) => count + trade.receive.length, 0)
 }

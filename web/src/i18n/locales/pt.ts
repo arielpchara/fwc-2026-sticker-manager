@@ -2,6 +2,7 @@ import type { Translations } from './en.js'
 
 const pt: Translations = {
   appTitle: 'Copa 2026 — Troca de Figurinhas',
+  btnHome: 'Inicio',
   btnOwn: 'Minhas',
   btnExtras: 'Repetidas',
   btnCompare: 'Comparar',
@@ -27,6 +28,7 @@ const pt: Translations = {
   addExtrasBtn: 'Adicionar Repetidas',
   compareBtn: 'Comparar',
   copyBtn: 'Copiar',
+  copyBtnMissing: 'Copiar Faltantes',
   viewAll: 'Ver tudo ({n})',
   viewInventory: 'Ver inventário',
   parseFeedback: 'Lendo: {n} figurinhas — {list}',
@@ -51,7 +53,7 @@ const pt: Translations = {
   historyToday: 'hoje',
   historyYesterday: 'ontem',
   historyDaysAgo: 'há {n} dias',
-  albumProgress: 'Álbum: {owned} / {total}',
+  albumProgress: 'Álbum: {owned} de {total}, repetidas {extras}',
   tradeWith: 'Trocar com {name}',
   tradeChroma: 'Cromo',
   tradeRegular: 'Regular',

@@ -1,5 +1,6 @@
 const en = {
   appTitle: 'Cup 2026 — Sticker Trade',
+  btnHome: 'Home',
   btnOwn: 'Own',
   btnExtras: 'Extras',
   btnCompare: 'Compare',
@@ -25,6 +26,7 @@ const en = {
   addExtrasBtn: 'Add Extras',
   compareBtn: 'Compare',
   copyBtn: 'Copy',
+  copyBtnMissing: 'Copy Missing',
   viewAll: 'View all ({n})',
   viewInventory: 'View inventory',
   parseFeedback: 'Parse: {n} codes — {list}',
@@ -49,7 +51,7 @@ const en = {
   historyToday: 'today',
   historyYesterday: 'yesterday',
   historyDaysAgo: '{n} days ago',
-  albumProgress: 'Album: {owned} / {total}',
+  albumProgress: 'Album: {owned} of {total}, extras {extras}',
   tradeWith: 'Trade with {name}',
   tradeChroma: 'Chrome',
   tradeRegular: 'Regular',

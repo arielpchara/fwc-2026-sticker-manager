@@ -1,10 +1,11 @@
 import { parseCode } from '../domain/sticker.js'
 import type { Inventory } from '../domain/inventory.js'
 
-export const GROUPED_LINE_RE = /^\s*([A-Z]{3})(?![A-Z])[^:\n]*:\s*.+$/gm
-const LINE_RE = /^\s*([A-Z]{3})(?![A-Z])[^:\n]*:\s*(.+)$/gm
+export const GROUPED_LINE_RE = /^\s*([A-Z]{3})(?![A-Za-z0-9])[^:\n]*:[ \t]*.+$/gm
+const LINE_RE = /^\s*([A-Z]{3})(?![A-Za-z0-9])[^:\n]*:[ \t]*(.+)$/gm
 
 const ITEM_RE = /^(\d{1,2})(?:\s*[xX]\s*(\d+)|\(\s*(\d+)\s*[xX]\s*\))?$/
+
 
 export function parseGrouped(text: string): Inventory {
   const inv: Inventory = {}

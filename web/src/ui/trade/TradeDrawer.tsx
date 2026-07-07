@@ -1,22 +1,19 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useCompareHistory, useOwnStickers, useTrade } from '../../application/useStickers.js'
 import { useLocale } from '../../i18n/index.js'
-import { TOTAL_STICKERS } from '../../data/stickers.js'
-import MainLayout from '../common/MainLayout.js'
 import TradeResult from '../trade/TradeResult.js'
 import { trader, updateTrade } from '../../application/traderTool.js'
 import { useMemo, useCallback } from 'react'
 import type { TradeBy } from '../../type/trade.js'
 import type { CompareMode } from '../../type/compare.js'
+import Drawer from '../common/Drawer.js'
 
-export default function TradePage() {
+export default function TradeDrawer() {
   const { name } = useParams<{ name: string }>()
   const navigate = useNavigate()
   const { t } = useLocale()
   const { entries } = useCompareHistory()
-  const { inv } = useOwnStickers()
-  const { trades: storedTrades, saveTrade, removeTrade } = useTrade()
-  const albumOwned = Object.keys(inv).length
+  const { trades: storedTrades, saveTrade } = useTrade()
 
   const giveEntry = name ? entries[`give-${name}`] : undefined
   const receiveEntry = name ? entries[`receive-${name}`] : undefined
@@ -42,29 +39,10 @@ export default function TradePage() {
   }, [name, trade, saveTrade])
 
   return (
-    <MainLayout albumOwned={albumOwned} albumTotal={TOTAL_STICKERS}>
-      <div className="p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-3">
-          <button
-            onClick={() => navigate('/compare')}
-            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
-          >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('compareBtn')}
-          </button>
-          <button
-            onClick={() => name && removeTrade(name)}
-            className="text-xs text-gray-400 hover:text-gray-600"
-          >
-            ↻ {t('tradeRecreate')}
-          </button>
-        </div>
-        {name && (
-          <TradeResult name={name} trade={trade} onChangeSticker={handleChangeSticker} />
-        )}
-      </div>
-    </MainLayout>
+    <Drawer open onClose={() => navigate('/compare')} title={name ? t('tradeWith', { name }) : ''}>
+      {name && (
+        <TradeResult name={name} trade={trade} onChangeSticker={handleChangeSticker} />
+      )}
+    </Drawer>
   )
 }

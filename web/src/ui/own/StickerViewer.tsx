@@ -38,7 +38,7 @@ function TeamAccordion({ prefix, items }: { prefix: string; items: [string, numb
       </summary>
       <div className="flex flex-wrap gap-2 p-3 border-t border-gray-100">
         {items.map(([code, qty]) => (
-          <Sticker key={code} code={code} qty={qty} displayFlag />
+          <Sticker key={code} code={code} qty={qty-1} displayFlag />
         ))}
       </div>
     </details>
