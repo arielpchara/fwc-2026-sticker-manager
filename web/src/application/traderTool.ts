@@ -19,8 +19,8 @@ function trade(give: string[], receive: string[]): TradeBy[] {
     const maxLength = Math.max(shuffledGive.length, shuffledReceive.length)
     for (let i = 0; i < maxLength; i++) {
         tradeEntries.push({
-            give: [shuffledGive[i] || null],
-            receive: [shuffledReceive[i] || null],
+            give: shuffledGive[i] ? [shuffledGive[i]] : [],
+            receive: shuffledReceive[i] ? [shuffledReceive[i]] : [],
             type: isChroma(shuffledGive[i] ?? shuffledReceive[i] ?? '') ? 'chroma' : 'normal',
             savedAt: Date.now(),
             key: [shuffledGive[i], shuffledReceive[i]].sort().join('')

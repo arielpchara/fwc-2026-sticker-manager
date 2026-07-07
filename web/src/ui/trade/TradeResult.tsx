@@ -7,6 +7,7 @@ import { StickerType, isChroma } from "../../application/stickerTools.js";
 import { sortByGroup } from "../../application/traderTool.js";
 import TradeChangeSticker from "./TradeChangeSticker.js";
 import { CompareMode } from "../../type/compare.js";
+import { copy, messageCompleteTrade, messageMissingTrade } from "../../application/copyTools.js";
 
 const CHROMA: StickerType = "chroma";
 
@@ -41,6 +42,10 @@ function getIncompleteTrade(trade: TradeBy[]): IncompleteTrade {
   }, { give: [], receive: [] } as IncompleteTrade);
 }
 
+function createMessage(name: string, trade: TradeBy[]): string {
+  return ''
+}
+
 export default function TradeResult({ name, trade, onChangeSticker }: TradeResultProps) {
   const { t } = useLocale();
 
@@ -66,30 +71,13 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
     (t) => t.give[0] != null && t.receive[0] != null,
   ).length;
 
-  const handleCopy = useCallback(() => {
-    const fmt = (code: string) => {
-      const suffix = isChroma(code) ? '*' : ''
-      return `${flagOf(code.slice(0, 3))} ${code}${suffix}`
-    }
+  const handleCopyTrade = () => {
+    copy(messageCompleteTrade(sorted, t("tradeWith", { name })));
+  };
 
-    const lines: string[] = [t('tradeWith', { name })]
-    let hasChroma = false
-
-    for (const entry of sorted) {
-      const give = entry.give.filter((c): c is string => c != null)
-      const receive = entry.receive.filter((c): c is string => c != null)
-      if (give.length === 0 || receive.length === 0) continue
-      if (!hasChroma) hasChroma = [...give, ...receive].some(isChroma)
-      lines.push(`${give.map(fmt).join(', ')} <-> ${receive.map(fmt).join(', ')}`)
-    }
-
-    if (hasChroma) {
-      lines.push('')
-      lines.push(`* ${t('tradeChroma')}`)
-    }
-
-    navigator.clipboard.writeText(lines.join('\n'))
-  }, [name, sorted, t]);
+  const handleCopyMissingTrade = () => {
+    copy(messageMissingTrade(sorted, t("tradeWith", { name })));
+  }
 
   const handleOpenChangeStickerDialog = (trade: TradeBy, sticker: TradeSticker, availableStickers: string[], mode: CompareMode) => (event: React.MouseEvent) => {
     event.preventDefault();
@@ -131,7 +119,7 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
           <span className="text-gray-400 font-normal">({validCount})</span>
         </p>
         <button
-          onClick={handleCopy}
+          onClick={handleCopyTrade}
           className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
         >
           <svg
@@ -148,6 +136,25 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
             />
           </svg>
           {t("copyBtn")}
+        </button>
+        <button
+          onClick={handleCopyMissingTrade}
+          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+        >
+          <svg
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
+          </svg>
+          {t("copyBtn")} missing
         </button>
       </div>
 

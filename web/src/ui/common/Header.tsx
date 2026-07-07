@@ -1,13 +1,14 @@
 import { useLocale } from '../../i18n/index.js'
 import LangSelector from './LangSelector.js'
 import AlbumProgress from './AlbumProgress.js'
+import LogoBar from './LogoBar.js'
 
 export default function Header({ albumOwned, albumTotal, onOwnClick, onSurplusClick, onCompareClick, onMatrixClick }: { albumOwned: number; albumTotal: number; onOwnClick?: () => void; onSurplusClick?: () => void; onCompareClick?: () => void; onMatrixClick?: () => void }) {
   const { t } = useLocale()
   return (
     <header className="bg-gradient-to-r from-green-700 to-green-600 text-white px-6 py-4 shadow-md">
       <div className="grid grid-cols-3 items-center">
-        <h1 className="text-2xl font-bold tracking-tight">{t('appTitle')}</h1>
+        <LogoBar />
         <div className="flex justify-center">
           <AlbumProgress owned={albumOwned} total={albumTotal} />
         </div>
