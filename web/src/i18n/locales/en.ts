@@ -55,6 +55,8 @@ const en = {
   tradeRegular: 'Regular',
   tradeMy: 'My',
   tradeYours: 'Yours',
+  editBtn: 'Change',
+  doneBtn: 'Done',
   expandAll: 'Expand all',
   collapseAll: 'Collapse all',
   team_FWC: 'FIFA World Cup',

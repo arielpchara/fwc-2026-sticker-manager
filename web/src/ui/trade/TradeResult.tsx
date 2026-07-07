@@ -1,4 +1,4 @@
-import { useCallback, useMemo, Fragment } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { groupOf } from '../data/groups.js'
 import { useLocale } from '../../i18n/index.js'
 import Sticker from '../common/Sticker.js'
@@ -13,12 +13,61 @@ function suffixNum(code: string) {
 
 function isChroma(code: string) {
   const n = suffixNum(code)
-  return n === 1 || prefixOf(code) === 'FWC'
+  return n === 1 || n === 0 || prefixOf(code) === 'FWC'
 }
 
 interface TradeRow {
   give: string
   receive: string
+}
+
+function buildRows(give: string[], receive: string[]): TradeRow[] {
+  const map = new Map<number, { give: string[]; receive: string[] }>()
+
+  for (const code of give) {
+    const n = suffixNum(code)
+    if (!map.has(n)) map.set(n, { give: [], receive: [] })
+    map.get(n)!.give.push(code)
+  }
+  for (const code of receive) {
+    const n = suffixNum(code)
+    if (!map.has(n)) map.set(n, { give: [], receive: [] })
+    map.get(n)!.receive.push(code)
+  }
+
+  const rows: TradeRow[] = []
+  const nums = [...map.keys()].sort((a, b) => a - b)
+
+  for (const n of nums) {
+    const { give: gList, receive: rList } = map.get(n)!
+    const sortFn = (a: string, b: string) => {
+      const ga = groupOf(prefixOf(a)).order
+      const gb = groupOf(prefixOf(b)).order
+      if (ga !== gb) return ga - gb
+      return suffixNum(a) - suffixNum(b)
+    }
+    gList.sort(sortFn)
+    rList.sort(sortFn)
+
+    const maxLen = Math.max(gList.length, rList.length)
+    for (let i = 0; i < maxLen; i++) {
+      rows.push({
+        give: gList[i] ?? null,
+        receive: rList[i] ?? null,
+      })
+    }
+  }
+
+  rows.sort((a, b) => {
+    const codeA = a.give ?? a.receive!
+    const codeB = b.give ?? b.receive!
+    const ga = groupOf(prefixOf(codeA)).order
+    const gb = groupOf(prefixOf(codeB)).order
+    if (ga !== gb) return ga - gb
+    return suffixNum(codeA) - suffixNum(codeB)
+  })
+
+  return rows.filter((r): r is TradeRow => r.give !== null && r.receive !== null)
 }
 
 export default function TradeResult({
@@ -31,66 +80,116 @@ export default function TradeResult({
   receiveItems: string[]
 }) {
   const { t } = useLocale()
-  const { chromaRows, regularRows } = useMemo(() => {
-    function buildRows(give: string[], receive: string[]): TradeRow[] {
-      const map = new Map<number, { give: string[]; receive: string[] }>()
 
-      for (const code of give) {
-        const n = suffixNum(code)
-        if (!map.has(n)) map.set(n, { give: [], receive: [] })
-        map.get(n)!.give.push(code)
-      }
-      for (const code of receive) {
-        const n = suffixNum(code)
-        if (!map.has(n)) map.set(n, { give: [], receive: [] })
-        map.get(n)!.receive.push(code)
-      }
+  const chromaGive = useMemo(() => giveItems.filter(isChroma), [giveItems])
+  const chromaReceive = useMemo(() => receiveItems.filter(isChroma), [receiveItems])
+  const regularGive = useMemo(() => giveItems.filter(c => !isChroma(c)), [giveItems])
+  const regularReceive = useMemo(() => receiveItems.filter(c => !isChroma(c)), [receiveItems])
 
-      const rows: TradeRow[] = []
-      const nums = [...map.keys()].sort((a, b) => a - b)
+  const initialChroma = useMemo(() => buildRows(chromaGive, chromaReceive), [chromaGive, chromaReceive])
+  const initialRegular = useMemo(() => buildRows(regularGive, regularReceive), [regularGive, regularReceive])
 
-      for (const n of nums) {
-        const { give: gList, receive: rList } = map.get(n)!
-        const sortFn = (a: string, b: string) => {
-          const ga = groupOf(prefixOf(a)).order
-          const gb = groupOf(prefixOf(b)).order
-          if (ga !== gb) return ga - gb
-          return suffixNum(a) - suffixNum(b)
-        }
-        gList.sort(sortFn)
-        rList.sort(sortFn)
+  const [chromaRows, setChromaRows] = useState<TradeRow[]>(initialChroma)
+  const [regularRows, setRegularRows] = useState<TradeRow[]>(initialRegular)
+  const [editingSection, setEditingSection] = useState<'chroma' | 'regular' | null>(null)
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
 
-        const maxLen = Math.max(gList.length, rList.length)
-        for (let i = 0; i < maxLen; i++) {
-          rows.push({
-            give: gList[i] ?? null,
-            receive: rList[i] ?? null,
-          })
-        }
-      }
+  const allRows = useMemo(() => [...chromaRows, ...regularRows], [chromaRows, regularRows])
 
-      rows.sort((a, b) => {
-        const codeA = a.give ?? a.receive!
-        const codeB = b.give ?? b.receive!
-        const ga = groupOf(prefixOf(codeA)).order
-        const gb = groupOf(prefixOf(codeB)).order
-        if (ga !== gb) return ga - gb
-        return suffixNum(codeA) - suffixNum(codeB)
-      })
+  const assignedGive = useMemo(() => new Set(allRows.map(r => r.give)), [allRows])
+  const assignedReceive = useMemo(() => new Set(allRows.map(r => r.receive)), [allRows])
 
-      return rows.filter((r): r is TradeRow => r.give !== null && r.receive !== null)
+  const unpairedGive = useMemo(() => giveItems.filter(c => !assignedGive.has(c)), [giveItems, assignedGive])
+  const unpairedReceive = useMemo(() => receiveItems.filter(c => !assignedReceive.has(c)), [receiveItems, assignedReceive])
+
+  function toggleEdit(section: 'chroma' | 'regular', index: number) {
+    if (editingSection === section && editingIndex === index) {
+      setEditingSection(null)
+      setEditingIndex(null)
+    } else {
+      setEditingSection(section)
+      setEditingIndex(index)
     }
+  }
 
-    const chromaGive = giveItems.filter(isChroma)
-    const chromaReceive = receiveItems.filter(isChroma)
-    const regularGive = giveItems.filter(c => !isChroma(c))
-    const regularReceive = receiveItems.filter(c => !isChroma(c))
+  function handleChange(section: 'chroma' | 'regular', index: number, side: 'give' | 'receive', value: string) {
+    const setter = section === 'chroma' ? setChromaRows : setRegularRows
+    setter(prev => {
+      const next = [...prev]
+      next[index] = { ...next[index], [side]: value }
+      return next
+    })
+    setEditingSection(null)
+    setEditingIndex(null)
+  }
 
-    return {
-      chromaRows: buildRows(chromaGive, chromaReceive),
-      regularRows: buildRows(regularGive, regularReceive),
-    }
-  }, [giveItems, receiveItems])
+  function getAvailable(items: string[], rows: TradeRow[], rowIndex: number, side: 'give' | 'receive'): string[] {
+    const used = new Set(rows.filter((_, i) => i !== rowIndex).map(r => r[side]))
+    return items.filter(c => c !== rows[rowIndex][side] && !used.has(c))
+  }
+
+  function renderRowCells(row: TradeRow, i: number, section: 'chroma' | 'regular') {
+    const isEditing = editingSection === section && editingIndex === i
+    const items = section === 'chroma' ? { give: chromaGive, receive: chromaReceive } : { give: regularGive, receive: regularReceive }
+    const rows = section === 'chroma' ? chromaRows : regularRows
+    const availGive = getAvailable(items.give, rows, i, 'give')
+    const availReceive = getAvailable(items.receive, rows, i, 'receive')
+
+    return (
+      <tr key={i} className="border-b border-gray-50">
+        <td className="py-1 whitespace-nowrap">
+          {isEditing ? (
+            <select
+              value={row.give}
+              onChange={e => handleChange(section, i, 'give', e.target.value)}
+              className="text-xs border border-gray-300 rounded px-1 py-0.5"
+            >
+              <option value={row.give}>{row.give}</option>
+              {availGive.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          ) : (
+            <Sticker code={row.give} displayFlag />
+          )}
+        </td>
+        <td className="text-gray-300 px-2 text-center">→</td>
+        <td className="py-1 whitespace-nowrap">
+          {isEditing ? (
+            <select
+              value={row.receive}
+              onChange={e => handleChange(section, i, 'receive', e.target.value)}
+              className="text-xs border border-gray-300 rounded px-1 py-0.5"
+            >
+              <option value={row.receive}>{row.receive}</option>
+              {availReceive.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          ) : (
+            <Sticker code={row.receive} displayFlag />
+          )}
+        </td>
+        <td className="py-1 pl-2">
+          <button
+            onClick={() => toggleEdit(section, i)}
+            className="text-xs text-gray-400 hover:text-gray-600 whitespace-nowrap"
+          >
+            {isEditing ? t('doneBtn') : t('editBtn')}
+          </button>
+        </td>
+      </tr>
+    )
+  }
+
+  function renderSection(rows: TradeRow[], section: 'chroma' | 'regular') {
+    if (rows.length === 0) return null
+    const label = section === 'chroma' ? t('tradeChroma') : t('tradeRegular')
+    return (
+      <>
+        <tr className="border-b border-gray-100">
+          <td colSpan={4} className="text-[11px] font-bold text-gray-500 uppercase tracking-wider pt-3 pb-1">{label}</td>
+        </tr>
+        {rows.map((row, i) => renderRowCells(row, i, section))}
+      </>
+    )
+  }
 
   const handleCopy = useCallback(() => {
     function sectionLines(rows: TradeRow[], header: string): string[] {
@@ -118,37 +217,37 @@ export default function TradeResult({
         </button>
       </div>
 
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-x-3 gap-y-0.5 text-xs">
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{t('tradeMy')}</span>
-        <span />
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{t('tradeYours')}</span>
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="text-left text-gray-400 uppercase tracking-wider">
+            <th className="font-medium pb-1">{t('tradeMy')}</th>
+            <th className="font-medium pb-1" />
+            <th className="font-medium pb-1">{t('tradeYours')}</th>
+            <th className="font-medium pb-1" />
+          </tr>
+        </thead>
+        <tbody>
+          {renderSection(chromaRows, 'chroma')}
+          {renderSection(regularRows, 'regular')}
+        </tbody>
+      </table>
 
-        {chromaRows.length > 0 && (
-          <>
-            <span className="col-span-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-1 -mb-0.5">{t('tradeChroma')}</span>
-            {chromaRows.map((row, i) => (
-              <Fragment key={i}>
-                <Sticker code={row.give} displayFlag />
-                <span className="text-gray-300 text-center">→</span>
-                <Sticker code={row.receive} displayFlag />
-              </Fragment>
-            ))}
-          </>
-        )}
-
-        {regularRows.length > 0 && (
-          <>
-            <span className="col-span-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider mt-1 -mb-0.5">{t('tradeRegular')}</span>
-            {regularRows.map((row, i) => (
-              <Fragment key={i}>
-                <Sticker code={row.give} displayFlag />
-                <span className="text-gray-300 text-center">→</span>
-                <Sticker code={row.receive} displayFlag />
-              </Fragment>
-            ))}
-          </>
-        )}
-      </div>
+      {(unpairedGive.length > 0 || unpairedReceive.length > 0) && (
+        <div className="text-xs space-y-1 pt-2 border-t border-gray-200">
+          {unpairedGive.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-gray-400 font-medium shrink-0">{t('tradeMy')}:</span>
+              {unpairedGive.map(c => <Sticker key={c} code={c} displayFlag compact />)}
+            </div>
+          )}
+          {unpairedReceive.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-gray-400 font-medium shrink-0">{t('tradeYours')}:</span>
+              {unpairedReceive.map(c => <Sticker key={c} code={c} displayFlag compact />)}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,45 +1,21 @@
-import { useState, useMemo, useEffect } from 'react'
-import { useOwnStickers, useCompareHistory, useTradeHistory } from '../../application/useStickers.js'
+import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useOwnStickers, useCompareHistory } from '../../application/useStickers.js'
 import { compareWith, canGive } from '../../application/stickerService.js'
 import { useLocale } from '../../i18n/index.js'
 import type { CompareEntry } from '../../storage/compareSlice.js'
 import CompareResult from './CompareResult.js'
 import CompareHistory from './CompareHistory.js'
-import TradeResult from '../trade/TradeResult.js'
 
 export default function CompareStickers() {
   const { t } = useLocale()
+  const navigate = useNavigate()
   const { inv, extras } = useOwnStickers()
   const { entries, saveEntry, deleteEntry } = useCompareHistory()
   const [mode, setMode] = useState<'receive' | 'give'>('receive')
   const [text, setText] = useState('')
   const [label, setLabel] = useState('')
   const [result, setResult] = useState<{ missing: string[]; offer: string[]; count: number } | null>(null)
-  const [tradeLabel, setTradeLabel] = useState<string | null>(null)
-
-  const matchingLabels = useMemo(() => {
-    const giveLabels = new Set(entries.filter(e => e.mode === 'give').map(e => e.label))
-    const receiveLabels = new Set(entries.filter(e => e.mode === 'receive').map(e => e.label))
-    return [...giveLabels].filter(l => receiveLabels.has(l))
-  }, [entries])
-
-  const tradeGiveItems = useMemo(() => {
-    if (!tradeLabel) return []
-    return entries.find(e => e.mode === 'give' && e.label === tradeLabel)?.missing ?? []
-  }, [tradeLabel, entries])
-
-  const tradeReceiveItems = useMemo(() => {
-    if (!tradeLabel) return []
-    return entries.find(e => e.mode === 'receive' && e.label === tradeLabel)?.missing ?? []
-  }, [tradeLabel, entries])
-
-  const { saveTrade } = useTradeHistory()
-
-  useEffect(() => {
-    if (tradeLabel && tradeGiveItems.length > 0 && tradeReceiveItems.length > 0) {
-      saveTrade({ label: tradeLabel, giveItems: tradeGiveItems, receiveItems: tradeReceiveItems, savedAt: Date.now() })
-    }
-  }, [tradeLabel, tradeGiveItems, tradeReceiveItems, saveTrade])
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -148,36 +124,9 @@ export default function CompareStickers() {
 
       <hr className="border-gray-200" />
 
-      {tradeLabel && (
-        <TradeResult
-          label={tradeLabel}
-          giveItems={tradeGiveItems}
-          receiveItems={tradeReceiveItems}
-        />
-      )}
-
-      {matchingLabels.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {matchingLabels.map(name => (
-            <button
-              key={name}
-              onClick={() => setTradeLabel(tradeLabel === name ? null : name)}
-              className={`text-xs font-medium px-2.5 py-1 rounded-full border transition ${
-                tradeLabel === name
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
-              }`}
-            >
-              {t('tradeWith', { name })}
-            </button>
-          ))}
-        </div>
-      )}
-
       <CompareHistory
         entries={entries}
-        matchingLabels={matchingLabels}
-        onTrade={setTradeLabel}
+        onTradeNavigate={(label) => navigate(`/compare/${label}`)}
         onReopen={handleReopen}
         onDelete={deleteEntry}
       />

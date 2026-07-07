@@ -57,6 +57,8 @@ const pt: Translations = {
   tradeRegular: 'Regular',
   tradeMy: 'Minhas',
   tradeYours: 'Suas',
+  editBtn: 'Alterar',
+  doneBtn: 'Pronto',
   expandAll: 'Expandir tudo',
   collapseAll: 'Recolher tudo',
   team_FWC: 'Copa do Mundo',

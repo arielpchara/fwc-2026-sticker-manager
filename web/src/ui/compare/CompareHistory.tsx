@@ -1,20 +1,25 @@
+import { useMemo } from 'react'
 import { useLocale } from '../../i18n/index.js'
 import type { CompareEntry } from '../../storage/compareSlice.js'
 
 export default function CompareHistory({
   entries = [],
-  matchingLabels = [],
-  onTrade,
+  onTradeNavigate,
   onReopen,
   onDelete,
 }: {
   entries: CompareEntry[]
-  matchingLabels?: string[]
-  onTrade?: (label: string) => void
+  onTradeNavigate?: (label: string) => void
   onReopen: (entry: CompareEntry) => void
   onDelete: (id: string) => void
 }) {
   const { t } = useLocale()
+
+  const matchingLabels = useMemo(() => {
+    const giveLabels = new Set(entries.filter(e => e.mode === 'give').map(e => e.label))
+    const receiveLabels = new Set(entries.filter(e => e.mode === 'receive').map(e => e.label))
+    return [...giveLabels].filter(l => receiveLabels.has(l))
+  }, [entries])
 
   function daysAgo(savedAt: number): string {
     const diff = Date.now() - savedAt
@@ -52,9 +57,9 @@ export default function CompareHistory({
               <span className="text-gray-300 shrink-0">{daysAgo(entry.savedAt)}</span>
             </div>
             <div className="flex items-center gap-1 shrink-0">
-              {matchingLabels.includes(entry.label) && onTrade && (
+              {matchingLabels.includes(entry.label) && onTradeNavigate && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onTrade(entry.label) }}
+                  onClick={(e) => { e.stopPropagation(); onTradeNavigate(entry.label) }}
                   className="text-[10px] font-semibold text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded transition"
                   title="Trade"
                 >
