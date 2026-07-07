@@ -1,4 +1,4 @@
-import { useLocale } from '../i18n/index.js'
+import { useLocale } from '../../i18n/index.js'
 
 const STEPS = [
   { key: 'tutorialStep1', btn: 'btnOwn', icon: 'M12 4v16m8-8H4' },

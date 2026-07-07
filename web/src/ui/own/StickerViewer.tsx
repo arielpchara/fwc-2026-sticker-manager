@@ -1,12 +1,15 @@
 import { useState, useMemo } from 'react'
-import { useOwnStickers } from '../application/useStickers.js'
-import { useLocale } from '../i18n/index.js'
-import { flagOf, colorOf } from './flags.js'
-import { groupOf, type GroupInfo } from './groups.js'
-import Filter from './Filter.js'
-import StickerCounter from './StickerCounter.js'
-import SortStickers from './SortStickers.js'
-import type { SortMode } from './SortStickers.js'
+import { useOwnStickers } from '../../application/useStickers.js'
+import { useLocale } from '../../i18n/index.js'
+import { flagOf } from '../data/flags.js'
+import { groupOf, type GroupInfo } from '../data/groups.js'
+import { maxStickers } from '../data/stickers.js'
+import Filter from '../common/Filter.js'
+import Sticker from '../common/Sticker.js'
+import StickerCounter from '../common/StickerCounter.js'
+import ProgressBar from '../common/ProgressBar.js'
+import SortStickers from '../common/SortStickers.js'
+import type { SortMode } from '../common/SortStickers.js'
 
 function prefixOf(code: string): string {
   return code === '00' ? '00' : code.slice(0, 3)
@@ -16,31 +19,10 @@ function suffixNum(code: string): number {
   return code === '00' ? 0 : parseInt(code.slice(3), 10)
 }
 
-function maxStickers(prefix: string): number {
-  if (prefix === '00') return 1
-  if (prefix === 'FWC') return 19
-  return 20
-}
-
-function StickerCard({ code, qty }: { code: string; qty: number }) {
-  const bg = colorOf(prefixOf(code))
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-sm font-bold text-xs text-white leading-tight"
-      style={{ backgroundColor: bg }}
-    >
-      <span>{code}</span>
-      <span className="bg-white/80 text-black text-[10px] font-bold w-3.5 h-3.5 flex items-center justify-center rounded-full">{qty}</span>
-    </span>
-  )
-}
-
 function TeamAccordion({ prefix, items }: { prefix: string; items: [string, number][] }) {
   const { t } = useLocale()
   const total = maxStickers(prefix)
   const owned = items.length
-  const pct = owned / total
-  const barColor = pct >= 1 ? 'bg-green-500' : pct >= 0.8 ? 'bg-lime-500' : pct >= 0.6 ? 'bg-yellow-500' : pct >= 0.4 ? 'bg-amber-500' : pct >= 0.2 ? 'bg-orange-500' : 'bg-red-500'
   return (
     <details className="group border border-gray-200 rounded-lg overflow-hidden">
       <summary className="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 text-sm font-medium text-gray-700 list-none [&::-webkit-details-marker]:hidden">
@@ -49,19 +31,14 @@ function TeamAccordion({ prefix, items }: { prefix: string; items: [string, numb
           <span>{prefix === '00' ? t('specialLabel') : prefix}</span>
         </span>
         <span className="flex items-center gap-2">
-          {pct < 1 && (
-            <span className="h-1.5 bg-gray-200 rounded-full overflow-hidden w-15 shrink-0">
-              <span className={`block h-full rounded-full transition-all ${barColor}`} style={{ width: `${Math.min(pct * 100, 100)}%` }} />
-            </span>
-          )}
-          {pct >= 1 && <span className="w-15 shrink-0" />}
+          <ProgressBar value={owned} max={total} />
           <StickerCounter owned={owned} total={total} />
           <svg className="w-3.5 h-3.5 text-gray-400 transition-transform group-open:rotate-180 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
         </span>
       </summary>
       <div className="flex flex-wrap gap-2 p-3 border-t border-gray-100">
         {items.map(([code, qty]) => (
-          <StickerCard key={code} code={code} qty={qty} />
+          <Sticker key={code} code={code} qty={qty} displayFlag />
         ))}
       </div>
     </details>

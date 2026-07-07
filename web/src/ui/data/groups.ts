@@ -4,7 +4,7 @@ export interface GroupInfo {
   order: number
 }
 
-const GROUPS: GroupInfo[] = [
+export const GROUPS: GroupInfo[] = [
   { label: 'Grupo A', prefixes: ['MEX', 'RSA', 'KOR', 'CZE'], order: 0 },
   { label: 'Grupo B', prefixes: ['CAN', 'BIH', 'QAT', 'SUI'], order: 1 },
   { label: 'Grupo C', prefixes: ['BRA', 'MAR', 'HAI', 'SCO'], order: 2 },

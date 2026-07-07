@@ -1,5 +1,5 @@
 import { type InputHTMLAttributes } from 'react'
-import { useLocale } from '../i18n/index.js'
+import { useLocale } from '../../i18n/index.js'
 
 export default function Filter(props: InputHTMLAttributes<HTMLInputElement>) {
   const { t } = useLocale()

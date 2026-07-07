@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useSurplusStickers, useOwnStickers } from '../../application/useStickers.js'
-import { parseSurplusText } from '../../application/stickerService.js'
-import { useLocale } from '../../i18n/index.js'
+import { useSurplusStickers, useOwnStickers } from '../../../application/useStickers.js'
+import { parseSurplusText } from '../../../application/stickerService.js'
+import { useLocale } from '../../../i18n/index.js'
 
 export default function AddSurplusStickers() {
   const { t } = useLocale()

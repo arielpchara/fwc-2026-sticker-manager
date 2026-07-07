@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '../storage/hooks.js'
 import { setOwn, mergeOwn, removeOwn, addSurplus } from '../storage/stickerSlice.js'
 import { upsertEntry, removeEntry, type CompareEntry } from '../storage/compareSlice.js'
+import { upsertTrade, removeTrade, type TradeEntry } from '../storage/tradeSlice.js'
 import { parseOwnText, parseSurplusText, computeExtras, parseText } from './stickerService.js'
 import type { Inventory } from './stickerService.js'
 
@@ -75,4 +76,25 @@ export function useCompareHistory() {
   )
 
   return { entries, saveEntry, deleteEntry }
+}
+
+export function useTradeHistory() {
+  const entries = useAppSelector((s) => s.trade?.entries ?? [])
+  const dispatch = useAppDispatch()
+
+  const saveTrade = useCallback(
+    (entry: TradeEntry) => {
+      dispatch(upsertTrade(entry))
+    },
+    [dispatch],
+  )
+
+  const deleteTrade = useCallback(
+    (label: string) => {
+      dispatch(removeTrade(label))
+    },
+    [dispatch],
+  )
+
+  return { entries, saveTrade, deleteTrade }
 }

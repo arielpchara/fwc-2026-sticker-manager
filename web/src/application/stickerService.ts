@@ -44,5 +44,11 @@ export function compareWith(theirText: string, myInv: Inventory): { missing: str
   return { missing, count: missing.length }
 }
 
+export function canGive(theirText: string, extras: ExtraItem[]): { offer: string[]; count: number } {
+  const theirs = new Set(parseText(theirText))
+  const offer = extras.filter((e) => theirs.has(e.code)).map((e) => e.code)
+  return { offer, count: offer.length }
+}
+
 export { codesOf, totalCopies, parseText }
 export type { Inventory, ExtraItem }

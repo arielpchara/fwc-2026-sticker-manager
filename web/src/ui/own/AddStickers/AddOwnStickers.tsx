@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useOwnStickers } from '../../application/useStickers.js'
-import { parseOwnText } from '../../application/stickerService.js'
-import { useLocale } from '../../i18n/index.js'
+import { useOwnStickers } from '../../../application/useStickers.js'
+import { parseOwnText } from '../../../application/stickerService.js'
+import { useLocale } from '../../../i18n/index.js'
 
 type Action = 'update' | 'add' | 'remove'
 

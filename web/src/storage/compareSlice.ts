@@ -5,6 +5,7 @@ export interface CompareEntry {
   theirText: string
   savedAt: number
   missing: string[]
+  mode: 'receive' | 'give'
 }
 
 export interface CompareState {
@@ -12,6 +13,10 @@ export interface CompareState {
 }
 
 const MAX_ENTRIES = 10
+
+function entryKey(e: CompareEntry): string {
+  return e.mode + '-' + e.label
+}
 
 function capEntries(entries: CompareEntry[]): CompareEntry[] {
   if (entries.length <= MAX_ENTRIES) return entries
@@ -23,7 +28,8 @@ const compareSlice = createSlice({
   initialState: { entries: [] } as CompareState,
   reducers: {
     upsertEntry(state, action: PayloadAction<CompareEntry>) {
-      const idx = state.entries.findIndex((e) => e.label === action.payload.label)
+      const key = entryKey(action.payload)
+      const idx = state.entries.findIndex((e) => entryKey(e) === key)
       if (idx !== -1) {
         state.entries[idx] = action.payload
       } else {
@@ -32,7 +38,7 @@ const compareSlice = createSlice({
       state.entries = capEntries(state.entries)
     },
     removeEntry(state, action: PayloadAction<string>) {
-      state.entries = state.entries.filter((e) => e.label !== action.payload)
+      state.entries = state.entries.filter((e) => entryKey(e) !== action.payload)
     },
   },
 })

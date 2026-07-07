@@ -1,4 +1,4 @@
-import { useLocale } from '../i18n/index.js'
+import { useLocale } from '../../i18n/index.js'
 
 export default function Description() {
   const { t } = useLocale()
