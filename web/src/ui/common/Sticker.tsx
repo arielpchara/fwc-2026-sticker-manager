@@ -31,7 +31,7 @@ export default function Sticker({
 
   const baseClasses = compact
     ? "px-1.5 py-0.5 text-[10px] tracking-wider"
-    : "px-3 py-1.5 text-xs tracking-wider";
+    : "px-4 py-2 text-sm tracking-wider";
 
   const glassClass = chroma ? "sticker-glass chroma" : "sticker-glass";
 
