@@ -40,7 +40,7 @@ export default function Sticker({
       {...rest}
       className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
       style={{
-        fontFamily: "'Space Grotesk', system-ui, -apple-system, sans-serif",
+        fontFamily: "'Fira Sans', system-ui, -apple-system, sans-serif",
         background: isMissing
           ? "linear-gradient(145deg, #1c1917 0%, #292524 100%)"
           : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
