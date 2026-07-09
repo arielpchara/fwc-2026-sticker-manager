@@ -8,11 +8,13 @@ export function MultiSelectChip({
   options,
   selected,
   onChange,
+  clearLabel,
 }: {
   label: string
   options: { value: string; label: string }[]
   selected: string[]
   onChange: (next: string[]) => void
+  clearLabel?: string
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -36,7 +38,10 @@ export function MultiSelectChip({
     }
   }
 
-  const display = selected.length ? `${label} (${selected.length})` : label
+  const displayLabel = label || 'Filter'
+  const display = selected.length ? `${displayLabel} (${selected.length})` : displayLabel
+
+  const clearAll = () => onChange([])
 
   return (
     <div ref={ref} className="relative inline-block">
@@ -52,6 +57,14 @@ export function MultiSelectChip({
       </button>
       {open && (
         <div className="absolute right-0 mt-1 z-50 bg-surface border border-border rounded-lg shadow-lg w-56 max-h-72 overflow-auto py-1">
+          {selected.length > 0 && clearLabel && (
+            <button
+              onClick={clearAll}
+              className="w-full text-left px-3 py-1 text-xs text-muted hover:text-fg border-b border-border"
+            >
+              {clearLabel}
+            </button>
+          )}
           {options.map((opt) => (
             <label
               key={opt.value}
@@ -83,7 +96,15 @@ export function GroupMultiSelect({
   const opts = GROUPS.map((g) => ({ value: g.labelKey, label: t(g.labelKey as never) }))
   // add special group for FWC/00
   opts.push({ value: 'specialLabel', label: t('specialLabel') })
-  return <MultiSelectChip label={t('filterGroup')} options={opts} selected={selected} onChange={onChange} />
+  return (
+    <MultiSelectChip
+      label={t('filterGroup')}
+      options={opts}
+      selected={selected}
+      onChange={onChange}
+      clearLabel={t('clearAll')}
+    />
+  )
 }
 
 export function TeamMultiSelect({
@@ -102,5 +123,13 @@ export function TeamMultiSelect({
   )
   opts.push({ value: 'FWC', label: `🏆 FWC` })
   opts.push({ value: '00', label: `⭐ 00` })
-  return <MultiSelectChip label={t('filterTeam')} options={opts} selected={selected} onChange={onChange} />
+  return (
+    <MultiSelectChip
+      label={t('filterTeam')}
+      options={opts}
+      selected={selected}
+      onChange={onChange}
+      clearLabel={t('clearAll')}
+    />
+  )
 }

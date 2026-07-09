@@ -57,6 +57,7 @@ const pt: Translations = {
   missingFilter: 'Faltando',
   filterGroup: 'Grupo',
   filterTeam: 'Seleção',
+  clearAll: 'Clique para limpar tudo',
   searchStatus: '{total} no álbum · {filtered} exibidas',
   copyWantTitle: 'O que eu quero',
   copyHaveTitle: 'O que eu tenho',

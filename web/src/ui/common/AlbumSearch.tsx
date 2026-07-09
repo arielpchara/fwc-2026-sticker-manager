@@ -21,8 +21,15 @@ export default function AlbumSearch({
   if (query.trim()) chips.push({ key: 'query', label: query.trim() })
   if (missing) chips.push({ key: 'missing', label: t('missingFilter') })
   if (extras) chips.push({ key: 'extras', label: t('extrasFilter') })
-  for (const g of groups) chips.push({ key: `group:${g}`, label: t(g as never) })
-  for (const p of teams) chips.push({ key: `team:${p}`, label: p })
+  for (const g of groups) {
+    const groupLabel = t(g as never) || g
+    const filterLabel = t('filterGroup') || 'Group'
+    chips.push({ key: `group:${g}`, label: `${filterLabel}: ${groupLabel}` })
+  }
+  for (const p of teams) {
+    const teamLabel = t('filterTeam') || 'Team'
+    chips.push({ key: `team:${p}`, label: `${teamLabel}: ${p}` })
+  }
 
   const removeChip = (key: string) => {
     if (key === 'query') onChange({ ...filters, query: '' })

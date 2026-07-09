@@ -55,6 +55,7 @@ const en = {
   missingFilter: 'Missing',
   filterGroup: 'Group',
   filterTeam: 'Team',
+  clearAll: 'Click to unselect all',
   searchStatus: '{total} owned · {filtered} shown',
   copyWantTitle: 'What I want',
   copyHaveTitle: 'What I have',
