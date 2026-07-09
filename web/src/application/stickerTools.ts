@@ -1,4 +1,4 @@
-import { GROUPS, groupOf } from "../data/groups.js";
+import { GROUPS, groupOf } from "../constants/groups.js";
 import { StickerGroupByTeam, StickerGroupByGroup } from "../type/group";
 import { Stickers, StickerType } from "../type/sticker";
 

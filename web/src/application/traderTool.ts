@@ -1,4 +1,4 @@
-import { GROUPS } from "../data/groups";
+import { GROUPS } from "../constants/groups";
 import { TradeBy } from "../type/trade";
 import { isChroma, stickerGroupByType } from "./stickerTools";
 

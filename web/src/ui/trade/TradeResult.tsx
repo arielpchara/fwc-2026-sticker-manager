@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { useLocale } from "../../i18n/index.js";
-import { flagOf } from "../../data/flags.js";
+import { flagOf } from "../../constants/flags.js";
 import Sticker from "../common/Sticker.js";
 import type { TradeBy, TradeSticker } from "../../type/trade.js";
 import {

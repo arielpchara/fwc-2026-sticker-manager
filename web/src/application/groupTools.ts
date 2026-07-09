@@ -1,4 +1,4 @@
-import { GROUPS, MAX_STICKERS_PER_TEAM } from "../data/groups";
+import { GROUPS, MAX_STICKERS_PER_TEAM } from "../constants/groups";
 
 export function getMaxStickerPerTeam(team: string): number {
   const group = GROUPS.find((g) => g.prefixes.includes(team));

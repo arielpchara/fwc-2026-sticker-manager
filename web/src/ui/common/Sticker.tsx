@@ -1,6 +1,6 @@
 import React from "react";
 import { isChroma } from "../../application/stickerTools.js";
-import { flagOf, colorOf } from "../../data/flags.js";
+import { flagOf, colorOf } from "../../constants/flags.js";
 
 function prefixOf(code: string) {
   return code === "00" ? "00" : code.slice(0, 3);

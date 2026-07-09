@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { flagOf } from "../../data/flags.js";
-import { groupOf } from "../../data/groups.js";
+import { flagOf } from "../../constants/flags.js";
+import { groupOf } from "../../constants/groups.js";
 import { useLocale } from "../../i18n/index.js";
 import { useStickerGroup } from "../../application/useStickerGroup.js";
 import type { ExtraItem } from "../../../../src/domain/inventory.js";

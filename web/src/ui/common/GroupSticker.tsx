@@ -1,12 +1,12 @@
 import { useState, useMemo, useCallback } from "react";
-import { flagOf } from "../../data/flags.js";
+import { flagOf } from "../../constants/flags.js";
 import { useLocale } from "../../i18n/index.js";
 import Sticker from "./Sticker.js";
-import { maxStickers } from "../../data/stickers.js";
+import { maxStickers } from "../../constants/stickers.js";
 import { StickerGroupByTeam } from "../../type/group.js";
 import { prefixOf } from "../../application/stickerTools.js";
 import { Stickers } from "../../type/sticker.js";
-import { MAX_STICKERS_PER_TEAM } from "../../data/groups.js";
+import { MAX_STICKERS_PER_TEAM } from "../../constants/groups.js";
 import { getMaxStickerPerTeam } from "../../application/groupTools.js";
 
 function teamName(

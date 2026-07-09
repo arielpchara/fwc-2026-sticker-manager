@@ -1,4 +1,4 @@
-import { flagOf } from "../data/flags";
+import { flagOf } from "../constants/flags";
 import { StickerGroupByTeam } from "../type/group";
 import { Stickers } from "../type/sticker";
 import { TradeBy } from "../type/trade";
