@@ -103,6 +103,8 @@ export default function TradeResult({
     ) =>
     (event: React.MouseEvent) => {
       event.preventDefault();
+      if (availableStickers.length === 0) return;
+      if (trade.give[0] == null || trade.receive[0] == null) return;
       setChangeStickerDialog({
         availableStickers,
         trade,
@@ -116,39 +118,44 @@ export default function TradeResult({
     return (
       <tr className="border-b border-border" key={i}>
         <td>{i + 1}</td>
-        <td className="py-1 whitespace-nowrap">
-          {give.map((code, i) => (
-            <Sticker
-              key={i}
-              code={code}
-              onDoubleClick={handleOpenChangeStickerDialog(
-                tradeBy,
-                code,
-                incompleteTrade.give,
-                "give",
-              )}
-            />
-          ))}
-          {give.length === 0 && (
-            <Sticker
-              key={i}
-              code={null}
-              onDoubleClick={handleOpenChangeStickerDialog(
-                tradeBy,
-                null,
-                incompleteTrade.give,
-                "give",
-              )}
-            />
-          )}
+        <td className="py-1 w-50">
+          <div className="flex flex-col gap-2">
+            {give.map((code, i) => (
+              <Sticker
+                key={i}
+                code={code}
+                full
+                onDoubleClick={handleOpenChangeStickerDialog(
+                  tradeBy,
+                  code,
+                  incompleteTrade.give,
+                  "give",
+                )}
+              />
+            ))}
+            {give.length === 0 && (
+              <Sticker
+                key={i}
+                code={null}
+                full
+                onDoubleClick={handleOpenChangeStickerDialog(
+                  tradeBy,
+                  null,
+                  incompleteTrade.give,
+                  "give",
+                )}
+              />
+            )}
+          </div>
         </td>
         <td className="text-muted px-2 text-center">→</td>
-        <td className="py-1 whitespace-nowrap">
-          <div className="flex items-center gap-1">
+        <td className="py-1 w-50">
+          <div className="flex flex-col gap-2">
             {receive.map((code, i) => (
               <Sticker
                 key={i}
                 code={code}
+                full
                 onDoubleClick={handleOpenChangeStickerDialog(
                   tradeBy,
                   code,
@@ -161,6 +168,7 @@ export default function TradeResult({
               <Sticker
                 key={i}
                 code={null}
+                full
                 onDoubleClick={handleOpenChangeStickerDialog(
                   tradeBy,
                   null,
@@ -226,7 +234,7 @@ export default function TradeResult({
 
       <table className="w-full text-xs">
         <thead>
-            <tr className="text-left text-muted uppercase tracking-wider">
+          <tr className="text-left text-muted uppercase tracking-wider">
             <th />
             <th className="font-medium pb-1">
               {t("tradeMy")}&nbsp;({giveCount})
