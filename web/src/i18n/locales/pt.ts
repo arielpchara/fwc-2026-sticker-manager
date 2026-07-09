@@ -54,6 +54,8 @@ const pt: Translations = {
   copyGiveTitle: 'Eu tenho estas que voce precisa',
   specialGroupLabel: 'Especiais',
   extrasFilter: 'Só repetidas',
+  missingFilter: 'Faltando',
+  searchStatus: '{total} no álbum · {filtered} exibidas',
   copyWantTitle: 'O que eu quero',
   copyHaveTitle: 'O que eu tenho',
   historyLabelPlaceholder: 'Nome (ex: João)',

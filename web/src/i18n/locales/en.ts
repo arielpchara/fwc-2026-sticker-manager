@@ -52,6 +52,8 @@ const en = {
   copyGiveTitle: 'I have these that you need',
   specialGroupLabel: 'Special',
   extrasFilter: 'Extras only',
+  missingFilter: 'Missing',
+  searchStatus: '{total} owned · {filtered} shown',
   copyWantTitle: 'What I want',
   copyHaveTitle: 'What I have',
   historyLabelPlaceholder: 'Name (e.g. João)',
