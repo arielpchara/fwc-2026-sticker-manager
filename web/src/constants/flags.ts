@@ -68,6 +68,22 @@ const COLORS: Record<string, string> = {
   URU: '#0038A8', USA: '#B22234', UZB: '#0099B5',
 }
 
+const SECONDARY_COLORS: Record<string, string> = {
+  ALG: '#FFFFFF', ANG: '#FFCC00', ARG: '#FFFFFF', AUS: '#FFCD00',
+  AUT: '#FFFFFF', BEL: '#FDDA25', BIH: '#FECB00', BRA: '#FEDD00',
+  CAN: '#FFFFFF', CIV: '#009E60', CMR: '#CE1126', COD: '#CE1021',
+  COL: '#003893', CPV: '#CF2027', CRO: '#171796', CUW: '#F9E814',
+  CZE: '#D7141A', DEN: '#FFFFFF', ECU: '#034EA2', EGY: '#000000',
+  ENG: '#FFFFFF', ESP: '#FFC400', FRA: '#EF4135', GER: '#DD0000',
+  GHA: '#FCD116', HAI: '#D21034', IRN: '#DA0000', IRQ: '#FFFFFF',
+  JOR: '#007A3D', JPN: '#FFFFFF', KOR: '#C60C30', KSA: '#FFFFFF',
+  MAR: '#006233', MEX: '#CE1126', NED: '#FFFFFF', NOR: '#00205B',
+  NZL: '#CC142B', PAN: '#D21034', PAR: '#D52B1E', POR: '#FF0000',
+  QAT: '#FFFFFF', RSA: '#FFB81C', SCO: '#FFFFFF', SEN: '#FDEF42',
+  SUI: '#FFFFFF', SWE: '#FECC00', TUN: '#FFFFFF', TUR: '#FFFFFF',
+  URU: '#FFFFFF', USA: '#3C3B6E', UZB: '#1EB53A',
+}
+
 const SPECIAL: Record<string, string> = {
   FWC: '🏆',
 }
@@ -78,4 +94,8 @@ export function flagOf(prefix: string): string {
 
 export function colorOf(prefix: string): string {
   return COLORS[prefix] ?? '#6b7280'
+}
+
+export function secondaryColorOf(prefix: string): string {
+  return SECONDARY_COLORS[prefix] ?? '#44403c'
 }

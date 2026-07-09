@@ -1,6 +1,6 @@
 import React from "react";
 import { isChroma } from "../../application/stickerTools.js";
-import { flagOf, colorOf } from "../../constants/flags.js";
+import { flagOf, colorOf, secondaryColorOf } from "../../constants/flags.js";
 
 function prefixOf(code: string) {
   return code === "00" ? "00" : code.slice(0, 3);
@@ -60,7 +60,7 @@ export default function Sticker({
       style={{
         background: isMissing
           ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"
-          : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
+          : `linear-gradient(145deg, ${baseColor} 0%, ${secondaryColorOf(prefix)} 100%)`,
       }}
     >
       {displayFlag && (
