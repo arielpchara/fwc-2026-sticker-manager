@@ -1,27 +1,25 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import { CompareEntry, CompareState } from '../type/compare'
-
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { CompareEntry, CompareState } from "../type/compare";
 
 function entryKey(e: CompareEntry): string {
-  return e.mode + '-' + e.name
+  return e.mode + "-" + e.name;
 }
 
 const compareSlice = createSlice({
-  name: 'compare',
+  name: "compare",
   initialState: { entries: {} } as CompareState,
   reducers: {
     upsertEntry(state, action: PayloadAction<CompareEntry>) {
-      const newEntry = action.payload
-      console.log('upsertEntry', newEntry)
-      state.entries[entryKey(newEntry)] = newEntry
+      const newEntry = action.payload;
+      state.entries[entryKey(newEntry)] = newEntry;
     },
     removeEntry(state, action: PayloadAction<string>) {
       state.entries = Object.fromEntries(
         Object.entries(state.entries).filter(([key]) => key !== action.payload),
-      )
+      );
     },
   },
-})
+});
 
-export const { upsertEntry, removeEntry } = compareSlice.actions
-export default compareSlice.reducer
+export const { upsertEntry, removeEntry } = compareSlice.actions;
+export default compareSlice.reducer;

@@ -3,8 +3,8 @@ import { useLocale } from '../../i18n/index.js'
 export default function Description() {
   const { t } = useLocale()
   return (
-    <section className="text-center max-w-xl mx-auto">
-      <p className="text-gray-600 text-lg">{t('description')}</p>
-    </section>
+    <div className="w-full bg-green-50 border-b border-green-100 px-4 py-2 text-center">
+      <p className="text-green-600 text-xs font-medium">{t('description')}</p>
+    </div>
   )
 }

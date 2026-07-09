@@ -3,12 +3,20 @@ import { useLocale } from "../../i18n/index.js";
 import { flagOf } from "../../data/flags.js";
 import Sticker from "../common/Sticker.js";
 import type { TradeBy, TradeSticker } from "../../type/trade.js";
-import { StickerType, isChroma } from "../../application/stickerTools.js";
-import { countGiveTradedStickers, countReceiveTradedStickers, sortByGroup } from "../../application/traderTool.js";
+import {
+  countGiveTradedStickers,
+  countReceiveTradedStickers,
+  sortByGroup,
+} from "../../application/traderTool.js";
 import TradeChangeSticker from "./TradeChangeSticker.js";
 import { CompareMode } from "../../type/compare.js";
-import { copy, messageCompleteTrade, messageMissingTrade } from "../../application/copyTools.js";
+import {
+  copy,
+  messageCompleteTrade,
+  messageMissingTrade,
+} from "../../application/copyTools.js";
 import { useTrade } from "../../application/useStickers.js";
+import { StickerType } from "../../type/sticker.js";
 
 const CHROMA: StickerType = "chroma";
 
@@ -30,29 +38,36 @@ interface IncompleteTrade {
   receive: string[];
 }
 
-
-
 function getIncompleteTrade(trade: TradeBy[]): IncompleteTrade {
-  return trade.reduce((acc, entry) => {
-    if (entry.give[0] == null && entry.receive[0] != null) {
-      acc.receive.push(entry.receive[0]);
-    } else if (entry.give[0] != null && entry.receive[0] == null) {
-      acc.give.push(entry.give[0]);
-    }
-    return acc;
-  }, { give: [], receive: [] } as IncompleteTrade);
+  return trade.reduce(
+    (acc, entry) => {
+      if (entry.give[0] == null && entry.receive[0] != null) {
+        acc.receive.push(entry.receive[0]);
+      } else if (entry.give[0] != null && entry.receive[0] == null) {
+        acc.give.push(entry.give[0]);
+      }
+      return acc;
+    },
+    { give: [], receive: [] } as IncompleteTrade,
+  );
 }
 
-export default function TradeResult({ name, trade, onChangeSticker }: TradeResultProps) {
+export default function TradeResult({
+  name,
+  trade,
+  onChangeSticker,
+}: TradeResultProps) {
   const { t } = useLocale();
-  const { removeTrade } = useTrade()
+  const { removeTrade } = useTrade();
 
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
 
   const giveCount = useMemo(() => countGiveTradedStickers(trade), [trade]);
-  const receiveCount = useMemo(() => countReceiveTradedStickers(trade), [trade]);
-
+  const receiveCount = useMemo(
+    () => countReceiveTradedStickers(trade),
+    [trade],
+  );
 
   const sorted = useMemo(() => {
     return sortByGroup(trade).sort((a, b) => {
@@ -64,7 +79,6 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
       return 0;
     });
   }, [trade]);
-  
 
   const incompleteTrade = useMemo(() => getIncompleteTrade(sorted), [sorted]);
 
@@ -78,36 +92,83 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
 
   const handleCopyMissingTrade = () => {
     copy(messageMissingTrade(sorted, t("tradeWith", { name })));
-  }
-
-  const handleOpenChangeStickerDialog = (trade: TradeBy, sticker: TradeSticker, availableStickers: string[], mode: CompareMode) => (event: React.MouseEvent) => {
-    event.preventDefault();
-    setChangeStickerDialog({
-      availableStickers,
-      trade,
-      sticker,
-      mode,
-    })
   };
+
+  const handleOpenChangeStickerDialog =
+    (
+      trade: TradeBy,
+      sticker: TradeSticker,
+      availableStickers: string[],
+      mode: CompareMode,
+    ) =>
+    (event: React.MouseEvent) => {
+      event.preventDefault();
+      setChangeStickerDialog({
+        availableStickers,
+        trade,
+        sticker,
+        mode,
+      });
+    };
 
   function row(tradeBy: TradeBy, i: number) {
     const { give, receive } = tradeBy;
     return (
       <tr className="border-b border-gray-50" key={i}>
-        <td>{i+1}</td>
+        <td>{i + 1}</td>
         <td className="py-1 whitespace-nowrap">
           {give.map((code, i) => (
-            <Sticker key={i} code={code} onDoubleClick={handleOpenChangeStickerDialog(tradeBy, code, incompleteTrade.give, 'give')} />
+            <Sticker
+              key={i}
+              code={code}
+              onDoubleClick={handleOpenChangeStickerDialog(
+                tradeBy,
+                code,
+                incompleteTrade.give,
+                "give",
+              )}
+            />
           ))}
-          {give.length === 0 && <Sticker key={i} code={null} onDoubleClick={handleOpenChangeStickerDialog(tradeBy, null, incompleteTrade.give, 'give')}/>}
+          {give.length === 0 && (
+            <Sticker
+              key={i}
+              code={null}
+              onDoubleClick={handleOpenChangeStickerDialog(
+                tradeBy,
+                null,
+                incompleteTrade.give,
+                "give",
+              )}
+            />
+          )}
         </td>
         <td className="text-gray-300 px-2 text-center">→</td>
         <td className="py-1 whitespace-nowrap">
           <div className="flex items-center gap-1">
-          {receive.map((code, i) => (
-            <Sticker key={i} code={code} onDoubleClick={handleOpenChangeStickerDialog(tradeBy, code, incompleteTrade.receive, 'receive')}/>
-          ))}
-          {receive.length === 0 && <Sticker key={i} code={null} onDoubleClick={handleOpenChangeStickerDialog(tradeBy, null, incompleteTrade.receive, 'receive')}/>}
+            {receive.map((code, i) => (
+              <Sticker
+                key={i}
+                code={code}
+                onDoubleClick={handleOpenChangeStickerDialog(
+                  tradeBy,
+                  code,
+                  incompleteTrade.receive,
+                  "receive",
+                )}
+              />
+            ))}
+            {receive.length === 0 && (
+              <Sticker
+                key={i}
+                code={null}
+                onDoubleClick={handleOpenChangeStickerDialog(
+                  tradeBy,
+                  null,
+                  incompleteTrade.receive,
+                  "receive",
+                )}
+              />
+            )}
           </div>
         </td>
       </tr>
@@ -117,13 +178,12 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3 justify-end">
-
-          <button
-                    onClick={() => name && removeTrade(name)}
-                    className="text-xs text-gray-400 hover:text-gray-600"
-                  >
-                    ↻ {t('tradeRecreate')}
-                  </button>
+        <button
+          onClick={() => name && removeTrade(name)}
+          className="text-xs text-gray-400 hover:text-gray-600"
+        >
+          ↻ {t("tradeRecreate")}
+        </button>
         <button
           onClick={handleCopyTrade}
           className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
@@ -168,9 +228,13 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
         <thead>
           <tr className="text-left text-gray-400 uppercase tracking-wider">
             <th />
-            <th className="font-medium pb-1">{t("tradeMy")}&nbsp;({giveCount})</th>
+            <th className="font-medium pb-1">
+              {t("tradeMy")}&nbsp;({giveCount})
+            </th>
             <th className="font-medium pb-1 w-6" />
-            <th className="font-medium pb-1">{name}&nbsp;({receiveCount})</th>
+            <th className="font-medium pb-1">
+              {name}&nbsp;({receiveCount})
+            </th>
           </tr>
         </thead>
         <tbody>{sorted.map((entry, i) => row(entry, i))}</tbody>
@@ -180,11 +244,16 @@ export default function TradeResult({ name, trade, onChangeSticker }: TradeResul
           sticker={changeStickerDialog.availableStickers}
           onClose={() => setChangeStickerDialog(null)}
           onSubmit={(selected) => {
-            onChangeSticker?.(changeStickerDialog.trade, selected, changeStickerDialog.mode)
-            setChangeStickerDialog(null)
+            selected.length > 0 &&
+              onChangeSticker?.(
+                changeStickerDialog.trade,
+                selected,
+                changeStickerDialog.mode,
+              );
+            setChangeStickerDialog(null);
           }}
         />
       )}
     </div>
   );
-  }
+}

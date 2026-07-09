@@ -1,30 +1,20 @@
-import { useMemo } from 'react'
-import { groupOf } from '../data/groups.js'
+import { useMemo } from "react";
+import { StickerGroupByGroup, StickerGroupByTeam } from "../type/group.js";
+import { Stickers } from "../type/sticker.js";
+import { groupByGroup, groupByTeam } from "./stickerTools.js";
 
-export interface StickerGroup {
-  prefix: string
-  codes: string[]
+interface StateStickerGroup {
+  byTeam: StickerGroupByTeam[];
+  byGroup: StickerGroupByGroup[];
 }
 
-function prefixOf(code: string): string {
-  return code === '00' ? '00' : code.slice(0, 3)
-}
-
-export function useStickerGroup(items: string[]): { groups: StickerGroup[] } {
+export function useStickerGroup(stickers: Stickers): StateStickerGroup {
   return useMemo(() => {
-    const map = new Map<string, string[]>()
-    const order = new Map<string, number>()
-    for (const code of items) {
-      const p = prefixOf(code)
-      if (!map.has(p)) {
-        map.set(p, [])
-        order.set(p, p === '00' ? -1 : groupOf(p).order)
-      }
-      map.get(p)!.push(code)
-    }
-    const groups = [...map.entries()]
-      .sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
-      .map(([prefix, codes]) => ({ prefix, codes }))
-    return { groups }
-  }, [items])
+    const byTeam = groupByTeam(stickers);
+    const byGroup = groupByGroup(byTeam);
+    return {
+      byTeam,
+      byGroup,
+    };
+  }, [stickers]);
 }

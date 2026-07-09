@@ -6,7 +6,7 @@ import { useLocale } from '../../../i18n/index.js'
 export default function AddSurplusStickers() {
   const { t } = useLocale()
   const { addSurplusText } = useSurplusStickers()
-  const { inv } = useOwnStickers()
+  const { inv, extras } = useOwnStickers()
   const [text, setText] = useState('')
   const [preview, setPreview] = useState<{ codes: string[] } | null>(null)
 
@@ -52,20 +52,16 @@ export default function AddSurplusStickers() {
         </button>
       </form>
 
-      {Object.keys(inv).length > 0 && (
-        <details className="text-xs text-gray-500">
-          <summary className="cursor-pointer hover:text-gray-700">{t('viewInventory')}</summary>
-          <div className="mt-1 max-h-32 overflow-y-auto">
-            {Object.entries(inv)
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([code, qty]) => (
-                <div key={code} className="flex justify-between px-1 py-0.5">
+      {Object.keys(extras).length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-2 text-gray-700 text-xs">
+            {extras
+              .map(({qty, code}) => (
+                <span key={code} className="">
                   <span>{code}</span>
                   <span className="text-gray-400">{qty > 1 ? `x${qty}` : ''}</span>
-                </div>
+                </span>
               ))}
-          </div>
-        </details>
+            </div>
       )}
     </div>
   )

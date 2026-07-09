@@ -164,7 +164,7 @@ export default function StickerViewer() {
             teams.length === 0 ? null : (
               <div key={group.order}>
                 <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
-                  {group.label}
+                  {t(group.labelKey as never)}
                 </h3>
                 <div className="space-y-2">
                   {teams.map(({ prefix, items }) => (

@@ -1,64 +1,122 @@
-import { useState } from 'react'
-import { flagOf } from '../../data/flags.js'
-import { useLocale } from '../../i18n/index.js'
-import Sticker from './Sticker.js'
-import type { StickerGroup } from '../../application/useStickerGroup.js'
+import { useState, useMemo, useCallback } from "react";
+import { flagOf } from "../../data/flags.js";
+import { useLocale } from "../../i18n/index.js";
+import Sticker from "./Sticker.js";
+import { maxStickers } from "../../data/stickers.js";
+import { StickerGroupByTeam } from "../../type/group.js";
+import { prefixOf } from "../../application/stickerTools.js";
+import { Stickers } from "../../type/sticker.js";
+import { MAX_STICKERS_PER_TEAM } from "../../data/groups.js";
+import { getMaxStickerPerTeam } from "../../application/groupTools.js";
 
-function teamName(prefix: string, t: ReturnType<typeof useLocale>['t']): string {
-  if (prefix === '00') return t('team_FWC')
-  return t(`team_${prefix}` as never)
+function teamName(
+  prefix: string,
+  t: ReturnType<typeof useLocale>["t"],
+): string {
+  if (prefix === "00") return t("team_FWC");
+  return t(`team_${prefix}` as never);
+}
+
+interface GroupStickerProps {
+  groups: StickerGroupByTeam[];
+  mode?: "regular" | "compact";
+  displayFlag?: boolean;
+  displayCount?: boolean;
+  showMissing?: boolean;
+}
+
+function createAllStickerList(
+  team: string,
+  max: number,
+  ownedStickers: Stickers,
+): Stickers {
+  return Object.fromEntries(
+    new Array(max).fill(0).map((_, i) => {
+      const code = team === "00" ? team : `${team}${i + 1}`;
+      return [code, ownedStickers[code]];
+    }),
+  );
+}
+
+function makeExpandedState(
+  groups: StickerGroupByTeam[],
+  expanded: boolean = true,
+) {
+  try {
+    return Object.fromEntries(groups.map(({ team }) => [team, expanded]) || []);
+  } catch (e) {
+    return {};
+  }
 }
 
 export default function GroupSticker({
-  groups,
-  mode = 'regular',
-}: {
-  groups: StickerGroup[]
-  mode?: 'regular' | 'compact'
-}) {
-  const { t } = useLocale()
-  const [expandedSet, setExpandedSet] = useState<Set<string>>(new Set(groups.map((g) => g.prefix)))
+  groups = [],
+  displayFlag = false,
+  mode = "regular",
+  showMissing = false,
+}: GroupStickerProps) {
+  const { t } = useLocale();
 
-  function toggle(prefix: string) {
-    setExpandedSet((prev) => {
-      const next = new Set(prev)
-      if (next.has(prefix)) next.delete(prefix)
-      else next.add(prefix)
-      return next
-    })
-  }
+  const [expandedState, setExpandedState] = useState(makeExpandedState(groups));
 
-  function expandAll() {
-    setExpandedSet(new Set(groups.map((g) => g.prefix)))
-  }
+  const isOpen = useCallback(
+    (team: string) => {
+      return expandedState[team];
+    },
+    [expandedState],
+  );
 
-  function collapseAll() {
-    setExpandedSet(new Set())
-  }
+  const allExpanded = useMemo(
+    () => groups.every(({ team }) => expandedState[team]),
+    [groups, expandedState],
+  );
 
-  const allExpanded = groups.length > 0 && groups.every((g) => expandedSet.has(g.prefix))
-  const allCollapsed = groups.every((g) => !expandedSet.has(g.prefix))
+  const toggle = (team: string) => {
+    setExpandedState((prev) => ({ ...prev, [team]: !prev[team] }));
+  };
 
-  if (mode === 'compact') {
+  const expandAll = useCallback(() => {
+    setExpandedState(makeExpandedState(groups));
+  }, [groups]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedState(makeExpandedState(groups, false));
+  }, [groups]);
+
+  const getStickerList = useCallback(
+    (team: string, stickers: Stickers): [string, number][] => {
+      if (showMissing) {
+        const max = getMaxStickerPerTeam(team);
+        return Object.entries(createAllStickerList(team, max, stickers));
+      }
+      return Object.entries(stickers);
+    },
+    [groups, showMissing],
+  );
+
+  if (mode === "compact") {
     return (
-      <div className="space-y-1">
-        {groups.map(({ prefix, codes }) => {
-          const icon = prefix === '00' ? '⭐' : flagOf(prefix)
-          const name = teamName(prefix, t)
+      <div className="space-y-2">
+        {groups.map(({ team, stickers }) => {
+          const icon = flagOf(team);
           return (
-            <div key={prefix} className="flex items-baseline gap-1.5 text-xs text-gray-700">
-              <span className="text-base leading-none shrink-0">{icon}</span>
-              <span className="font-medium shrink-0">{name}</span>
-              <span className="flex flex-wrap gap-0.5">
-                {codes.map((code) => (
+            <div
+              key={team}
+              className="flex items-baseline gap-2 text-xs text-gray-700"
+            >
+              <span className="font-medium shrink-0 w-15 text-right">
+                {icon} {team}
+              </span>
+              <span className="flex flex-wrap gap-1.5">
+                {getStickerList(team, stickers).map(([code]) => (
                   <Sticker key={code} code={code} displayFlag={false} compact />
                 ))}
               </span>
             </div>
-          )
+          );
         })}
       </div>
-    )
+    );
   }
 
   return (
@@ -69,46 +127,66 @@ export default function GroupSticker({
           disabled={allExpanded}
           className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          ◎ {t('expandAll')}
+          ◎ {t("expandAll")}
         </button>
         <button
           onClick={collapseAll}
-          disabled={allCollapsed}
+          disabled={!allExpanded}
           className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          ◎ {t('collapseAll')}
+          ◎ {t("collapseAll")}
         </button>
       </div>
-      {groups.map(({ prefix, codes }) => {
-        const isOpen = expandedSet.has(prefix)
-        const icon = prefix === '00' ? '⭐' : flagOf(prefix)
-        const name = teamName(prefix, t)
+      {groups.map(({ team, stickers }) => {
+        const icon = flagOf(team);
         return (
-          <details key={prefix} open={isOpen} className="group border border-gray-200 rounded-lg overflow-hidden">
+          <details
+            key={team}
+            open={isOpen(team)}
+            className="group border border-gray-200 rounded-lg overflow-hidden"
+          >
             <summary
-              onClick={(e) => { e.preventDefault(); toggle(prefix) }}
+              onClick={(e) => {
+                e.preventDefault();
+                toggle(team);
+              }}
               className="flex items-center gap-2 px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 text-sm font-medium text-gray-700 list-none [&::-webkit-details-marker]:hidden"
             >
               <span className="text-base leading-none">{icon}</span>
-              <span>{name}</span>
-              <span className="text-xs text-gray-400">({codes.length})</span>
+              <span>{team}</span>
+              <span className="text-xs text-gray-400">
+                {Object.keys(stickers).length}/20
+              </span>
               <span className="ml-auto">
                 <svg
-                  className={`w-3.5 h-3.5 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  className={`w-3.5 h-3.5 text-gray-400 transition-transform ${expandedState ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </span>
             </summary>
-            <div className="flex flex-wrap gap-1 p-3 border-t border-gray-100">
-              {codes.map((code) => (
-                <Sticker key={code} code={code} displayFlag={false} />
+            <div className="grid grid-cols-10 p-2 border-t border-gray-100 gap-5">
+              {getStickerList(team, stickers).map(([code, qdy]) => (
+                <Sticker
+                  key={code}
+                  code={code}
+                  full
+                  qty={qdy ?? 0}
+                  displayFlag={displayFlag}
+                />
               ))}
             </div>
           </details>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
