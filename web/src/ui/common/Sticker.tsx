@@ -26,7 +26,11 @@ export default function Sticker({
   const chroma = code ? isChroma(code) : false;
   const isMissing = qty === 0;
 
-  const baseColor = isMissing ? "#292524" : prefix ? colorOf(prefix) : "#44403c";
+  const baseColor = isMissing
+    ? "#3f3a36"
+    : prefix
+      ? colorOf(prefix)
+      : "#44403c";
   const displayCode = (code || "----").toUpperCase();
 
   const baseClasses = compact
@@ -42,16 +46,21 @@ export default function Sticker({
       style={{
         fontFamily: "'Fira Sans', system-ui, -apple-system, sans-serif",
         background: isMissing
-          ? "linear-gradient(145deg, #1c1917 0%, #292524 100%)"
+          ? "linear-gradient(145deg, #292524 0%, #3f3a36 100%)"
           : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
       }}
     >
       {displayFlag && (
-        <span className={`leading-none opacity-90 font-semibold ${compact ? "text-xs" : "text-base"}`}>
+        <span
+          className={`leading-none opacity-90 font-semibold ${compact ? "text-xs" : "text-base"}`}
+        >
           {flagOf(prefix)}
         </span>
       )}
-      <span className="relative z-10 tracking-[0.08em] font-black" style={{ fontWeight: 900 }}>
+      <span
+        className="relative z-10 tracking-[0.08em] font-black"
+        style={{ fontWeight: 500 }}
+      >
         {displayCode}
       </span>
 
