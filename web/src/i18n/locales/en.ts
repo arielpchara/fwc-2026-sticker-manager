@@ -53,6 +53,8 @@ const en = {
   specialGroupLabel: 'Special',
   extrasFilter: 'Extras only',
   missingFilter: 'Missing',
+  filterGroup: 'Group',
+  filterTeam: 'Team',
   searchStatus: '{total} owned · {filtered} shown',
   copyWantTitle: 'What I want',
   copyHaveTitle: 'What I have',

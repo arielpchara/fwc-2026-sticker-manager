@@ -1,11 +1,13 @@
 import type { Stickers } from "../type/sticker.js";
-import { GROUPS } from "../constants/groups.js";
+import { GROUPS, PREFIX_TO_GROUP } from "../constants/groups.js";
 import { maxStickers } from "../constants/stickers.js";
 
 export type InventoryFilters = {
   query: string;
   missing: boolean;
   extras: boolean;
+  groups: string[];
+  teams: string[];
 };
 
 function allAlbumCodes(): string[] {
@@ -24,6 +26,17 @@ function allAlbumCodes(): string[] {
   return codes;
 }
 
+function codeMatchesGroupTeam(code: string, groups: string[], teams: string[]): boolean {
+  const prefix = code === "00" ? "00" : code.slice(0, 3);
+  const g = PREFIX_TO_GROUP.get(prefix);
+  const groupKey = g ? g.labelKey : "specialLabel";
+
+  const groupOk = groups.length === 0 || groups.includes(groupKey);
+  const teamOk = teams.length === 0 || teams.includes(prefix);
+
+  return groupOk && teamOk;
+}
+
 export function filterInventory(
   inv: Stickers,
   filters: InventoryFilters,
@@ -39,7 +52,11 @@ export function filterInventory(
   if (filters.missing) {
     const all = allAlbumCodes();
     for (const code of all) {
-      if (!inv[code] && (!q || code.includes(q))) {
+      if (
+        !inv[code] &&
+        (!q || code.includes(q)) &&
+        codeMatchesGroupTeam(code, filters.groups, filters.teams)
+      ) {
         result[code] = 0;
       }
     }
@@ -48,7 +65,11 @@ export function filterInventory(
 
   if (filters.extras) {
     for (const [code, qty] of Object.entries(inv)) {
-      if (qty >= 2 && (!q || code.includes(q))) {
+      if (
+        qty >= 2 &&
+        (!q || code.includes(q)) &&
+        codeMatchesGroupTeam(code, filters.groups, filters.teams)
+      ) {
         result[code] = qty;
       }
     }
@@ -58,7 +79,19 @@ export function filterInventory(
   // only query or no filters
   if (q) {
     for (const [code, qty] of Object.entries(inv)) {
-      if (code.includes(q)) result[code] = qty;
+      if (code.includes(q) && codeMatchesGroupTeam(code, filters.groups, filters.teams)) {
+        result[code] = qty;
+      }
+    }
+    return result;
+  }
+
+  // group/team only
+  if (filters.groups.length || filters.teams.length) {
+    for (const [code, qty] of Object.entries(inv)) {
+      if (codeMatchesGroupTeam(code, filters.groups, filters.teams)) {
+        result[code] = qty;
+      }
     }
     return result;
   }
@@ -71,5 +104,11 @@ export function countFiltered(filtered: Stickers): number {
 }
 
 export function hasActiveFilters(filters: InventoryFilters): boolean {
-  return Boolean(filters.query.trim() || filters.missing || filters.extras);
+  return Boolean(
+    filters.query.trim() ||
+      filters.missing ||
+      filters.extras ||
+      filters.groups.length ||
+      filters.teams.length,
+  );
 }

@@ -55,6 +55,8 @@ const pt: Translations = {
   specialGroupLabel: 'Especiais',
   extrasFilter: 'Só repetidas',
   missingFilter: 'Faltando',
+  filterGroup: 'Grupo',
+  filterTeam: 'Seleção',
   searchStatus: '{total} no álbum · {filtered} exibidas',
   copyWantTitle: 'O que eu quero',
   copyHaveTitle: 'O que eu tenho',

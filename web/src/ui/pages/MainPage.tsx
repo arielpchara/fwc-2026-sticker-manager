@@ -21,6 +21,8 @@ export default function MainPage() {
     query: "",
     missing: false,
     extras: false,
+    groups: [],
+    teams: [],
   });
 
   const active = hasActiveFilters(filters);

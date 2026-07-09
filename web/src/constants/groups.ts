@@ -72,7 +72,7 @@ export const GROUPS_INDEX_PREFIX: Record<string, [number, number]> = {
   PAN: [11, 3],
 };
 
-const PREFIX_TO_GROUP = new Map<string, GroupInfo>();
+export const PREFIX_TO_GROUP = new Map<string, GroupInfo>();
 for (const g of GROUPS) {
   for (const p of g.prefixes) {
     PREFIX_TO_GROUP.set(p, g);

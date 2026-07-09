@@ -1,11 +1,7 @@
 import { useLocale } from '../../i18n/index.js'
 import Filter from '../common/Filter.js'
-
-export type InventoryFilters = {
-  query: string
-  missing: boolean
-  extras: boolean
-}
+import { GroupMultiSelect, TeamMultiSelect } from './MultiSelectChip.js'
+import type { InventoryFilters } from '../../application/filterInventory.js'
 
 export default function AlbumSearch({
   filters,
@@ -19,17 +15,27 @@ export default function AlbumSearch({
   filteredCount: number
 }) {
   const { t } = useLocale()
-  const { query, missing, extras } = filters
+  const { query, missing, extras, groups, teams } = filters
 
   const chips: { key: string; label: string }[] = []
   if (query.trim()) chips.push({ key: 'query', label: query.trim() })
   if (missing) chips.push({ key: 'missing', label: t('missingFilter') })
   if (extras) chips.push({ key: 'extras', label: t('extrasFilter') })
+  for (const g of groups) chips.push({ key: `group:${g}`, label: t(g as never) })
+  for (const p of teams) chips.push({ key: `team:${p}`, label: p })
 
   const removeChip = (key: string) => {
     if (key === 'query') onChange({ ...filters, query: '' })
     if (key === 'missing') onChange({ ...filters, missing: false })
     if (key === 'extras') onChange({ ...filters, extras: false })
+    if (key.startsWith('group:')) {
+      const g = key.slice(6)
+      onChange({ ...filters, groups: groups.filter((x) => x !== g) })
+    }
+    if (key.startsWith('team:')) {
+      const p = key.slice(5)
+      onChange({ ...filters, teams: teams.filter((x) => x !== p) })
+    }
   }
 
   return (
@@ -39,7 +45,7 @@ export default function AlbumSearch({
         onChange={(e) => onChange({ ...filters, query: e.target.value })}
       />
 
-      <div className="flex gap-1.5">
+      <div className="flex flex-wrap gap-1.5">
         <button
           onClick={() => onChange({ ...filters, missing: !missing, extras: false })}
           className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
@@ -60,6 +66,15 @@ export default function AlbumSearch({
         >
           {t('extrasFilter')}
         </button>
+
+        <GroupMultiSelect
+          selected={groups}
+          onChange={(g) => onChange({ ...filters, groups: g })}
+        />
+        <TeamMultiSelect
+          selected={teams}
+          onChange={(t) => onChange({ ...filters, teams: t })}
+        />
       </div>
 
       <div className="text-xs text-muted flex flex-wrap items-center gap-2">
