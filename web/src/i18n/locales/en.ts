@@ -59,6 +59,8 @@ const en = {
   displayGroup: 'Group A→L',
   displayList: 'List',
   displayCompact: 'Compact',
+  sortByComplete: 'By Complete',
+  sortByTeamCode: 'By Team Code',
   searchStatus: '{total} owned · {filtered} shown',
   copyWantTitle: 'What I want',
   copyHaveTitle: 'What I have',

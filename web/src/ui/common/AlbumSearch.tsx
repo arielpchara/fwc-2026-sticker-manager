@@ -1,16 +1,22 @@
 import { useLocale } from '../../i18n/index.js'
 import Filter from '../common/Filter.js'
 import { GroupMultiSelect, TeamMultiSelect } from './MultiSelectChip.js'
+import TeamSortSelect from './TeamSortSelect.js'
 import type { InventoryFilters } from '../../application/filterInventory.js'
+import type { TeamSort } from '../../application/sortTeams.js'
 
 export default function AlbumSearch({
   filters,
   onChange,
+  sort,
+  onSortChange,
   totalInv,
   filteredCount,
 }: {
   filters: InventoryFilters
   onChange: (next: InventoryFilters) => void
+  sort: TeamSort
+  onSortChange: (v: TeamSort) => void
   totalInv: number
   filteredCount: number
 }) {
@@ -52,36 +58,39 @@ export default function AlbumSearch({
         onChange={(e) => onChange({ ...filters, query: e.target.value })}
       />
 
-      <div className="flex flex-wrap gap-1.5">
-        <button
-          onClick={() => onChange({ ...filters, missing: !missing, extras: false })}
-          className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
-            missing
-              ? 'bg-gold text-bg border-gold'
-              : 'bg-surface text-muted border-border hover:border-gold'
-          }`}
-        >
-          {t('missingFilter')}
-        </button>
-        <button
-          onClick={() => onChange({ ...filters, extras: !extras, missing: false })}
-          className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
-            extras
-              ? 'bg-copper text-white border-copper'
-              : 'bg-surface text-muted border-border hover:border-gold'
-          }`}
-        >
-          {t('extrasFilter')}
-        </button>
+      <div className="flex flex-wrap items-center gap-1.5 justify-between">
+        <div className="flex flex-wrap gap-1.5">
+          <button
+            onClick={() => onChange({ ...filters, missing: !missing, extras: false })}
+            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
+              missing
+                ? 'bg-gold text-bg border-gold'
+                : 'bg-surface text-muted border-border hover:border-gold'
+            }`}
+          >
+            {t('missingFilter')}
+          </button>
+          <button
+            onClick={() => onChange({ ...filters, extras: !extras, missing: false })}
+            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
+              extras
+                ? 'bg-copper text-white border-copper'
+                : 'bg-surface text-muted border-border hover:border-gold'
+            }`}
+          >
+            {t('extrasFilter')}
+          </button>
 
-        <GroupMultiSelect
-          selected={groups}
-          onChange={(g) => onChange({ ...filters, groups: g })}
-        />
-        <TeamMultiSelect
-          selected={teams}
-          onChange={(t) => onChange({ ...filters, teams: t })}
-        />
+          <GroupMultiSelect
+            selected={groups}
+            onChange={(g) => onChange({ ...filters, groups: g })}
+          />
+          <TeamMultiSelect
+            selected={teams}
+            onChange={(t) => onChange({ ...filters, teams: t })}
+          />
+        </div>
+        <TeamSortSelect value={sort} onChange={onSortChange} />
       </div>
 
       <div className="text-xs text-muted flex flex-wrap items-center gap-2">

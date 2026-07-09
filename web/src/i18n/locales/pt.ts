@@ -61,6 +61,8 @@ const pt: Translations = {
   displayGroup: 'Grupo A→L',
   displayList: 'Lista',
   displayCompact: 'Compacto',
+  sortByComplete: 'Por Completo',
+  sortByTeamCode: 'Por Código',
   searchStatus: '{total} no álbum · {filtered} exibidas',
   copyWantTitle: 'O que eu quero',
   copyHaveTitle: 'O que eu tenho',

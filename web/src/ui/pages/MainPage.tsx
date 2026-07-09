@@ -9,6 +9,7 @@ import {
   type InventoryFilters,
   hasActiveFiltersHideMissing,
 } from "../../application/filterInventory.js";
+import { sortTeams, type TeamSort } from "../../application/sortTeams.js";
 import Body from "../common/Body.js";
 import GroupSticker from "../common/GroupSticker.js";
 import MainLayout from "../common/MainLayout.js";
@@ -29,6 +30,7 @@ export default function MainPage() {
   });
   const [layout, setLayout] = useState<LayoutMode>("group");
   const [compact, setCompact] = useState(false);
+  const [sort, setSort] = useState<TeamSort>("code");
 
   const active = hasActiveFilters(filters);
   const hideMissing = hasActiveFiltersHideMissing(filters);
@@ -41,12 +43,23 @@ export default function MainPage() {
   const totalInv = Object.keys(inv).length;
   const stickerMode = compact ? "compact" as const : "regular" as const;
 
+  const sortedByTeam = useMemo(
+    () => sortTeams(groups.byTeam.filter((t): t is NonNullable<typeof t> => t != null), sort, !hideMissing),
+    [groups.byTeam, sort, hideMissing],
+  );
+  const sortedByGroup = useMemo(
+    () => groups.byGroup.map((g) => ({ ...g, teams: sortTeams(g.teams, sort, !hideMissing) })),
+    [groups.byGroup, sort, hideMissing],
+  );
+
   return (
     <MainLayout>
       <Body>
         <AlbumSearch
           filters={filters}
           onChange={setFilters}
+          sort={sort}
+          onSortChange={setSort}
           totalInv={totalInv}
           filteredCount={filteredCount}
         />
@@ -61,15 +74,15 @@ export default function MainPage() {
         </div>
 
         {layout === "list" ? (
-          groups.byTeam.length === 0 ? (
+          sortedByTeam.length === 0 ? (
             <p className="text-xs text-muted text-center">{t("noMatch")}</p>
           ) : (
-            <GroupSticker groups={groups.byTeam} mode={stickerMode} showMissing={!hideMissing} />
+            <GroupSticker groups={sortedByTeam} mode={stickerMode} showMissing={!hideMissing} />
           )
-        ) : groups.byGroup.length === 0 ? (
+        ) : sortedByGroup.length === 0 ? (
           <p className="text-xs text-muted text-center">{t("noMatch")}</p>
         ) : (
-          groups.byGroup.map(({ labelKey, teams }) => (
+          sortedByGroup.map(({ labelKey, teams }) => (
             <section key={t(labelKey as never)} className="mb-6">
               <h2 className="text-lg font-semibold mb-2">
                 {t(labelKey as never)}
