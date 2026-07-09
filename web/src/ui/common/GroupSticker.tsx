@@ -104,8 +104,8 @@ export default function GroupSticker({
               key={team}
               className="flex items-baseline gap-2 text-xs text-fg"
             >
-              <span className="font-medium shrink-0 w-15 text-right">
-                {icon} {team}
+              <span className="font-medium shrink-0 w-5 text-right">
+                {icon}
               </span>
               <span className="flex flex-wrap gap-1.5">
                 {getStickerList(team, stickers).map(([code]) => (

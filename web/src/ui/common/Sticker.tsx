@@ -34,17 +34,30 @@ export default function Sticker({
   const displayCode = (code || "----").toUpperCase();
 
   const baseClasses = compact
-    ? "px-1.5 py-0.5 text-[10px] tracking-wider"
+    ? "px-1.5 py-0.5 text-[11px] tracking-wider"
     : "px-4 py-2 text-sm tracking-wider";
 
   const glassClass = chroma ? "sticker-glass chroma" : "sticker-glass";
 
+  if (compact) {
+    return (
+      <span
+        style={{
+          borderColor: baseColor,
+          borderBottomWidth: 1,
+          borderStyle: "solid",
+        }}
+      >
+        {displayCode}
+      </span>
+    );
+  }
+
   return (
     <span
       {...rest}
-      className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none overflow-visible ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
+      className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none overflow-visible ${isMissing && "missing"} ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
       style={{
-        fontFamily: "'Fira Sans', system-ui, -apple-system, sans-serif",
         background: isMissing
           ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"
           : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
