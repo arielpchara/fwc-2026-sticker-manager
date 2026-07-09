@@ -7,6 +7,7 @@ import {
   hasActiveFilters,
   countFiltered,
   type InventoryFilters,
+  hasActiveFiltersHideMissing,
 } from "../../application/filterInventory.js";
 import Body from "../common/Body.js";
 import GroupSticker from "../common/GroupSticker.js";
@@ -26,6 +27,7 @@ export default function MainPage() {
   });
 
   const active = hasActiveFilters(filters);
+  const hideMissing = hasActiveFiltersHideMissing(filters);
   const displayInv = useMemo(
     () => (active ? filterInventory(inv, filters) : inv),
     [inv, filters, active],
@@ -52,7 +54,7 @@ export default function MainPage() {
               <h2 className="text-lg font-semibold mb-2">
                 {t(labelKey as never)}
               </h2>
-              <GroupSticker groups={teams} showMissing={!active} />
+              <GroupSticker groups={teams} showMissing={!hideMissing} />
             </section>
           ))
         )}

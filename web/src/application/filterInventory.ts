@@ -26,7 +26,11 @@ function allAlbumCodes(): string[] {
   return codes;
 }
 
-function codeMatchesGroupTeam(code: string, groups: string[], teams: string[]): boolean {
+function codeMatchesGroupTeam(
+  code: string,
+  groups: string[],
+  teams: string[],
+): boolean {
   const prefix = code === "00" ? "00" : code.slice(0, 3);
   const g = PREFIX_TO_GROUP.get(prefix);
   const groupKey = g ? g.labelKey : "specialLabel";
@@ -79,7 +83,10 @@ export function filterInventory(
   // only query or no filters
   if (q) {
     for (const [code, qty] of Object.entries(inv)) {
-      if (code.includes(q) && codeMatchesGroupTeam(code, filters.groups, filters.teams)) {
+      if (
+        code.includes(q) &&
+        codeMatchesGroupTeam(code, filters.groups, filters.teams)
+      ) {
         result[code] = qty;
       }
     }
@@ -106,9 +113,15 @@ export function countFiltered(filtered: Stickers): number {
 export function hasActiveFilters(filters: InventoryFilters): boolean {
   return Boolean(
     filters.query.trim() ||
-      filters.missing ||
-      filters.extras ||
-      filters.groups.length ||
-      filters.teams.length,
+    filters.missing ||
+    filters.extras ||
+    filters.groups.length ||
+    filters.teams.length,
   );
+}
+
+export function hasActiveFiltersHideMissing(
+  filters: InventoryFilters,
+): boolean {
+  return Boolean(filters.query.trim() || filters.missing || filters.extras);
 }
