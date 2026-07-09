@@ -13,6 +13,8 @@ import Body from "../common/Body.js";
 import GroupSticker from "../common/GroupSticker.js";
 import MainLayout from "../common/MainLayout.js";
 import AlbumSearch from "../common/AlbumSearch.js";
+import DisplayMode from "../common/DisplayMode.js";
+import type { LayoutMode } from "../common/DisplayMode.js";
 
 export default function MainPage() {
   const { inv } = useOwnStickers();
@@ -25,6 +27,8 @@ export default function MainPage() {
     groups: [],
     teams: [],
   });
+  const [layout, setLayout] = useState<LayoutMode>("group");
+  const [compact, setCompact] = useState(false);
 
   const active = hasActiveFilters(filters);
   const hideMissing = hasActiveFiltersHideMissing(filters);
@@ -35,6 +39,7 @@ export default function MainPage() {
   const groups = useStickerGroup(displayInv);
   const filteredCount = countFiltered(displayInv);
   const totalInv = Object.keys(inv).length;
+  const stickerMode = compact ? "compact" as const : "regular" as const;
 
   return (
     <MainLayout>
@@ -46,7 +51,22 @@ export default function MainPage() {
           filteredCount={filteredCount}
         />
 
-        {groups.byGroup.length === 0 ? (
+        <div className="mb-6">
+          <DisplayMode
+            layout={layout}
+            onLayout={setLayout}
+            compact={compact}
+            onCompact={setCompact}
+          />
+        </div>
+
+        {layout === "list" ? (
+          groups.byTeam.length === 0 ? (
+            <p className="text-xs text-muted text-center">{t("noMatch")}</p>
+          ) : (
+            <GroupSticker groups={groups.byTeam} mode={stickerMode} showMissing={!hideMissing} />
+          )
+        ) : groups.byGroup.length === 0 ? (
           <p className="text-xs text-muted text-center">{t("noMatch")}</p>
         ) : (
           groups.byGroup.map(({ labelKey, teams }) => (
@@ -54,7 +74,7 @@ export default function MainPage() {
               <h2 className="text-lg font-semibold mb-2">
                 {t(labelKey as never)}
               </h2>
-              <GroupSticker groups={teams} showMissing={!hideMissing} />
+              <GroupSticker groups={teams} showMissing={!hideMissing} mode={stickerMode} />
             </section>
           ))
         )}
