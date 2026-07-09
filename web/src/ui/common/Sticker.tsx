@@ -14,18 +14,6 @@ interface StickerProps extends React.HTMLAttributes<HTMLSpanElement> {
   full?: boolean;
 }
 
-function numberPart(code: string) {
-  return code === "00" ? "00" : code.slice(3);
-}
-
-function darken(hex: string, amount: number): string {
-  const num = parseInt(hex.replace("#", ""), 16);
-  const r = Math.max(0, (num >> 16) - amount);
-  const g = Math.max(0, ((num >> 8) & 0xff) - amount);
-  const b = Math.max(0, (num & 0xff) - amount);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-}
-
 export default function Sticker({
   code,
   displayFlag = true,
@@ -36,38 +24,36 @@ export default function Sticker({
 }: StickerProps) {
   const prefix = code ? prefixOf(code) : "00";
   const chroma = code ? isChroma(code) : false;
+  const isMissing = qty === 0;
 
-  const bg = qty === 0 ? "#a6abb4" : prefix ? colorOf(prefix) : "#6b7280";
-  const borderBg = darken(bg, 40);
+  const baseColor = isMissing ? "#292524" : prefix ? colorOf(prefix) : "#44403c";
+  const displayCode = (code || "----").toUpperCase();
+
+  const baseClasses = compact
+    ? "px-1.5 py-0.5 text-[10px] tracking-wider"
+    : "px-3 py-1.5 text-xs tracking-wider";
+
+  const glassClass = chroma ? "sticker-glass chroma" : "sticker-glass";
 
   return (
     <span
       {...rest}
-      className={`relative inline-flex items-center gap-1 rounded-md text-white leading-tight ${compact ? "px-2 py-0.5 font-normal text-[10px]" : "px-4 py-2 font-bold text-xs"} ${full ? "w-full h-full flex items-center justify-center" : ""}`}
+      className={`inline-flex items-center gap-1 rounded-md text-fg font-black uppercase leading-none select-none ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
       style={{
-        background: `linear-gradient(150deg, ${borderBg} 50%, ${bg} 50%)`,
-        ...(chroma ? { boxShadow: `0 1px 2px 2px rgb(197, 131, 0)` } : {}),
-        borderColor: borderBg,
-        borderWidth: 2,
-        borderStyle: "solid",
-        textShadow: "0px 0px 2px rgba(0, 0, 0, 1)",
+        background: isMissing
+          ? "linear-gradient(145deg, #1c1917 0%, #292524 100%)"
+          : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
       }}
     >
       {displayFlag && (
-        <span className={`leading-none ${compact ? "text-xs" : "text-base"}`}>
+        <span className={`leading-none opacity-90 ${compact ? "text-xs" : "text-base"}`}>
           {flagOf(prefix)}
         </span>
       )}
-      <span>{code || "----"}</span>
+      <span className="relative z-10 tracking-[0.08em]">{displayCode}</span>
+
       {qty !== undefined && qty > 1 && (
-        <span
-          className="absolute z-10 -top-3 -right-2 bg-white text-black text-[10px] w-8 h-5 flex items-center justify-center rounded-full"
-          style={{
-            borderColor: borderBg,
-            borderWidth: 2,
-            borderStyle: "solid",
-          }}
-        >
+        <span className="absolute -top-1.5 -right-1 z-20 bg-gold text-bg text-[9px] font-black uppercase px-1.5 py-px rounded-full border border-gold-bright shadow">
           +{qty - 1}
         </span>
       )}
