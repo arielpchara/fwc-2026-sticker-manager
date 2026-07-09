@@ -38,7 +38,7 @@ export default function Sticker({
   return (
     <span
       {...rest}
-      className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
+      className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none overflow-visible ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
       style={{
         fontFamily: "'Fira Sans', system-ui, -apple-system, sans-serif",
         background: isMissing
