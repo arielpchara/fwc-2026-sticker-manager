@@ -35,11 +35,11 @@ export default function AddOwnStickers() {
           onInput={handlePreview}
           placeholder={t('ownPlaceholder')}
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full border border-border bg-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
         {preview && (
-          <p className="text-xs text-green-700">
+          <p className="text-xs text-gold">
             {t('parseFeedback', { n: preview.count, list: preview.stickers.slice(0, 10).join(', ') })}
             {preview.stickers.length > 10 && t('parseMore', { n: preview.stickers.length - 10 })}
           </p>
@@ -49,21 +49,21 @@ export default function AddOwnStickers() {
           <button
             onClick={() => handleAction('update')}
             disabled={!text.trim()}
-            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            className="bg-gold hover:bg-gold-bright disabled:bg-surface-2 text-bg text-sm font-medium px-4 py-2 rounded-lg transition"
           >
             {t('updateBtn')}
           </button>
           <button
             onClick={() => handleAction('add')}
             disabled={!text.trim()}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            className="bg-gold-dim hover:bg-gold disabled:bg-surface-2 text-fg text-sm font-medium px-4 py-2 rounded-lg transition"
           >
             {t('addBtn')}
           </button>
           <button
             onClick={() => handleAction('remove')}
             disabled={!text.trim()}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+            className="bg-red-600 hover:bg-red-700 disabled:bg-surface-2 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
           >
             {t('removeBtn')}
           </button>
@@ -71,13 +71,13 @@ export default function AddOwnStickers() {
       </div>
 
       {stickers.length > 0 && (
-        <details className="text-xs text-gray-500">
-          <summary className="cursor-pointer hover:text-gray-700">{t('viewAll', { n: stickers.length })}</summary>
+        <details className="text-xs text-muted">
+          <summary className="cursor-pointer hover:text-fg">{t('viewAll', { n: stickers.length })}</summary>
           <div className="mt-1 max-h-32 overflow-y-auto">
             {stickers.map((c) => (
               <div key={c} className="flex justify-between px-1 py-0.5">
                 <span>{c}</span>
-                <span className="text-gray-400">{inv[c] > 1 ? `x${inv[c]}` : ''}</span>
+                <span className="text-muted">{inv[c] > 1 ? `x${inv[c]}` : ''}</span>
               </div>
             ))}
           </div>

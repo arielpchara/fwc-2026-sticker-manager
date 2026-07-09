@@ -25,7 +25,7 @@ export default function Modal({ open, onClose, children }: { open: boolean; onCl
   }, [])
 
   return (
-    <dialog ref={ref} onClick={handleBackdrop} className="backdrop:bg-black/40 rounded-xl shadow-xl max-w-lg w-full p-0 border-0 m-auto fixed inset-0">
+    <dialog ref={ref} onClick={handleBackdrop} className="backdrop:bg-black/40 bg-surface rounded-xl shadow-xl max-w-lg w-full p-0 border-0 m-auto fixed inset-0">
       <div className="p-5 space-y-4">
         {children}
       </div>

@@ -33,11 +33,11 @@ export default function AddSurplusStickers() {
           onInput={handlePreview}
           placeholder={t('extrasPlaceholder')}
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-border bg-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
         {preview && (
-          <p className="text-xs text-blue-700">
+          <p className="text-xs text-gold">
             {t('parseFeedback', { n: preview.codes.length, list: preview.codes.slice(0, 10).join(', ') })}
             {preview.codes.length > 10 && t('parseMore', { n: preview.codes.length - 10 })}
           </p>
@@ -46,19 +46,19 @@ export default function AddSurplusStickers() {
         <button
           type="submit"
           disabled={!text.trim()}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+          className="bg-gold-dim hover:bg-gold disabled:bg-surface-2 text-fg text-sm font-medium px-4 py-2 rounded-lg transition"
         >
           {t('addExtrasBtn')}
         </button>
       </form>
 
       {Object.keys(extras).length > 0 && (
-        <div className="mt-1 flex flex-wrap gap-2 text-gray-700 text-xs">
+        <div className="mt-1 flex flex-wrap gap-2 text-fg text-xs">
             {extras
               .map(({qty, code}) => (
                 <span key={code} className="">
                   <span>{code}</span>
-                  <span className="text-gray-400">{qty > 1 ? `x${qty}` : ''}</span>
+                  <span className="text-muted">{qty > 1 ? `x${qty}` : ''}</span>
                 </span>
               ))}
             </div>

@@ -22,8 +22,8 @@ export default function SortStickers({
           onClick={() => onChange(s.value)}
           className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
             value === s.value
-              ? 'bg-green-700 text-white border-green-700'
-              : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+              ? 'bg-gold text-bg border-gold'
+              : 'bg-surface text-muted border-border hover:border-gold'
           }`}
         >
           {s.label}

@@ -24,7 +24,7 @@ export default function TradeChangeSticker({ sticker, onSubmit, onClose }: Trade
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white rounded-lg p-4 w-80" onClick={e => e.stopPropagation()}>
-        <p className="text-sm font-semibold text-gray-800 mb-2">
+        <p className="text-sm font-semibold text-fg mb-2">
           {t('tradeChangeTitle')}
         </p>
         <div className="flex flex-wrap gap-1.5 max-h-64 overflow-y-auto">
@@ -42,7 +42,7 @@ export default function TradeChangeSticker({ sticker, onSubmit, onClose }: Trade
         </div>
         <button
           onClick={() => onSubmit([...selected])}
-          className="mt-3 w-full text-xs font-medium bg-purple-600 text-white rounded-lg py-1.5 hover:bg-purple-700"
+          className="mt-3 w-full text-xs font-medium bg-gold text-bg rounded-lg py-1.5 hover:bg-gold-bright"
         >
           {t('tradeChangeSubmit', { n: selected.size })}
         </button>

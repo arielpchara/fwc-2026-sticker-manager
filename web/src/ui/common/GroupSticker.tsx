@@ -102,7 +102,7 @@ export default function GroupSticker({
           return (
             <div
               key={team}
-              className="flex items-baseline gap-2 text-xs text-gray-700"
+              className="flex items-baseline gap-2 text-xs text-fg"
             >
               <span className="font-medium shrink-0 w-15 text-right">
                 {icon} {team}
@@ -125,14 +125,14 @@ export default function GroupSticker({
         <button
           onClick={expandAll}
           disabled={allExpanded}
-          className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs text-muted hover:text-fg disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ◎ {t("expandAll")}
         </button>
         <button
           onClick={collapseAll}
           disabled={!allExpanded}
-          className="text-xs text-gray-400 hover:text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="text-xs text-muted hover:text-fg disabled:opacity-40 disabled:cursor-not-allowed"
         >
           ◎ {t("collapseAll")}
         </button>
@@ -143,23 +143,23 @@ export default function GroupSticker({
           <details
             key={team}
             open={isOpen(team)}
-            className="group border border-gray-200 rounded-lg overflow-hidden"
+            className="group border border-border rounded-lg overflow-hidden"
           >
             <summary
               onClick={(e) => {
                 e.preventDefault();
                 toggle(team);
               }}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100 text-sm font-medium text-gray-700 list-none [&::-webkit-details-marker]:hidden"
+              className="flex items-center gap-2 px-3 py-2 bg-surface cursor-pointer hover:bg-surface-2 text-sm font-medium text-fg list-none [&::-webkit-details-marker]:hidden"
             >
               <span className="text-base leading-none">{icon}</span>
               <span>{team}</span>
-              <span className="text-xs text-gray-400">
+                <span className="text-xs text-muted">
                 {Object.keys(stickers).length}/20
               </span>
               <span className="ml-auto">
                 <svg
-                  className={`w-3.5 h-3.5 text-gray-400 transition-transform ${expandedState ? "rotate-180" : ""}`}
+                    className={`w-3.5 h-3.5 text-muted transition-transform ${expandedState ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -173,7 +173,7 @@ export default function GroupSticker({
                 </svg>
               </span>
             </summary>
-            <div className="grid grid-cols-10 p-2 border-t border-gray-100 gap-5">
+            <div className="grid grid-cols-10 p-2 border-t border-border gap-5">
               {getStickerList(team, stickers).map(([code, qdy]) => (
                 <Sticker
                   key={code}

@@ -114,7 +114,7 @@ export default function TradeResult({
   function row(tradeBy: TradeBy, i: number) {
     const { give, receive } = tradeBy;
     return (
-      <tr className="border-b border-gray-50" key={i}>
+      <tr className="border-b border-border" key={i}>
         <td>{i + 1}</td>
         <td className="py-1 whitespace-nowrap">
           {give.map((code, i) => (
@@ -142,7 +142,7 @@ export default function TradeResult({
             />
           )}
         </td>
-        <td className="text-gray-300 px-2 text-center">→</td>
+        <td className="text-muted px-2 text-center">→</td>
         <td className="py-1 whitespace-nowrap">
           <div className="flex items-center gap-1">
             {receive.map((code, i) => (
@@ -180,13 +180,13 @@ export default function TradeResult({
       <div className="flex items-center gap-3 justify-end">
         <button
           onClick={() => name && removeTrade(name)}
-          className="text-xs text-gray-400 hover:text-gray-600"
+          className="text-xs text-muted hover:text-fg"
         >
           ↻ {t("tradeRecreate")}
         </button>
         <button
           onClick={handleCopyTrade}
-          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          className="text-xs text-muted hover:text-fg flex items-center gap-1"
         >
           <svg
             className="w-3.5 h-3.5"
@@ -205,7 +205,7 @@ export default function TradeResult({
         </button>
         <button
           onClick={handleCopyMissingTrade}
-          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          className="text-xs text-muted hover:text-fg flex items-center gap-1"
         >
           <svg
             className="w-3.5 h-3.5"
@@ -226,7 +226,7 @@ export default function TradeResult({
 
       <table className="w-full text-xs">
         <thead>
-          <tr className="text-left text-gray-400 uppercase tracking-wider">
+            <tr className="text-left text-muted uppercase tracking-wider">
             <th />
             <th className="font-medium pb-1">
               {t("tradeMy")}&nbsp;({giveCount})

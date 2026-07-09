@@ -52,14 +52,14 @@ export default function CompareResult({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-700">
+        <p className="text-sm font-medium text-fg">
           {mode === "receive"
             ? t("compareCanReceive", { n: items.length })
             : t("compareCanGive", { n: items.length })}
         </p>
         <button
           onClick={handleCopy}
-          className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          className="text-xs text-muted hover:text-fg flex items-center gap-1"
         >
           <svg
             className="w-3.5 h-3.5"

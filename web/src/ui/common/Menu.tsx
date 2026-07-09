@@ -33,23 +33,23 @@ export default function Menu() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="text-white text-xl p-1 hover:opacity-80"
+        className="text-gold text-xl p-1 hover:opacity-80"
         aria-label="Menu"
       >
         ☰
       </button>
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-white text-gray-800 rounded-lg shadow-lg min-w-40 z-50 py-1">
+        <div className="absolute right-0 top-full mt-1 bg-surface text-fg rounded-lg shadow-lg min-w-40 z-50 py-1">
           {items.map(item => (
             <button
               key={item.labelKey}
               onClick={() => { navigate(item.to); setOpen(false) }}
-              className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 whitespace-nowrap"
+              className="w-full text-left px-4 py-2 text-sm hover:bg-surface-2 whitespace-nowrap"
             >
               {t(item.labelKey)}
             </button>
           ))}
-          <hr className="my-1 mx-2 border-gray-200" />
+          <hr className="my-1 mx-2 border-border" />
           <div className="px-4 py-2">
             <LangSelector />
           </div>

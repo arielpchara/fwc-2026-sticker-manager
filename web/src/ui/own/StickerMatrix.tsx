@@ -38,10 +38,10 @@ export default function StickerMatrix() {
             {cells.map(({ code, owned }, i) => (
               <div
                 key={i}
-                className="w-[45px] h-[45px] border border-gray-200 flex items-center justify-center text-[10px] font-bold leading-none"
+                className="w-[45px] h-[45px] border border-border flex items-center justify-center text-[10px] font-bold leading-none"
                 style={{
                   backgroundColor: owned ? colorOf(prefix) : "transparent",
-                  color: owned ? "#fff" : "#9ca3af",
+                  color: owned ? "#fff" : "#a8a29e",
                 }}
               >
                 {code}

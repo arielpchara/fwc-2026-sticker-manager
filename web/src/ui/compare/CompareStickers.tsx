@@ -72,8 +72,8 @@ export default function CompareStickers() {
             onClick={() => toggleMode('receive')}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
               mode === 'receive'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-gold text-bg'
+                : 'bg-surface text-muted hover:bg-surface-2'
             }`}
           >
             {t('compareReceiveTab')}
@@ -83,8 +83,8 @@ export default function CompareStickers() {
             onClick={() => toggleMode('give')}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
               mode === 'give'
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-gold text-bg'
+                : 'bg-surface text-muted hover:bg-surface-2'
             }`}
           >
             {t('compareGiveTab')}
@@ -96,19 +96,19 @@ export default function CompareStickers() {
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder={t('historyLabelPlaceholder')}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full border border-border bg-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t('comparePlaceholder')}
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full border border-border bg-surface rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
         <button
           type="submit"
           disabled={!text.trim()}
-          className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white text-sm font-medium px-4 py-2 rounded-lg transition"
+          className="bg-gold hover:bg-gold-bright disabled:bg-surface-2 text-bg text-sm font-medium px-4 py-2 rounded-lg transition"
         >
           {t('compareBtn')}
         </button>
@@ -122,7 +122,7 @@ export default function CompareStickers() {
         )
       )}
 
-      <hr className="border-gray-200" />
+      <hr className="border-border" />
 
       <CompareHistory
         entries={Object.values(entries)}

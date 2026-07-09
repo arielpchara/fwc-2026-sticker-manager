@@ -23,7 +23,7 @@ export default function CompareHistory({
 
   if (!entries || entries.length === 0) {
     return (
-      <div className="text-xs text-gray-400 text-center py-2">
+      <div className="text-xs text-muted text-center py-2">
         {t('historyEmpty')}
       </div>
     )
@@ -31,19 +31,19 @@ export default function CompareHistory({
 
   return (
     <div className="space-y-1">
-      <p className="text-xs font-medium text-gray-500">{t('historyTitle')}</p>
+      <p className="text-xs font-medium text-muted">{t('historyTitle')}</p>
       {[...entries]
         .map((entry) => (
           <div
             key={entry.mode + '-' + entry.name}
-            className="flex items-center justify-between text-xs text-gray-600 py-1.5 px-2 rounded hover:bg-gray-50"
+            className="flex items-center justify-between text-xs text-muted py-1.5 px-2 rounded hover:bg-surface-2"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <span className={`font-bold shrink-0 ${entry.mode === 'receive' ? 'text-purple-500' : 'text-orange-500'}`}>
+              <span className={`font-bold shrink-0 ${entry.mode === 'receive' ? 'text-gold' : 'text-copper'}`}>
                 {entry.mode === 'receive' ? '↓' : '↑'}
               </span>
-              <span className="font-medium text-gray-800 truncate">{entry.name}</span>
-              <span className="text-gray-400 shrink-0">
+              <span className="font-medium text-fg truncate">{entry.name}</span>
+              <span className="text-muted shrink-0">
                 {t('historyMissing', { n: entry.stickers.length })}
               </span>
             </div>
@@ -59,14 +59,14 @@ export default function CompareHistory({
               )}
               <button
                 onClick={() => onReopen(entry)}
-                className="text-gray-400 hover:text-purple-600 p-0.5"
+                className="text-muted hover:text-gold p-0.5"
                 title={t('historyReopen')}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
               </button>
               <button
                     onClick={() => onDelete(entry.mode + '-' + entry.name)}
-                className="text-gray-300 hover:text-red-500 p-0.5"
+                className="text-muted hover:text-red-500 p-0.5"
                 title={t('historyDelete')}
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
