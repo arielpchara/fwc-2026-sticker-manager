@@ -8,6 +8,7 @@ import { prefixOf } from "../../application/stickerTools.js";
 import { Stickers } from "../../type/sticker.js";
 import { MAX_STICKERS_PER_TEAM } from "../../constants/groups.js";
 import { getMaxStickerPerTeam } from "../../application/groupTools.js";
+import ProgressBar from "./ProgressBar.js";
 
 function teamName(
   prefix: string,
@@ -150,27 +151,35 @@ export default function GroupSticker({
                 e.preventDefault();
                 toggle(team);
               }}
-              className="flex items-center gap-2 px-3 py-2 bg-surface cursor-pointer hover:bg-surface-2 text-sm font-medium text-fg list-none [&::-webkit-details-marker]:hidden"
+              className="flex flex-col gap-2 px-3 py-2 bg-surface cursor-pointer hover:bg-surface-2 text-sm font-medium text-fg list-none [&::-webkit-details-marker]:hidden"
             >
-              <span className="text-base leading-none">{icon}</span>
-              <span>{team}</span>
-              <span className="text-xs text-muted">
-                {Object.keys(stickers).length}/20
-              </span>
-              <span className="ml-auto">
-                <svg
-                  className={`w-3.5 h-3.5 text-muted transition-transform ${expandedState ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+              <div className="flex items-center gap-2">
+                <span className="text-base leading-none">{icon}</span>
+                <span>{team}</span>
+                <span className="text-xs text-muted">
+                  {Object.keys(stickers).length}/{getMaxStickerPerTeam(team)}
+                </span>
+                <span className="ml-auto">
+                  <svg
+                    className={`w-3.5 h-3.5 text-muted transition-transform ${expandedState ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </span>
+              </div>
+              <span className="grow-1">
+                <ProgressBar
+                  max={getMaxStickerPerTeam(team)}
+                  value={Object.keys(stickers).length}
+                />
               </span>
             </summary>
             <div className="grid grid-cols-10 p-2 border-t border-border gap-2">
