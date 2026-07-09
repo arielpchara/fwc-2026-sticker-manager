@@ -46,7 +46,7 @@ export default function Sticker({
       style={{
         fontFamily: "'Fira Sans', system-ui, -apple-system, sans-serif",
         background: isMissing
-          ? "linear-gradient(145deg, #292524 0%, #3f3a36 100%)"
+          ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"
           : `linear-gradient(145deg, ${baseColor} 0%, #111 100%)`,
       }}
     >

@@ -154,12 +154,12 @@ export default function GroupSticker({
             >
               <span className="text-base leading-none">{icon}</span>
               <span>{team}</span>
-                <span className="text-xs text-muted">
+              <span className="text-xs text-muted">
                 {Object.keys(stickers).length}/20
               </span>
               <span className="ml-auto">
                 <svg
-                    className={`w-3.5 h-3.5 text-muted transition-transform ${expandedState ? "rotate-180" : ""}`}
+                  className={`w-3.5 h-3.5 text-muted transition-transform ${expandedState ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -173,7 +173,7 @@ export default function GroupSticker({
                 </svg>
               </span>
             </summary>
-            <div className="grid grid-cols-10 p-2 border-t border-border gap-5">
+            <div className="grid grid-cols-10 p-2 border-t border-border gap-2">
               {getStickerList(team, stickers).map(([code, qdy]) => (
                 <Sticker
                   key={code}

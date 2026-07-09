@@ -5,7 +5,7 @@ description: After a plan and build, AI commits the changes using Conventional C
 
 # Skill: commit
 
-After any change AI commit the change.
+before start a new prompt commit the current change
 
 ## Workflow
 
