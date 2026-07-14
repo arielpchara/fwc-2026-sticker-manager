@@ -1,0 +1,3 @@
+npm run build:web
+git add web/dist/
+git commit -m "chore: build web dist" --allow-empty
