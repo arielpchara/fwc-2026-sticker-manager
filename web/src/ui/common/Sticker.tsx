@@ -60,7 +60,7 @@ export default function Sticker({
       style={{
         background: isMissing
           ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"
-          : `linear-gradient(145deg, ${baseColor} 0%, ${secondaryColorOf(prefix)} 100%)`,
+          : `linear-gradient(145deg, ${baseColor} 33%, ${secondaryColorOf(prefix)} 95%)`,
       }}
     >
       {displayFlag && (

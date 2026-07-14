@@ -61,3 +61,20 @@ export function messageStickerListByTeam(
   });
   return [header, ...want.filter(Boolean), footer].join("\n");
 }
+
+export function messageMissing(
+  trade: StickerGroupByTeam[],
+  header: string = "",
+  footer: string = "",
+): string {
+  return [
+    header,
+    ...trade
+      .map(
+        ({ team, stickers }) =>
+          `${flagOf(team)} ${Object.keys(stickers).join(", ")}`,
+      )
+      .filter((line) => line.length > 0),
+    footer,
+  ].join("\n");
+}

@@ -1,7 +1,7 @@
 import type { StickerGroupByTeam } from "../type/group.js";
 import { getMaxStickerPerTeam } from "./groupTools.js";
 
-export type TeamSort = "completion" | "code";
+export type TeamSort = "completion" | "code" | null;
 
 function missingCount(team: StickerGroupByTeam, showMissing: boolean): number {
   if (showMissing) {
@@ -18,6 +18,7 @@ export function sortTeams(
   sort: TeamSort,
   showMissing: boolean,
 ): StickerGroupByTeam[] {
+  if (sort === null) return teams;
   return [...teams].sort((a, b) => {
     if (sort === "code") return a.team.localeCompare(b.team);
     const mA = missingCount(a, showMissing);

@@ -20,10 +20,8 @@ export default function ProgressBar({
   const height = size === "md" ? "h-2.5" : "h-1.5";
   const progress = Math.min(pct * 100, 100);
   const color = PROGRESS_COLORS.find(([threshold, color]) => {
-    console.log(threshold >= progress / 100);
     return threshold >= progress / 100 ? color : null;
   })?.[1];
-  console.log(PROGRESS_COLORS);
   return (
     <span
       className={`flex ${height} rounded-full overflow-hidden w-full bg-black/70`}

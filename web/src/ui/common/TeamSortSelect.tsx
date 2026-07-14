@@ -1,34 +1,36 @@
-import { useState, useRef, useEffect } from 'react'
-import { useLocale } from '../../i18n/index.js'
-import type { TeamSort } from '../../application/sortTeams.js'
+import { useState, useRef, useEffect } from "react";
+import { useLocale } from "../../i18n/index.js";
+import type { TeamSort } from "../../application/sortTeams.js";
 
 const OPTIONS: { value: TeamSort; labelKey: string }[] = [
-  { value: 'completion', labelKey: 'sortByComplete' },
-  { value: 'code', labelKey: 'sortByTeamCode' },
-]
+  { value: null, labelKey: "noSort" },
+  { value: "completion", labelKey: "sortByComplete" },
+  { value: "code", labelKey: "sortByTeamCode" },
+];
 
 export default function TeamSortSelect({
   value,
   onChange,
 }: {
-  value: TeamSort
-  onChange: (v: TeamSort) => void
+  value: TeamSort;
+  onChange: (v: TeamSort) => void;
 }) {
-  const { t } = useLocale()
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
 
-  const current = OPTIONS.find((o) => o.value === value)
-  const label = current ? t(current.labelKey as never) : 'Sort'
+  const current = OPTIONS.find((o) => o.value === value);
+  const label = current ? t(current.labelKey as never) : "Sort";
 
   return (
     <div ref={ref} className="relative">
@@ -43,9 +45,12 @@ export default function TeamSortSelect({
           {OPTIONS.map((o) => (
             <button
               key={o.value}
-              onClick={() => { onChange(o.value); setOpen(false) }}
+              onClick={() => {
+                onChange(o.value);
+                setOpen(false);
+              }}
               className={`w-full text-left px-3 py-1.5 text-sm hover:bg-surface-2 ${
-                value === o.value ? 'text-gold font-semibold' : 'text-muted'
+                value === o.value ? "text-gold font-semibold" : "text-muted"
               }`}
             >
               {t(o.labelKey as never)}
@@ -54,5 +59,5 @@ export default function TeamSortSelect({
         </div>
       )}
     </div>
-  )
+  );
 }
