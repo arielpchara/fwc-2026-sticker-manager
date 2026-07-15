@@ -1,5 +1,5 @@
 import { useLocale } from '../../i18n/index.js'
-import Filter from '../common/Filter.js'
+import StickerSuggestInput from './StickerSuggestInput.js'
 import { GroupMultiSelect, TeamMultiSelect } from './MultiSelectChip.js'
 import TeamSortSelect from './TeamSortSelect.js'
 import type { InventoryFilters } from '../../application/filterInventory.js'
@@ -53,7 +53,7 @@ export default function AlbumSearch({
 
   return (
     <div className="space-y-2 mb-6">
-      <Filter
+      <StickerSuggestInput
         value={query}
         onChange={(e) => onChange({ ...filters, query: e.target.value })}
       />

@@ -10,7 +10,7 @@ export type InventoryFilters = {
   teams: string[];
 };
 
-function allAlbumCodes(): string[] {
+export function allAlbumCodes(): string[] {
   const codes: string[] = [];
   for (const g of GROUPS) {
     for (const p of g.prefixes) {
