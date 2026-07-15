@@ -9,6 +9,7 @@ import { useLocale } from "./i18n/index.js";
 import type { Translations } from "./i18n/locales/en.js";
 import AddOwnStickers from "./ui/own/AddStickers/AddOwnStickers.js";
 import AddSurplusStickers from "./ui/own/AddStickers/AddSurplusStickers.js";
+import ImportExportDrawer from "./ui/own/ImportExportDrawer.js";
 
 function DrawerPage({
   title,
@@ -46,6 +47,14 @@ export default function App() {
             element={
               <DrawerPage title="dialogExtras">
                 <AddSurplusStickers />
+              </DrawerPage>
+            }
+          />
+          <Route
+            path="import-export"
+            element={
+              <DrawerPage title="dialogImportExport">
+                <ImportExportDrawer />
               </DrawerPage>
             }
           />

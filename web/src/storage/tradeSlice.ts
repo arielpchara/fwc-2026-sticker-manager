@@ -20,8 +20,11 @@ const tradeSlice = createSlice({
         Object.entries(state.trades).filter(([name]) => name !== action.payload),
       )
     },
+    replaceTrades(state, action: PayloadAction<Record<string, Trade>>) {
+      state.trades = action.payload
+    },
   },
 })
 
-export const { setTrade, deleteTrade } = tradeSlice.actions
+export const { setTrade, deleteTrade, replaceTrades } = tradeSlice.actions
 export default tradeSlice.reducer

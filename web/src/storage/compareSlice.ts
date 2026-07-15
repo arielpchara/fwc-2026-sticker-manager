@@ -18,8 +18,11 @@ const compareSlice = createSlice({
         Object.entries(state.entries).filter(([key]) => key !== action.payload),
       );
     },
+    setEntries(state, action: PayloadAction<Record<string, CompareEntry>>) {
+      state.entries = action.payload;
+    },
   },
 });
 
-export const { upsertEntry, removeEntry } = compareSlice.actions;
+export const { upsertEntry, removeEntry, setEntries } = compareSlice.actions;
 export default compareSlice.reducer;
