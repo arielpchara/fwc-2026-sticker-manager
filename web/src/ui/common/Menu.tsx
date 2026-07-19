@@ -1,39 +1,39 @@
-import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useLocale } from '../../i18n/index.js'
-import type { Translations } from '../../i18n/locales/en.js'
-import LangSelector from './LangSelector.js'
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLocale } from "../../i18n/index.js";
+import type { Translations } from "../../i18n/locales/en.js";
+import LangSelector from "./LangSelector.js";
 
 export default function Menu() {
-  const navigate = useNavigate()
-  const { t } = useLocale()
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate();
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return
+    if (!open) return;
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
+        setOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [open])
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
 
   const items: { labelKey: keyof Translations; to: string }[] = [
-    { labelKey: 'btnHome',     to: '/' },
-    { labelKey: 'btnOwn',     to: '/own' },
-    { labelKey: 'btnExtras',  to: '/extras' },
-    { labelKey: 'btnCompare', to: '/compare' },
-    { labelKey: 'btnMatrix',  to: '/grid' },
-    { labelKey: 'btnImportExport', to: '/import-export' },
-  ]
+    { labelKey: "btnHome", to: "/" },
+    { labelKey: "btnOwn", to: "/own" },
+    // { labelKey: 'btnExtras',  to: '/extras' },
+    { labelKey: "btnCompare", to: "/compare" },
+    { labelKey: "btnMatrix", to: "/grid" },
+    { labelKey: "btnImportExport", to: "/import-export" },
+  ];
 
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
         className="text-gold text-xl p-1 hover:opacity-80"
         aria-label="Menu"
       >
@@ -41,10 +41,13 @@ export default function Menu() {
       </button>
       {open && (
         <div className="absolute right-0 top-full mt-1 bg-surface text-fg rounded-lg shadow-lg min-w-40 z-50 py-1">
-          {items.map(item => (
+          {items.map((item) => (
             <button
               key={item.labelKey}
-              onClick={() => { navigate(item.to); setOpen(false) }}
+              onClick={() => {
+                navigate(item.to);
+                setOpen(false);
+              }}
               className="w-full text-left px-4 py-2 text-sm hover:bg-surface-2 whitespace-nowrap"
             >
               {t(item.labelKey)}
@@ -57,5 +60,5 @@ export default function Menu() {
         </div>
       )}
     </div>
-  )
+  );
 }
