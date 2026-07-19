@@ -1,6 +1,9 @@
 import { GROUPS } from "../constants/groups";
-import { TradeBy } from "../type/trade";
+import { TradeBy, TradeSticker } from "../type/trade";
 import { isChroma, stickerGroupByType } from "./stickerTools";
+
+const notNull = (list: TradeSticker[]): string[] =>
+  list.filter((code) => code !== null);
 
 function shuffleStickers(codes: string[]) {
   const shuffled = [...codes];
@@ -51,6 +54,13 @@ export function sortByGroup(trades: TradeBy[]): TradeBy[] {
   return Object.values(teamsInOrder).flat();
 }
 
+export function filterCompleteTrades(trades: TradeBy[]): TradeBy[] {
+  return trades.filter(
+    ({ give, receive }) =>
+      notNull(give).length > 0 && notNull(receive).length > 0,
+  );
+}
+
 export function updateTrade(
   trades: TradeBy[],
   index: number,
@@ -77,4 +87,18 @@ export function countGiveTradedStickers(trades: TradeBy[]): number {
 
 export function countReceiveTradedStickers(trades: TradeBy[]): number {
   return trades.reduce((count, trade) => count + trade.receive.length, 0);
+}
+
+export function getAllReceiveTrades(trades: TradeBy[]): string[] {
+  return trades.reduce(
+    (all, { receive }) => [...all, ...notNull(receive)],
+    [] as string[],
+  );
+}
+
+export function getAllGiveTrades(trades: TradeBy[]): string[] {
+  return trades.reduce(
+    (all, { give }) => [...all, ...notNull(give)],
+    [] as string[],
+  );
 }

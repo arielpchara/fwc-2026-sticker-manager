@@ -6,6 +6,9 @@ import type { TradeBy, TradeSticker } from "../../type/trade.js";
 import {
   countGiveTradedStickers,
   countReceiveTradedStickers,
+  filterCompleteTrades,
+  getAllGiveTrades,
+  getAllReceiveTrades,
   sortByGroup,
 } from "../../application/traderTool.js";
 import TradeChangeSticker from "./TradeChangeSticker.js";
@@ -15,15 +18,20 @@ import {
   messageCompleteTrade,
   messageMissingTrade,
 } from "../../application/copyTools.js";
-import { useTrade } from "../../application/useStickers.js";
+import {
+  useTrade,
+  useOwnStickers,
+  useSurplusStickers,
+} from "../../application/useStickers.js";
 import { StickerType } from "../../type/sticker.js";
 
 const CHROMA: StickerType = "chroma";
 
 interface TradeResultProps {
   name: string;
-  trade: TradeBy[];
+  trades: TradeBy[];
   onChangeSticker?: (from: TradeBy, to: string[], mode: CompareMode) => void;
+  onCompleteTrade?: () => void;
 }
 
 interface DialogChangeTradeState {
@@ -54,23 +62,25 @@ function getIncompleteTrade(trade: TradeBy[]): IncompleteTrade {
 
 export default function TradeResult({
   name,
-  trade,
+  trades,
   onChangeSticker,
+  onCompleteTrade,
 }: TradeResultProps) {
   const { t } = useLocale();
   const { removeTrade } = useTrade();
+  const { addStickers, removeStickers } = useOwnStickers();
 
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
 
-  const giveCount = useMemo(() => countGiveTradedStickers(trade), [trade]);
+  const giveCount = useMemo(() => countGiveTradedStickers(trades), [trades]);
   const receiveCount = useMemo(
-    () => countReceiveTradedStickers(trade),
-    [trade],
+    () => countReceiveTradedStickers(trades),
+    [trades],
   );
 
   const sorted = useMemo(() => {
-    return sortByGroup(trade).sort((a, b) => {
+    return sortByGroup(trades).sort((a, b) => {
       const aValid = a.give[0] != null && a.receive[0] != null;
       const bValid = b.give[0] != null && b.receive[0] != null;
       if (aValid !== bValid) return aValid ? -1 : 1;
@@ -78,7 +88,7 @@ export default function TradeResult({
       if (a.type !== CHROMA && b.type === CHROMA) return 1;
       return 0;
     });
-  }, [trade]);
+  }, [trades]);
 
   const incompleteTrade = useMemo(() => getIncompleteTrade(sorted), [sorted]);
 
@@ -92,6 +102,14 @@ export default function TradeResult({
 
   const handleCopyMissingTrade = () => {
     copy(messageMissingTrade(sorted, t("tradeWith", { name })));
+  };
+
+  const handleCompleteTrade = () => {
+    const completeTrades = filterCompleteTrades(trades);
+    if (completeTrades.length === 0) return;
+    removeStickers(getAllGiveTrades(completeTrades).join(", "));
+    addStickers(getAllReceiveTrades(completeTrades).join(", "));
+    onCompleteTrade?.();
   };
 
   const handleOpenChangeStickerDialog =
@@ -247,6 +265,13 @@ export default function TradeResult({
         </thead>
         <tbody>{sorted.map((entry, i) => row(entry, i))}</tbody>
       </table>
+      <button
+        onClick={handleCompleteTrade}
+        disabled={validCount === 0}
+        className="w-full bg-gradient-to-r from-gold to-copper text-bg font-bold py-3 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 transition-all"
+      >
+        {t("tradeComplete")} ({validCount})
+      </button>
       {changeStickerDialog && (
         <TradeChangeSticker
           sticker={changeStickerDialog.availableStickers}
