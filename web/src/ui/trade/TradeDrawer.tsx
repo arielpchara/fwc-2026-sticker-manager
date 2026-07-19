@@ -12,7 +12,7 @@ export default function TradeDrawer() {
   const { name } = useParams<{ name: string }>()
   const navigate = useNavigate()
   const { t } = useLocale()
-  const { entries } = useCompareHistory()
+  const { entries, deleteEntry } = useCompareHistory()
   const { trades: storedTrades, saveTrade } = useTrade()
 
   const giveEntry = name ? entries[`give-${name}`] : undefined
@@ -41,7 +41,16 @@ export default function TradeDrawer() {
   return (
     <Drawer open onClose={() => navigate('/compare')} title={name ? t('tradeWith', { name }) : ''}>
       {name && (
-        <TradeResult name={name} trade={trade} onChangeSticker={handleChangeSticker} />
+        <TradeResult
+          name={name}
+          trade={trade}
+          onChangeSticker={handleChangeSticker}
+          onCompleteTrade={() => {
+            deleteEntry(`give-${name}`)
+            deleteEntry(`receive-${name}`)
+            navigate('/compare')
+          }}
+        />
       )}
     </Drawer>
   )
