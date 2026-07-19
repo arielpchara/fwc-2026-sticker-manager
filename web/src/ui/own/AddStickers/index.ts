@@ -1,2 +1,1 @@
-export { default as AddOwnStickers } from './AddOwnStickers.js'
-export { default as AddSurplusStickers } from './AddSurplusStickers.js'
+export { default as AddStickers } from './AddStickers.js'

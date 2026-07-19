@@ -1,11 +1,10 @@
 import type { Translations } from '../../i18n/locales/en.js'
 import { useLocale } from '../../i18n/index.js'
-import { AddOwnStickers, AddSurplusStickers } from '../own/AddStickers/index.js'
+import { AddStickers } from '../own/AddStickers/index.js'
 import Modal from './Modal.js'
 
 const MODAL_MAP: Record<string, { titleKey: keyof Translations; component: React.ComponentType }> = {
-  own: { titleKey: 'dialogOwn', component: AddOwnStickers },
-  surplus: { titleKey: 'dialogExtras', component: AddSurplusStickers },
+  own: { titleKey: 'dialogOwn', component: AddStickers },
 }
 
 export default function ModalManager({ modalContent, onClose }: { modalContent: string | null; onClose: () => void }) {

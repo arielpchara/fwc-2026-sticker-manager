@@ -31,12 +31,19 @@ const stickerSlice = createSlice({
         state.inv[code] = 1 + surplusQty;
       }
     },
+    setSurplus(state, action: PayloadAction<Record<string, number>>) {
+      const inv: Record<string, number> = {}
+      for (const [code, surplusQty] of Object.entries(action.payload)) {
+        inv[code] = 1 + surplusQty
+      }
+      state.inv = inv
+    },
     clearOwn(state) {
       state.inv = {};
     },
   },
 });
 
-export const { setOwn, mergeOwn, removeOwn, addSurplus, clearOwn } =
+export const { setOwn, mergeOwn, removeOwn, addSurplus, setSurplus, clearOwn } =
   stickerSlice.actions;
 export default stickerSlice.reducer;
