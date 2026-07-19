@@ -23,7 +23,9 @@ const stickerSlice = createSlice({
     },
     removeOwn(state, action: PayloadAction<string[]>) {
       for (const code of action.payload) {
-        delete state.inv[code];
+        if (state.inv[code] !== undefined || state.inv[code] > 0) {
+          state.inv[code] -= 1;
+        }
       }
     },
     addSurplus(state, action: PayloadAction<Record<string, number>>) {
@@ -32,11 +34,11 @@ const stickerSlice = createSlice({
       }
     },
     setSurplus(state, action: PayloadAction<Record<string, number>>) {
-      const inv: Record<string, number> = {}
+      const inv: Record<string, number> = {};
       for (const [code, surplusQty] of Object.entries(action.payload)) {
-        inv[code] = 1 + surplusQty
+        inv[code] = 1 + surplusQty;
       }
-      state.inv = inv
+      state.inv = inv;
     },
     clearOwn(state) {
       state.inv = {};
