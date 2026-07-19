@@ -13,7 +13,7 @@ export default function TradeDrawer() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const { t } = useLocale();
-  const { entries } = useCompareHistory();
+  const { entries, deleteEntry } = useCompareHistory();
   const { trades: storedTrades, saveTrade } = useTrade();
 
   const offerEntry = name ? entries[`offer-${name}`] : undefined;
@@ -53,6 +53,11 @@ export default function TradeDrawer() {
           name={name}
           trade={trade}
           onChangeSticker={handleChangeSticker}
+          onCompleteTrade={() => {
+            deleteEntry(`give-${name}`);
+            deleteEntry(`receive-${name}`);
+            navigate("/compare");
+          }}
         />
       )}
     </Drawer>

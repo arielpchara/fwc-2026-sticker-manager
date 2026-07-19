@@ -17,6 +17,7 @@ import {
 } from "../../application/copyTools.js";
 import { StickerType } from "../../type/sticker.js";
 import { useTrade } from "../../hooks/useTrade.js";
+import { useStickers } from "../../hooks/useStickers.js";
 
 const CHROMA: StickerType = "chroma";
 
@@ -24,6 +25,7 @@ interface TradeResultProps {
   name: string;
   trade: TradeBy[];
   onChangeSticker?: (from: TradeBy, to: string[], mode: CompareMode) => void;
+  onCompleteTrade?: () => void;
 }
 
 interface DialogChangeTradeState {
@@ -56,9 +58,11 @@ export default function TradeResult({
   name,
   trade,
   onChangeSticker,
+  onCompleteTrade,
 }: TradeResultProps) {
   const { t } = useLocale();
   const { removeTrade } = useTrade();
+  const { increaseInventory, subtractInventory } = useStickers();
 
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
@@ -92,6 +96,19 @@ export default function TradeResult({
 
   const handleCopyMissingTrade = () => {
     copy(messageMissingTrade(sorted, t("tradeWith", { name })));
+  };
+
+  const handleCompleteTrade = () => {
+    const giveCodes = sorted
+      .filter((t) => t.offer[0] != null && t.receive[0] != null)
+      .map((t) => t.offer[0]!);
+    const receiveCodes = sorted
+      .filter((t) => t.offer[0] != null && t.receive[0] != null)
+      .map((t) => t.receive[0]!);
+    if (giveCodes.length === 0) return;
+    subtractInventory(giveCodes.join(", "));
+    increaseInventory(receiveCodes.join(", "));
+    onCompleteTrade?.();
   };
 
   const handleOpenChangeStickerDialog =
@@ -247,6 +264,13 @@ export default function TradeResult({
         </thead>
         <tbody>{sorted.map((entry, i) => row(entry, i))}</tbody>
       </table>
+      <button
+        onClick={handleCompleteTrade}
+        disabled={validCount === 0}
+        className="w-full bg-gradient-to-r from-gold to-copper text-bg font-bold py-3 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 transition-all"
+      >
+        {t("tradeComplete")} ({validCount})
+      </button>
       {changeStickerDialog && (
         <TradeChangeSticker
           sticker={changeStickerDialog.availableStickers}

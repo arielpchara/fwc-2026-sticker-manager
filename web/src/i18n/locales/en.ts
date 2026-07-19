@@ -92,6 +92,7 @@ const en = {
   tradeChangeTitle: "Select stickers to swap",
   tradeChangeSubmit: "Swap ({n})",
   tradeRecreate: "Recreate",
+  tradeComplete: "Complete Trade",
   editBtn: "Change",
   doneBtn: "Done",
   expandAll: "Expand all",

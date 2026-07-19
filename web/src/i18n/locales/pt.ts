@@ -94,6 +94,7 @@ const pt: Translations = {
   tradeChangeTitle: "Selecione figurinhas para trocar",
   tradeChangeSubmit: "Trocar ({n})",
   tradeRecreate: "Recriar",
+  tradeComplete: "Finalizar Troca",
   editBtn: "Alterar",
   doneBtn: "Pronto",
   expandAll: "Expandir tudo",
