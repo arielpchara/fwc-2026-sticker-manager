@@ -5,6 +5,7 @@ import {
   mergeOwn,
   removeOwn,
   addSurplus,
+  setSurplus,
 } from "../storage/stickerSlice.js";
 import { upsertEntry, removeEntry } from "../storage/compareSlice.js";
 import { deleteTrade, setTrade } from "../storage/tradeSlice.js";
@@ -75,7 +76,16 @@ export function useSurplusStickers() {
     [dispatch],
   );
 
-  return { addSurplusText };
+  const overwriteSurplus = useCallback(
+    (text: string) => {
+      const result = parseSurplusText(text);
+      dispatch(setSurplus(result.surplus));
+      return result;
+    },
+    [dispatch],
+  );
+
+  return { addSurplusText, overwriteSurplus };
 }
 
 export function useTrade() {

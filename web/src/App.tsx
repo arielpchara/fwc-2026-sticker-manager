@@ -7,8 +7,7 @@ import GridPage from "./ui/pages/GridPage.js";
 import Drawer from "./ui/common/Drawer.js";
 import { useLocale } from "./i18n/index.js";
 import type { Translations } from "./i18n/locales/en.js";
-import AddOwnStickers from "./ui/own/AddStickers/AddOwnStickers.js";
-import AddSurplusStickers from "./ui/own/AddStickers/AddSurplusStickers.js";
+import AddStickers from "./ui/own/AddStickers/AddStickers.js";
 import ImportExportDrawer from "./ui/own/ImportExportDrawer.js";
 
 function DrawerPage({
@@ -38,15 +37,7 @@ export default function App() {
             path="own"
             element={
               <DrawerPage title="dialogOwn">
-                <AddOwnStickers />
-              </DrawerPage>
-            }
-          />
-          <Route
-            path="extras"
-            element={
-              <DrawerPage title="dialogExtras">
-                <AddSurplusStickers />
+                <AddStickers />
               </DrawerPage>
             }
           />
