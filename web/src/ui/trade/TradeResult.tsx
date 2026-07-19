@@ -6,6 +6,9 @@ import type { TradeBy, TradeSticker } from "../../type/trade.js";
 import {
   countOfferTradedStickers,
   countReceiveTradedStickers,
+  filterCompleteTrades,
+  getAllGiveTrades,
+  getAllReceiveTrades,
   sortByGroup,
 } from "../../application/traderTool.js";
 import TradeChangeSticker from "./TradeChangeSticker.js";
@@ -23,7 +26,7 @@ const CHROMA: StickerType = "chroma";
 
 interface TradeResultProps {
   name: string;
-  trade: TradeBy[];
+  trades: TradeBy[];
   onChangeSticker?: (from: TradeBy, to: string[], mode: CompareMode) => void;
   onCompleteTrade?: () => void;
 }
@@ -56,7 +59,7 @@ function getIncompleteTrade(trade: TradeBy[]): IncompleteTrade {
 
 export default function TradeResult({
   name,
-  trade,
+  trades,
   onChangeSticker,
   onCompleteTrade,
 }: TradeResultProps) {
@@ -67,14 +70,14 @@ export default function TradeResult({
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
 
-  const offerCount = useMemo(() => countOfferTradedStickers(trade), [trade]);
+  const offerCount = useMemo(() => countOfferTradedStickers(trades), [trades]);
   const receiveCount = useMemo(
-    () => countReceiveTradedStickers(trade),
-    [trade],
+    () => countReceiveTradedStickers(trades),
+    [trades],
   );
 
   const sorted = useMemo(() => {
-    return sortByGroup(trade).sort((a, b) => {
+    return sortByGroup(trades).sort((a, b) => {
       const aValid = a.offer[0] != null && a.receive[0] != null;
       const bValid = b.offer[0] != null && b.receive[0] != null;
       if (aValid !== bValid) return aValid ? -1 : 1;
@@ -82,7 +85,7 @@ export default function TradeResult({
       if (a.type !== CHROMA && b.type === CHROMA) return 1;
       return 0;
     });
-  }, [trade]);
+  }, [trades]);
 
   const incompleteTrade = useMemo(() => getIncompleteTrade(sorted), [sorted]);
 

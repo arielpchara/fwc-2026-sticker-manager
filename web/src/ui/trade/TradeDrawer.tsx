@@ -51,7 +51,7 @@ export default function TradeDrawer() {
       {name && (
         <TradeResult
           name={name}
-          trade={trade}
+          trades={trade}
           onChangeSticker={handleChangeSticker}
           onCompleteTrade={() => {
             deleteEntry(`give-${name}`);
