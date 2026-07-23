@@ -6,7 +6,8 @@ import type { CompareEntry } from "../../type/compare.js";
 import CompareResult from "./CompareResult.js";
 import CompareHistory from "./CompareHistory.js";
 import { useCompareHistory } from "../../hooks/useCompareHistory.js";
-import { countExtrasFromInventory } from "../../application/stickerTools.js";
+import { filterOnlyExtrasFromInventory } from "../../application/filterInventory.js";
+import { countInventory } from "../../application/stickerTools.js";
 
 export default function CompareStickers() {
   const { t } = useLocale();
@@ -23,47 +24,47 @@ export default function CompareStickers() {
   } | null>(null);
 
   const myExtrasCount = useMemo(
-    () => countExtrasFromInventory(inventory),
+    () => countInventory(filterOnlyExtrasFromInventory(inventory)),
     [inventory],
   );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // if (!text.trim()) return;
-    // if (mode === "receive") {
-    //   const r = compareWith(text, inv);
-    //   setResult({ missing: r.missing, offer: [], count: r.count });
-    //   saveEntry({
-    //     name: label || t("historyUnnamed"),
-    //     text,
-    //     savedAt: Date.now(),
-    //     stickers: r.missing,
-    //     mode: "receive",
-    //   });
-    // } else {
-    //   const r = canGive(text, extras);
-    //   setResult({ missing: [], offer: r.offer, count: r.count });
-    //   saveEntry({
-    //     name: label || t("historyUnnamed"),
-    //     text,
-    //     savedAt: Date.now(),
-    //     stickers: r.offer,
-    //     mode: "give",
-    //   });
-    // }
+    if (!text.trim()) return;
+    if (mode === "receive") {
+      const r = compareWith(text, inv);
+      setResult({ missing: r.missing, offer: [], count: r.count });
+      saveEntry({
+        name: label || t("historyUnnamed"),
+        text,
+        savedAt: Date.now(),
+        stickers: r.missing,
+        mode: "receive",
+      });
+    } else {
+      const r = canGive(text, extras);
+      setResult({ missing: [], offer: r.offer, count: r.count });
+      saveEntry({
+        name: label || t("historyUnnamed"),
+        text,
+        savedAt: Date.now(),
+        stickers: r.offer,
+        mode: "give",
+      });
+    }
   }
 
   function handleReopen(entry: CompareEntry) {
     setMode(entry.mode);
     setLabel(entry.name);
     setText(entry.text);
-    // if (entry.mode === "receive") {
-    //   const r = compareWith(entry.text, inv);
-    //   setResult({ missing: r.missing, offer: [], count: r.count });
-    // } else {
-    //   const r = canGive(entry.text, extras);
-    //   setResult({ missing: [], offer: r.offer, count: r.count });
-    // }
+    if (entry.mode === "receive") {
+      const r = compareWith(entry.text, inv);
+      setResult({ missing: r.missing, offer: [], count: r.count });
+    } else {
+      const r = canGive(entry.text, extras);
+      setResult({ missing: [], offer: r.offer, count: r.count });
+    }
   }
 
   function toggleMode(m: "receive" | "give") {

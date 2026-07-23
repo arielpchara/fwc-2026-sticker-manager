@@ -22,6 +22,8 @@ export function allAlbumCodes(): string[] {
   }
   const maxFWC = maxStickers("FWC");
   for (let i = 1; i <= maxFWC; i++) codes.push("FWC" + i);
+  const maxCC = maxStickers("CC");
+  for (let i = 1; i <= maxCC; i++) codes.push("CC" + i);
   codes.push("00");
   return codes;
 }
@@ -133,6 +135,21 @@ export function filterOnlyExtrasFromInventory(inventory: Inventory): Inventory {
         return {
           ...extraInventory,
           [sticker]: quantity - 1,
+        };
+      }
+      return extraInventory;
+    },
+    {} as Inventory,
+  );
+}
+
+export function filterOnlyOwnedFromInventory(inventory: Inventory): Inventory {
+  return Object.entries(inventory).reduce(
+    (extraInventory, [sticker, quantity]) => {
+      if (quantity > 0) {
+        return {
+          ...extraInventory,
+          [sticker]: quantity,
         };
       }
       return extraInventory;

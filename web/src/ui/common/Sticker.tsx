@@ -1,10 +1,6 @@
 import React from "react";
-import { isChroma } from "../../application/stickerTools.js";
+import { isChroma, prefixOf } from "../../application/stickerTools.js";
 import { flagOf, colorOf, secondaryColorOf } from "../../constants/flags.js";
-
-function prefixOf(code: string) {
-  return code === "00" ? "00" : code.slice(0, 3);
-}
 
 interface StickerProps extends React.HTMLAttributes<HTMLSpanElement> {
   code: string | null;
@@ -27,10 +23,10 @@ export default function Sticker({
   const isMissing = qty === 0;
 
   const baseColor = isMissing
-    ? "#3f3a36"
+    ? "#8a8580"
     : prefix
       ? colorOf(prefix)
-      : "#44403c";
+      : "#b4b4b4";
   const displayCode = (code || "----").toUpperCase();
 
   const baseClasses = compact

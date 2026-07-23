@@ -104,6 +104,8 @@ const COLORS: Record<string, string> = {
   URU: "#0038A8",
   USA: "#B22234",
   UZB: "#0099B5",
+  CC: "#E4002B",
+  FWC: "#005A93",
 };
 
 const SECONDARY_COLORS: Record<string, string> = {
@@ -158,10 +160,13 @@ const SECONDARY_COLORS: Record<string, string> = {
   URU: "#FFFFFF",
   USA: "#3C3B6E",
   UZB: "#1EB53A",
+  CC: "#FFFFFF",
+  FWC: "#DDDDDD",
 };
 
 const SPECIAL: Record<string, string> = {
   FWC: "🏆",
+  CC: "🥤",
 };
 
 export function flagOf(prefix: string): string {

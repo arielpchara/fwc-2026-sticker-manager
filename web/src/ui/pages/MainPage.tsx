@@ -18,6 +18,7 @@ import DisplayMode from "../common/DisplayMode.js";
 import GroupSticker from "../common/GroupSticker.js";
 import MainLayout from "../common/MainLayout.js";
 import { Outlet } from "react-router-dom";
+import { TOTAL_STICKERS } from "../../constants/stickers.js";
 
 export default function MainPage() {
   const { inventory } = useStickers();
@@ -42,7 +43,6 @@ export default function MainPage() {
   );
   const groups = useStickerGroup(displayInv);
   const filteredCount = countFiltered(displayInv);
-  const totalInv = Object.keys(inventory).length;
   const stickerMode = compact ? ("compact" as const) : ("regular" as const);
 
   const sortedByTeam = useMemo(
@@ -75,7 +75,7 @@ export default function MainPage() {
           onChange={setFilters}
           sort={sort}
           onSortChange={setSort}
-          totalInv={totalInv}
+          totalInv={TOTAL_STICKERS}
           filteredCount={filteredCount}
         />
         <button

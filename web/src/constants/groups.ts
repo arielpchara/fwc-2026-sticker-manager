@@ -1,24 +1,24 @@
 export interface GroupInfo {
   labelKey: string;
   prefixes: string[];
-  order: number;
 }
 
 export const MAX_STICKERS_PER_TEAM = 20;
 
 export const GROUPS: GroupInfo[] = [
-  { labelKey: "group_A", prefixes: ["MEX", "RSA", "KOR", "CZE"], order: 0 },
-  { labelKey: "group_B", prefixes: ["CAN", "BIH", "QAT", "SUI"], order: 1 },
-  { labelKey: "group_C", prefixes: ["BRA", "MAR", "HAI", "SCO"], order: 2 },
-  { labelKey: "group_D", prefixes: ["USA", "PAR", "AUS", "TUR"], order: 3 },
-  { labelKey: "group_E", prefixes: ["GER", "CUW", "CIV", "ECU"], order: 4 },
-  { labelKey: "group_F", prefixes: ["NED", "JPN", "SWE", "TUN"], order: 5 },
-  { labelKey: "group_G", prefixes: ["BEL", "EGY", "IRN", "NZL"], order: 6 },
-  { labelKey: "group_H", prefixes: ["ESP", "CPV", "KSA", "URU"], order: 7 },
-  { labelKey: "group_I", prefixes: ["FRA", "SEN", "IRQ", "NOR"], order: 8 },
-  { labelKey: "group_J", prefixes: ["ARG", "ALG", "AUT", "JOR"], order: 9 },
-  { labelKey: "group_K", prefixes: ["POR", "COD", "UZB", "COL"], order: 10 },
-  { labelKey: "group_L", prefixes: ["ENG", "CRO", "GHA", "PAN"], order: 11 },
+  { labelKey: "specialLabel", prefixes: ["00", "FWC", "CC"] },
+  { labelKey: "group_A", prefixes: ["MEX", "RSA", "KOR", "CZE"] },
+  { labelKey: "group_B", prefixes: ["CAN", "BIH", "QAT", "SUI"] },
+  { labelKey: "group_C", prefixes: ["BRA", "MAR", "HAI", "SCO"] },
+  { labelKey: "group_D", prefixes: ["USA", "PAR", "AUS", "TUR"] },
+  { labelKey: "group_E", prefixes: ["GER", "CUW", "CIV", "ECU"] },
+  { labelKey: "group_F", prefixes: ["NED", "JPN", "SWE", "TUN"] },
+  { labelKey: "group_G", prefixes: ["BEL", "EGY", "IRN", "NZL"] },
+  { labelKey: "group_H", prefixes: ["ESP", "CPV", "KSA", "URU"] },
+  { labelKey: "group_I", prefixes: ["FRA", "SEN", "IRQ", "NOR"] },
+  { labelKey: "group_J", prefixes: ["ARG", "ALG", "AUT", "JOR"] },
+  { labelKey: "group_K", prefixes: ["POR", "COD", "UZB", "COL"] },
+  { labelKey: "group_L", prefixes: ["ENG", "CRO", "GHA", "PAN"] },
 ];
 
 export const GROUPS_INDEX_PREFIX: Record<string, [number, number]> = {
@@ -82,7 +82,6 @@ for (const g of GROUPS) {
 const FALLBACK_GROUP: GroupInfo = {
   labelKey: "specialLabel",
   prefixes: [],
-  order: -1,
 };
 
 export function groupOf(prefix: string): GroupInfo {
