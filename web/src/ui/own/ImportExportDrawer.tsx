@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useAppSelector, useAppDispatch } from "../../storage/hooks.js";
-import { setOwn } from "../../storage/stickerSlice.js";
+import { stickerActions } from "../../storage/stickerSlice.js";
 import { setEntries } from "../../storage/compareSlice.js";
 import { replaceTrades } from "../../storage/tradeSlice.js";
 import {
@@ -16,7 +16,10 @@ export default function ImportExportDrawer() {
   const dispatch = useAppDispatch();
   const root = useAppSelector((s) => s);
   const [importText, setImportText] = useState("");
-  const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "ok" | "error";
+    text: string;
+  } | null>(null);
   const [exporting, setExporting] = useState(false);
 
   const state: ExportableState = {
@@ -59,7 +62,7 @@ export default function ImportExportDrawer() {
   async function handleImport() {
     try {
       const restored = await deserializeState(importText);
-      dispatch(setOwn(restored.sticker.inv));
+      dispatch(stickerActions.overwrite(restored.sticker.inventory));
       dispatch(setEntries(restored.compare.entries));
       dispatch(replaceTrades(restored.trade.trades));
       setImportText("");

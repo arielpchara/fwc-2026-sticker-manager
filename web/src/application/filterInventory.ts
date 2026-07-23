@@ -1,4 +1,4 @@
-import type { Stickers } from "../type/sticker.js";
+import type { Inventory } from "../type/sticker.js";
 import { GROUPS, PREFIX_TO_GROUP } from "../constants/groups.js";
 import { maxStickers } from "../constants/stickers.js";
 
@@ -42,11 +42,11 @@ function codeMatchesGroupTeam(
 }
 
 export function filterInventory(
-  inv: Stickers,
+  inv: Inventory,
   filters: InventoryFilters,
-): Stickers {
+): Inventory {
   const q = filters.query.trim().toUpperCase();
-  const result: Stickers = {};
+  const result: Inventory = {};
 
   if (filters.missing && filters.extras) {
     // mutually exclusive: return empty
@@ -106,7 +106,7 @@ export function filterInventory(
   return { ...inv };
 }
 
-export function countFiltered(filtered: Stickers): number {
+export function countFiltered(filtered: Inventory): number {
   return Object.keys(filtered).length;
 }
 
@@ -124,4 +124,19 @@ export function hasActiveFiltersHideMissing(
   filters: InventoryFilters,
 ): boolean {
   return Boolean(filters.query.trim() || filters.missing || filters.extras);
+}
+
+export function filterOnlyExtrasFromInventory(inventory: Inventory): Inventory {
+  return Object.entries(inventory).reduce(
+    (extraInventory, [sticker, quantity]) => {
+      if (quantity > 1) {
+        return {
+          ...extraInventory,
+          [sticker]: quantity - 1,
+        };
+      }
+      return extraInventory;
+    },
+    {} as Inventory,
+  );
 }

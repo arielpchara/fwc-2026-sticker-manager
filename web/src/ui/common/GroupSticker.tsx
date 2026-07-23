@@ -5,7 +5,7 @@ import Sticker from "./Sticker.js";
 import { maxStickers } from "../../constants/stickers.js";
 import { StickerGroupByTeam } from "../../type/group.js";
 import { prefixOf } from "../../application/stickerTools.js";
-import { Stickers } from "../../type/sticker.js";
+import { Inventory } from "../../type/sticker.js";
 import { MAX_STICKERS_PER_TEAM } from "../../constants/groups.js";
 import { getMaxStickerPerTeam } from "../../application/groupTools.js";
 import ProgressBar from "./ProgressBar.js";
@@ -29,8 +29,8 @@ interface GroupStickerProps {
 function createAllStickerList(
   team: string,
   max: number,
-  ownedStickers: Stickers,
-): Stickers {
+  ownedStickers: Inventory,
+): Inventory {
   return Object.fromEntries(
     new Array(max).fill(0).map((_, i) => {
       const code = team === "00" ? team : `${team}${i + 1}`;
@@ -85,7 +85,7 @@ export default function GroupSticker({
   }, [groups]);
 
   const getStickerList = useCallback(
-    (team: string, stickers: Stickers): [string, number][] => {
+    (team: string, stickers: Inventory): [string, number][] => {
       if (showMissing) {
         const max = getMaxStickerPerTeam(team);
         return Object.entries(createAllStickerList(team, max, stickers));

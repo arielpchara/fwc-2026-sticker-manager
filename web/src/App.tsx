@@ -7,7 +7,7 @@ import GridPage from "./ui/pages/GridPage.js";
 import Drawer from "./ui/common/Drawer.js";
 import { useLocale } from "./i18n/index.js";
 import type { Translations } from "./i18n/locales/en.js";
-import AddStickers from "./ui/own/AddStickers/AddStickers.js";
+import { ParseStickers } from "./ui/own/ParseStickers.js";
 import ImportExportDrawer from "./ui/own/ImportExportDrawer.js";
 
 function DrawerPage({
@@ -37,7 +37,7 @@ export default function App() {
             path="own"
             element={
               <DrawerPage title="dialogOwn">
-                <AddStickers />
+                <ParseStickers />
               </DrawerPage>
             }
           />
@@ -50,7 +50,7 @@ export default function App() {
             }
           />
         </Route>
-        <Route path="/grid" element={<GridPage />} />
+        {/* <Route path="/grid" element={<GridPage />} /> */}
         <Route path="/compare" element={<ComparePage />}>
           <Route path=":name" element={<TradeDrawer />} />
         </Route>

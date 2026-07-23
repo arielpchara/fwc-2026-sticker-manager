@@ -8,8 +8,8 @@ import {
   type InventoryFilters,
 } from "../../application/filterInventory.js";
 import { sortTeams, type TeamSort } from "../../application/sortTeams.js";
-import { useStickerGroup } from "../../application/useStickerGroup.js";
-import { useOwnStickers } from "../../application/useStickers.js";
+import { useStickerGroup } from "../../hooks/useStickerGroup.js";
+import { useStickers } from "../../hooks/useStickers.js";
 import { useLocale } from "../../i18n/index.js";
 import AlbumSearch from "../common/AlbumSearch.js";
 import Body from "../common/Body.js";
@@ -20,7 +20,7 @@ import MainLayout from "../common/MainLayout.js";
 import { Outlet } from "react-router-dom";
 
 export default function MainPage() {
-  const { inv } = useOwnStickers();
+  const { inventory } = useStickers();
   const { t } = useLocale();
 
   const [filters, setFilters] = useState<InventoryFilters>({
@@ -37,12 +37,12 @@ export default function MainPage() {
   const active = hasActiveFilters(filters);
   const hideMissing = hasActiveFiltersHideMissing(filters);
   const displayInv = useMemo(
-    () => (active ? filterInventory(inv, filters) : inv),
-    [inv, filters, active],
+    () => (active ? filterInventory(inventory, filters) : inventory),
+    [inventory, filters, active],
   );
   const groups = useStickerGroup(displayInv);
   const filteredCount = countFiltered(displayInv);
-  const totalInv = Object.keys(inv).length;
+  const totalInv = Object.keys(inventory).length;
   const stickerMode = compact ? ("compact" as const) : ("regular" as const);
 
   const sortedByTeam = useMemo(

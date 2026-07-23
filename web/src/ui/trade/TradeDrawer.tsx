@@ -1,9 +1,4 @@
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  useCompareHistory,
-  useOwnStickers,
-  useTrade,
-} from "../../application/useStickers.js";
 import { useLocale } from "../../i18n/index.js";
 import TradeResult from "../trade/TradeResult.js";
 import { trader, updateTrade } from "../../application/traderTool.js";
@@ -11,12 +6,14 @@ import { useMemo, useCallback } from "react";
 import type { TradeBy } from "../../type/trade.js";
 import type { CompareMode } from "../../type/compare.js";
 import Drawer from "../common/Drawer.js";
+import { useCompareHistory } from "../../hooks/useCompareHistory.js";
+import { useTrade } from "../../hooks/useTrade.js";
 
 export default function TradeDrawer() {
   const { name } = useParams<{ name: string }>();
   const navigate = useNavigate();
   const { t } = useLocale();
-  const { entries, deleteEntry } = useCompareHistory();
+  const { entries } = useCompareHistory();
   const { trades: storedTrades, saveTrade } = useTrade();
 
   const giveEntry = name ? entries[`give-${name}`] : undefined;
@@ -25,7 +22,7 @@ export default function TradeDrawer() {
   const receive = receiveEntry?.stickers ?? [];
   const stored = name ? storedTrades[name] : undefined;
 
-  const trade = useMemo(() => {
+  const trades = useMemo(() => {
     if (stored?.isLock) return stored.trades;
     return give.length || receive.length ? trader(give, receive) : [];
   }, [stored, give, receive]);
@@ -33,16 +30,16 @@ export default function TradeDrawer() {
   const handleChangeSticker = useCallback(
     (from: TradeBy, to: string[], mode: CompareMode) => {
       if (!name) return;
-      const idx = trade.findIndex((t) => t.key === from.key);
+      const idx = trades.findIndex((t) => t.key === from.key);
       if (idx === -1) return;
       const updated: TradeBy = {
         ...from,
         ...(mode === "give" ? { give: to } : { receive: to }),
       };
-      const newTrades = updateTrade(trade, idx, updated);
+      const newTrades = updateTrade(trades, idx, updated);
       saveTrade(name, newTrades, true);
     },
-    [name, trade, saveTrade],
+    [name, trades, saveTrade],
   );
 
   return (
@@ -54,11 +51,8 @@ export default function TradeDrawer() {
       {name && (
         <TradeResult
           name={name}
-          trades={trade}
+          trades={trades}
           onChangeSticker={handleChangeSticker}
-          onCompleteTrade={() => {
-            navigate("/compare");
-          }}
         />
       )}
     </Drawer>

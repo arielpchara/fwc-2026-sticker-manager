@@ -18,12 +18,9 @@ import {
   messageCompleteTrade,
   messageMissingTrade,
 } from "../../application/copyTools.js";
-import {
-  useTrade,
-  useOwnStickers,
-  useSurplusStickers,
-} from "../../application/useStickers.js";
 import { StickerType } from "../../type/sticker.js";
+import { useTrade } from "../../hooks/useTrade.js";
+import { useStickers } from "../../hooks/useStickers.js";
 
 const CHROMA: StickerType = "chroma";
 
@@ -68,7 +65,7 @@ export default function TradeResult({
 }: TradeResultProps) {
   const { t } = useLocale();
   const { removeTrade } = useTrade();
-  const { addStickers, removeStickers } = useOwnStickers();
+  const { increaseInventory, subtractInventory } = useStickers();
 
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
@@ -107,8 +104,8 @@ export default function TradeResult({
   const handleCompleteTrade = () => {
     const completeTrades = filterCompleteTrades(trades);
     if (completeTrades.length === 0) return;
-    removeStickers(getAllGiveTrades(completeTrades).join(", "));
-    addStickers(getAllReceiveTrades(completeTrades).join(", "));
+    increaseInventory(getAllGiveTrades(completeTrades).join(", "));
+    subtractInventory(getAllReceiveTrades(completeTrades).join(", "));
     onCompleteTrade?.();
   };
 

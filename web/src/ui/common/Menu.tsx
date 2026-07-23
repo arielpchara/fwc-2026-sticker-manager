@@ -26,7 +26,7 @@ export default function Menu() {
     { labelKey: "btnOwn", to: "/own" },
     // { labelKey: 'btnExtras',  to: '/extras' },
     { labelKey: "btnCompare", to: "/compare" },
-    { labelKey: "btnMatrix", to: "/grid" },
+    // { labelKey: "btnMatrix", to: "/grid" },
     { labelKey: "btnImportExport", to: "/import-export" },
   ];
 

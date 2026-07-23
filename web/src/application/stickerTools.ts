@@ -1,6 +1,6 @@
 import { GROUPS, groupOf } from "../constants/groups.js";
 import { StickerGroupByTeam, StickerGroupByGroup } from "../type/group";
-import { Stickers, StickerType } from "../type/sticker";
+import { Inventory, StickerType } from "../type/sticker";
 
 export function prefixOf(code: string) {
   return code === "00" ? "00" : code.slice(0, 3);
@@ -32,7 +32,7 @@ export function stickerGroupByType(codes: string[]) {
   return { chroma, normal };
 }
 
-export function groupByTeam(stickers: Stickers): StickerGroupByTeam[] {
+export function groupByTeam(stickers: Inventory): StickerGroupByTeam[] {
   const teamsOrder = GROUPS.flatMap((g) => g.prefixes);
   const teamIndex: Record<string, number> = Object.fromEntries([
     ["00", 0],
@@ -71,4 +71,11 @@ export function groupByGroup(
     teamGroup.unshift({ labelKey: "specialLabel", teams: specials });
   }
   return teamGroup;
+}
+
+export function countExtrasFromInventory(inventory: Inventory): number {
+  return Object.entries(inventory).reduce(
+    (count, [, quantity]) => count + quantity,
+    0,
+  );
 }
