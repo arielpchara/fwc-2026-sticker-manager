@@ -1,3 +1,1 @@
-npm run build:web
-git add web/dist/
-git diff --cached --quiet || git commit --amend --no-edit
+// no
