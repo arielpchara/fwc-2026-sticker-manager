@@ -4,10 +4,10 @@ import { useLocale } from "../../i18n/index.js";
 import Sticker from "./Sticker.js";
 import { maxStickers } from "../../constants/stickers.js";
 import { StickerGroupByTeam } from "../../type/group.js";
-import { prefixOf } from "../../application/stickerTools.js";
+import { countInventory, prefixOf } from "../../application/stickerTools.js";
 import { Inventory } from "../../type/sticker.js";
 import { MAX_STICKERS_PER_TEAM } from "../../constants/groups.js";
-import { getMaxStickerPerTeam } from "../../application/groupTools.js";
+import { getMaxStickerPerTeam } from "../../application/teamsTools.js";
 import ProgressBar from "./ProgressBar.js";
 import { filterOnlyOwnedFromInventory } from "../../application/filterInventory.js";
 
@@ -110,12 +110,16 @@ export default function GroupSticker({
                 {icon}
               </span>
               <span className="flex flex-wrap gap-1.5">
-                {getStickerList(
-                  team,
-                  filterOnlyOwnedFromInventory(stickers),
-                ).map(([code]) => (
-                  <Sticker key={code} code={code} displayFlag={false} compact />
-                ))}
+                {Object.entries(filterOnlyOwnedFromInventory(stickers)).map(
+                  ([code]) => (
+                    <Sticker
+                      key={code}
+                      code={code}
+                      displayFlag={false}
+                      compact
+                    />
+                  ),
+                )}
               </span>
             </div>
           );
@@ -161,7 +165,8 @@ export default function GroupSticker({
                 <span className="text-base leading-none">{icon}</span>
                 <span>{team}</span>
                 <span className="text-xs text-muted">
-                  {Object.keys(stickers).length}/{getMaxStickerPerTeam(team)}
+                  {countInventory(filterOnlyOwnedFromInventory(stickers))}/
+                  {getMaxStickerPerTeam(team)}
                 </span>
                 <span className="ml-auto">
                   <svg
@@ -182,7 +187,7 @@ export default function GroupSticker({
               <span className="grow-1">
                 <ProgressBar
                   max={getMaxStickerPerTeam(team)}
-                  value={Object.keys(stickers).length}
+                  value={countInventory(filterOnlyOwnedFromInventory(stickers))}
                 />
               </span>
             </summary>

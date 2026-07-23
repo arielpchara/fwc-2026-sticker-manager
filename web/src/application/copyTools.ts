@@ -63,13 +63,13 @@ export function messageStickerListByTeam(
 }
 
 export function messageMissing(
-  trade: StickerGroupByTeam[],
+  trades: StickerGroupByTeam[],
   header: string = "",
   footer: string = "",
 ): string {
   return [
     header,
-    ...trade
+    ...trades
       .map(
         ({ team, stickers }) =>
           `${flagOf(team)} ${Object.keys(stickers).join(", ")}`,

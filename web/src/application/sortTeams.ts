@@ -1,5 +1,5 @@
 import type { StickerGroupByTeam } from "../type/group.js";
-import { getMaxStickerPerTeam } from "./groupTools.js";
+import { getMaxStickerPerTeam } from "./teamsTools.js";
 
 export type TeamSort = "completion" | "code" | null;
 

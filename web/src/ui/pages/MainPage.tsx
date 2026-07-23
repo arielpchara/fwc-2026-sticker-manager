@@ -3,6 +3,7 @@ import { copy, messageMissing } from "../../application/copyTools.js";
 import {
   countFiltered,
   filterInventory,
+  filterOnlyOwnedFromInventory,
   hasActiveFilters,
   hasActiveFiltersHideMissing,
   type InventoryFilters,
@@ -54,6 +55,7 @@ export default function MainPage() {
       ),
     [groups.byTeam, sort, hideMissing],
   );
+
   const sortedByGroup = useMemo(
     () =>
       groups.byGroup.map((g) => ({
@@ -64,7 +66,14 @@ export default function MainPage() {
   );
 
   const handleCopyTrade = () => {
-    copy(messageMissing(sortedByTeam));
+    copy(
+      messageMissing(
+        sortedByTeam.map(({ team, stickers }) => ({
+          team,
+          stickers: filterOnlyOwnedFromInventory(stickers),
+        })),
+      ),
+    );
   };
 
   return (

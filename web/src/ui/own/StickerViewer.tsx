@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useOwnStickers } from "../../hooks/useStickers.js";
+import { useStickers } from "../../hooks/useStickers.js";
 import { useLocale } from "../../i18n/index.js";
 import { flagOf } from "../../constants/flags.js";
 import { groupOf, type GroupInfo } from "../../constants/groups.js";
@@ -72,7 +72,7 @@ interface GroupedTeams {
 
 export default function StickerViewer() {
   const { t } = useLocale();
-  const { inv, stickers } = useOwnStickers();
+  const { inventory, stickers } = useStickers();
   const [filter, setFilter] = useState("");
   const [sortMode, setSortMode] = useState<SortMode>("group");
   const [extrasOnly, setExtrasOnly] = useState(false);
@@ -83,31 +83,32 @@ export default function StickerViewer() {
     const map = new Map<string, [string, number][]>();
     for (const code of stickers) {
       if (q && !code.includes(q)) continue;
-      if (extrasOnly && inv[code] < 2) continue;
+      if (extrasOnly && inventory[code] < 2) continue;
       const key = prefixOf(code);
       if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push([code, inv[code]]);
+      map.get(key)!.push([code, inventory[code]]);
     }
     for (const [, items] of map) {
       items.sort(([a], [b]) => suffixNum(a) - suffixNum(b));
     }
     return map;
-  }, [stickers, inv, q, extrasOnly]);
+  }, [stickers, inventory, q, extrasOnly]);
 
   const grouped = useMemo(() => {
     const teamEntries = [...byPrefix.entries()];
     teamEntries.sort(([a], [b]) => a.localeCompare(b));
 
-    const groupMap = new Map<number, GroupedTeams>();
-    for (const [prefix, items] of teamEntries) {
+    const groupMap = new Map<string, GroupedTeams>();
+    for (const i in teamEntries) {
+      const [prefix, items] = teamEntries[i];
       const g = groupOf(prefix);
-      if (!groupMap.has(g.order)) {
-        groupMap.set(g.order, { group: g, teams: [] });
+      if (!groupMap.has(i)) {
+        groupMap.set(i, { group: g, teams: [] });
       }
-      groupMap.get(g.order)!.teams.push({ prefix, items });
+      groupMap.get(i)!.teams.push({ prefix, items });
     }
 
-    return [...groupMap.entries()].sort(([a], [b]) => a - b).map(([, v]) => v);
+    return [...groupMap.values()]; //[...groupMap.entries()].sort(([a], [b]) => a - b).map(([, v]) => v);
   }, [byPrefix]);
 
   const flatTeams = useMemo(() => {
@@ -190,7 +191,7 @@ export default function StickerViewer() {
         ) : (
           grouped.map(({ group, teams }) =>
             teams.length === 0 ? null : (
-              <div key={group.order}>
+              <div key={group.labelKey}>
                 <h3 className="text-xs font-bold text-muted uppercase tracking-wider mb-2">
                   {t(group.labelKey as never)}
                 </h3>
