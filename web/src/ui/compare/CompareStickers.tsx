@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStickers } from "../../hooks/useStickers.js";
 import { useLocale } from "../../i18n/index.js";
@@ -6,8 +6,7 @@ import type { CompareEntry } from "../../type/compare.js";
 import CompareResult from "./CompareResult.js";
 import CompareHistory from "./CompareHistory.js";
 import { useCompareHistory } from "../../hooks/useCompareHistory.js";
-import { filterOnlyExtrasFromInventory } from "../../application/filterInventory.js";
-import { countInventory } from "../../application/stickerTools.js";
+import { findMissing, findOffer } from "../../application/compareTools.js";
 
 export default function CompareStickers() {
   const { t } = useLocale();
@@ -23,32 +22,27 @@ export default function CompareStickers() {
     count: number;
   } | null>(null);
 
-  const myExtrasCount = useMemo(
-    () => countInventory(filterOnlyExtrasFromInventory(inventory)),
-    [inventory],
-  );
-
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!text.trim()) return;
     if (mode === "receive") {
-      const r = compareWith(text, inv);
-      setResult({ missing: r.missing, offer: [], count: r.count });
+      const missing = findMissing(text, inventory);
+      setResult({ missing, offer: [], count: missing.length });
       saveEntry({
         name: label || t("historyUnnamed"),
         text,
         savedAt: Date.now(),
-        stickers: r.missing,
+        stickers: missing,
         mode: "receive",
       });
     } else {
-      const r = canGive(text, extras);
-      setResult({ missing: [], offer: r.offer, count: r.count });
+      const offer = findOffer(text, extraInventory);
+      setResult({ missing: [], offer, count: offer.length });
       saveEntry({
         name: label || t("historyUnnamed"),
         text,
         savedAt: Date.now(),
-        stickers: r.offer,
+        stickers: offer,
         mode: "give",
       });
     }
@@ -59,11 +53,11 @@ export default function CompareStickers() {
     setLabel(entry.name);
     setText(entry.text);
     if (entry.mode === "receive") {
-      const r = compareWith(entry.text, inv);
-      setResult({ missing: r.missing, offer: [], count: r.count });
+      const missing = findMissing(entry.text, inventory);
+      setResult({ missing, offer: [], count: missing.length });
     } else {
-      const r = canGive(entry.text, extras);
-      setResult({ missing: [], offer: r.offer, count: r.count });
+      const offer = findOffer(entry.text, extraInventory);
+      setResult({ missing: [], offer, count: offer.length });
     }
   }
 
@@ -136,7 +130,6 @@ export default function CompareStickers() {
           <CompareResult
             items={displayItems}
             mode={mode}
-            extras={extraInventory}
           />
         ))}
 
