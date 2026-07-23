@@ -1,41 +1,15 @@
 import { useCallback } from "react";
-import { flagOf } from "../../constants/flags.js";
-import { groupOf } from "../../constants/groups.js";
 import { useLocale } from "../../i18n/index.js";
 import { useStickerGroup } from "../../hooks/useStickerGroup.js";
-import type { ExtraItem } from "../../../../src/domain/inventory.js";
 import { copy, messageStickerListByTeam } from "../../application/copyTools.js";
 import GroupSticker from "../common/GroupSticker.js";
-import { Inventory } from "../../type/sticker.js";
-
-function prefixOf(code: string) {
-  return code === "00" ? "00" : code.slice(0, 3);
-}
-
-function groupCodes(codes: string[]): { prefix: string; codes: string[] }[] {
-  const map = new Map<string, string[]>();
-  const order = new Map<string, number>();
-  for (const code of codes) {
-    const p = prefixOf(code);
-    if (!map.has(p)) {
-      map.set(p, []);
-      order.set(p, p === "00" ? -1 : groupOf(p).order);
-    }
-    map.get(p)!.push(code);
-  }
-  return [...map.entries()]
-    .sort(([a], [b]) => (order.get(a) ?? -1) - (order.get(b) ?? -1))
-    .map(([prefix, codes]) => ({ prefix, codes }));
-}
 
 export default function CompareResult({
   items,
   mode,
-  extras,
 }: {
   items: string[];
   mode: "receive" | "give";
-  extras: Inventory;
 }) {
   const { t } = useLocale();
   const itemMap = Object.fromEntries(items.map((c) => [c, 1]));
@@ -48,7 +22,7 @@ export default function CompareResult({
       "",
     ).trim();
     copy(message);
-  }, [items, groups, mode, extras, t]);
+  }, [items, groups, mode, t]);
 
   return (
     <div className="space-y-2">
