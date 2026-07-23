@@ -4,7 +4,7 @@ import { flagOf } from "../../constants/flags.js";
 import Sticker from "../common/Sticker.js";
 import type { TradeBy, TradeSticker } from "../../type/trade.js";
 import {
-  countGiveTradedStickers,
+  countOfferTradedStickers,
   countReceiveTradedStickers,
   filterCompleteTrades,
   getAllGiveTrades,
@@ -39,21 +39,21 @@ interface DialogChangeTradeState {
 }
 
 interface IncompleteTrade {
-  give: string[];
+  offer: string[];
   receive: string[];
 }
 
 function getIncompleteTrade(trade: TradeBy[]): IncompleteTrade {
   return trade.reduce(
     (acc, entry) => {
-      if (entry.give[0] == null && entry.receive[0] != null) {
+      if (entry.offer[0] == null && entry.receive[0] != null) {
         acc.receive.push(entry.receive[0]);
-      } else if (entry.give[0] != null && entry.receive[0] == null) {
-        acc.give.push(entry.give[0]);
+      } else if (entry.offer[0] != null && entry.receive[0] == null) {
+        acc.offer.push(entry.offer[0]);
       }
       return acc;
     },
-    { give: [], receive: [] } as IncompleteTrade,
+    { offer: [], receive: [] } as IncompleteTrade,
   );
 }
 
@@ -70,7 +70,7 @@ export default function TradeResult({
   const [changeStickerDialog, setChangeStickerDialog] =
     useState<DialogChangeTradeState | null>(null);
 
-  const giveCount = useMemo(() => countGiveTradedStickers(trades), [trades]);
+  const offerCount = useMemo(() => countOfferTradedStickers(trades), [trades]);
   const receiveCount = useMemo(
     () => countReceiveTradedStickers(trades),
     [trades],
@@ -78,8 +78,8 @@ export default function TradeResult({
 
   const sorted = useMemo(() => {
     return sortByGroup(trades).sort((a, b) => {
-      const aValid = a.give[0] != null && a.receive[0] != null;
-      const bValid = b.give[0] != null && b.receive[0] != null;
+      const aValid = a.offer[0] != null && a.receive[0] != null;
+      const bValid = b.offer[0] != null && b.receive[0] != null;
       if (aValid !== bValid) return aValid ? -1 : 1;
       if (a.type === CHROMA && b.type !== CHROMA) return -1;
       if (a.type !== CHROMA && b.type === CHROMA) return 1;
@@ -90,7 +90,7 @@ export default function TradeResult({
   const incompleteTrade = useMemo(() => getIncompleteTrade(sorted), [sorted]);
 
   const validCount = sorted.filter(
-    (t) => t.give[0] != null && t.receive[0] != null,
+    (t) => t.offer[0] != null && t.receive[0] != null,
   ).length;
 
   const handleCopyTrade = () => {
@@ -119,7 +119,7 @@ export default function TradeResult({
     (event: React.MouseEvent) => {
       event.preventDefault();
       if (availableStickers.length === 0) return;
-      if (trade.give[0] == null || trade.receive[0] == null) return;
+      if (trade.offer[0] == null || trade.receive[0] == null) return;
       setChangeStickerDialog({
         availableStickers,
         trade,
@@ -129,13 +129,13 @@ export default function TradeResult({
     };
 
   function row(tradeBy: TradeBy, i: number) {
-    const { give, receive } = tradeBy;
+    const { offer, receive } = tradeBy;
     return (
       <tr className="border-b border-border" key={i}>
         <td>{i + 1}</td>
         <td className="py-1 w-50">
           <div className="flex flex-col gap-2">
-            {give.map((code, i) => (
+            {offer.map((code, i) => (
               <Sticker
                 key={i}
                 code={code}
@@ -143,12 +143,12 @@ export default function TradeResult({
                 onDoubleClick={handleOpenChangeStickerDialog(
                   tradeBy,
                   code,
-                  incompleteTrade.give,
-                  "give",
+                  incompleteTrade.offer,
+                  "offer",
                 )}
               />
             ))}
-            {give.length === 0 && (
+            {offer.length === 0 && (
               <Sticker
                 key={i}
                 code={null}
@@ -156,8 +156,8 @@ export default function TradeResult({
                 onDoubleClick={handleOpenChangeStickerDialog(
                   tradeBy,
                   null,
-                  incompleteTrade.give,
-                  "give",
+                  incompleteTrade.offer,
+                  "offer",
                 )}
               />
             )}
@@ -252,7 +252,7 @@ export default function TradeResult({
           <tr className="text-left text-muted uppercase tracking-wider">
             <th />
             <th className="font-medium pb-1">
-              {t("tradeMy")}&nbsp;({giveCount})
+              {t("tradeMy")}&nbsp;({offerCount})
             </th>
             <th className="font-medium pb-1 w-6" />
             <th className="font-medium pb-1">

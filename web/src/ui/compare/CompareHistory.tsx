@@ -16,13 +16,13 @@ export default function CompareHistory({
   const { t } = useLocale();
 
   const matchingLabels = useMemo(() => {
-    const giveLabels = new Set(
-      entries.filter((e) => e.mode === "give").map((e) => e.name),
+    const offerLabels = new Set(
+      entries.filter((e) => e.mode === "offer").map((e) => e.name),
     );
     const receiveLabels = new Set(
       entries.filter((e) => e.mode === "receive").map((e) => e.name),
     );
-    return [...giveLabels].filter((l) => receiveLabels.has(l));
+    return [...offerLabels].filter((l) => receiveLabels.has(l));
   }, [entries]);
 
   if (!entries || entries.length === 0) {

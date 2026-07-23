@@ -9,7 +9,7 @@ export default function CompareResult({
   mode,
 }: {
   items: string[];
-  mode: "receive" | "give";
+  mode: "receive" | "offer";
 }) {
   const { t } = useLocale();
   const itemMap = Object.fromEntries(items.map((c) => [c, 1]));
@@ -18,7 +18,7 @@ export default function CompareResult({
   const handleCopy = useCallback(() => {
     const message = messageStickerListByTeam(
       groups.byTeam,
-      `${t(mode === "receive" ? "copyWantTitle" : "copyGiveTitle")} (${items.length})`,
+      `${t(mode === "receive" ? "copyWantTitle" : "copyOfferTitle")} (${items.length})`,
       "",
     ).trim();
     copy(message);
@@ -30,7 +30,7 @@ export default function CompareResult({
         <p className="text-sm font-medium text-fg">
           {mode === "receive"
             ? t("compareCanReceive", { n: items.length })
-            : t("compareCanGive", { n: items.length })}
+            : t("compareCanOffer", { n: items.length })}
         </p>
         <button
           onClick={handleCopy}

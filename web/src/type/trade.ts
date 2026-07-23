@@ -3,7 +3,7 @@ import { StickerType } from "./sticker";
 export type TradeSticker = string | null;
 
 export interface TradeBy {
-  give: TradeSticker[];
+  offer: TradeSticker[];
   receive: TradeSticker[];
   type: StickerType | "multi";
   savedAt: number;
