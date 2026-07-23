@@ -2,10 +2,11 @@ import { useCallback } from "react";
 import { flagOf } from "../../constants/flags.js";
 import { groupOf } from "../../constants/groups.js";
 import { useLocale } from "../../i18n/index.js";
-import { useStickerGroup } from "../../application/useStickerGroup.js";
+import { useStickerGroup } from "../../hooks/useStickerGroup.js";
 import type { ExtraItem } from "../../../../src/domain/inventory.js";
 import { copy, messageStickerListByTeam } from "../../application/copyTools.js";
 import GroupSticker from "../common/GroupSticker.js";
+import { Inventory } from "../../type/sticker.js";
 
 function prefixOf(code: string) {
   return code === "00" ? "00" : code.slice(0, 3);
@@ -34,7 +35,7 @@ export default function CompareResult({
 }: {
   items: string[];
   mode: "receive" | "give";
-  extras: ExtraItem[];
+  extras: Inventory;
 }) {
   const { t } = useLocale();
   const itemMap = Object.fromEntries(items.map((c) => [c, 1]));

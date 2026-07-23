@@ -1,10 +1,10 @@
-import type { Stickers } from "../type/sticker.js";
+import type { Inventory } from "../type/sticker.js";
 import type { CompareEntry } from "../type/compare.js";
 import type { Trade } from "../type/trade.js";
 import { compress, decompress } from "./compress.js";
 
 export interface ExportableState {
-  sticker: { inv: Stickers };
+  sticker: { inventory: Inventory };
   compare: { entries: Record<string, CompareEntry> };
   trade: { trades: Record<string, Trade> };
 }

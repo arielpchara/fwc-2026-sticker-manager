@@ -1,6 +1,6 @@
 import { flagOf } from "../constants/flags";
 import { StickerGroupByTeam } from "../type/group";
-import { Stickers } from "../type/sticker";
+import { Inventory } from "../type/sticker";
 import { TradeBy } from "../type/trade";
 import { isChroma } from "./stickerTools";
 

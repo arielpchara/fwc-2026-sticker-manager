@@ -15,8 +15,8 @@ import {
   messageCompleteTrade,
   messageMissingTrade,
 } from "../../application/copyTools.js";
-import { useTrade } from "../../application/useStickers.js";
 import { StickerType } from "../../type/sticker.js";
+import { useTrade } from "../../hooks/useTrade.js";
 
 const CHROMA: StickerType = "chroma";
 

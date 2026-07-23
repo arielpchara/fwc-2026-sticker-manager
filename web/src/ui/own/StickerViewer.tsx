@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useOwnStickers } from "../../application/useStickers.js";
+import { useOwnStickers } from "../../hooks/useStickers.js";
 import { useLocale } from "../../i18n/index.js";
 import { flagOf } from "../../constants/flags.js";
 import { groupOf, type GroupInfo } from "../../constants/groups.js";

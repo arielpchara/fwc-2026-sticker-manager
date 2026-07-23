@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useOwnStickers } from "../../application/useStickers.js";
+import { useOwnStickers } from "../../hooks/useStickers.js";
 import { flagOf, colorOf } from "../../constants/flags.js";
 import { GROUPS } from "../../constants/groups.js";
 import { maxStickers } from "../../constants/stickers.js";

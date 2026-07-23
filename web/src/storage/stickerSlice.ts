@@ -1,49 +1,43 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { Stickers } from "../type/sticker";
+import { Inventory } from "../type/sticker";
+import { generateEmptyInventory } from "../application/inventory";
 
 export interface StickerState {
-  inv: Stickers;
+  inventory: Inventory;
 }
 
 const initialState: StickerState = {
-  inv: {},
+  inventory: generateEmptyInventory(),
 };
 
 const stickerSlice = createSlice({
   name: "sticker",
   initialState,
   reducers: {
-    setOwn(state, action: PayloadAction<Record<string, number>>) {
-      state.inv = action.payload;
+    overwrite(state, action: PayloadAction<Record<string, number>>) {
+      state.inventory = action.payload;
     },
-    mergeOwn(state, action: PayloadAction<string[]>) {
-      for (const code of action.payload) {
-        if (!state.inv[code]) state.inv[code] = 1;
+    decrement(state, action: PayloadAction<Record<string, number>>) {
+      for (const [sticker, count] of Object.entries(action.payload)) {
+        if (state.inventory[sticker] !== undefined) {
+          state.inventory[sticker] -= count;
+          if (state.inventory[sticker] <= 0) {
+            state.inventory[sticker] = 0;
+          }
+        }
       }
     },
-    removeOwn(state, action: PayloadAction<string[]>) {
-      for (const code of action.payload) {
-        delete state.inv[code];
-      }
-    },
-    addSurplus(state, action: PayloadAction<Record<string, number>>) {
+    increment(state, action: PayloadAction<Record<string, number>>) {
       for (const [code, surplusQty] of Object.entries(action.payload)) {
-        state.inv[code] = 1 + surplusQty;
+        state.inventory[code] = 1 + surplusQty;
       }
     },
-    setSurplus(state, action: PayloadAction<Record<string, number>>) {
-      const inv: Record<string, number> = {}
-      for (const [code, surplusQty] of Object.entries(action.payload)) {
-        inv[code] = 1 + surplusQty
-      }
-      state.inv = inv
-    },
-    clearOwn(state) {
-      state.inv = {};
+    clear(state) {
+      state.inventory = generateEmptyInventory();
     },
   },
 });
 
-export const { setOwn, mergeOwn, removeOwn, addSurplus, setSurplus, clearOwn } =
-  stickerSlice.actions;
+export const stickerActions = stickerSlice.actions;
+
 export default stickerSlice.reducer;
