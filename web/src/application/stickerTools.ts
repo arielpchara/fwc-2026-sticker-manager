@@ -2,17 +2,22 @@ import { GROUPS, groupOf } from "../constants/groups.js";
 import { StickerGroupByTeam, StickerGroupByGroup } from "../type/group";
 import { Inventory, StickerType } from "../type/sticker";
 
-export function prefixOf(code: string) {
-  return code === "00" ? "00" : code.slice(0, 3);
+export function prefixOf(sticker: string) {
+  return sticker.match(/^(\D{2,3}|00)/gi)?.[0] || "NOT_FOUND";
 }
 
-export function suffixNum(code: string) {
-  return code === "00" ? 0 : parseInt(code.slice(3), 10);
+export function numberOf(sticker: string) {
+  const stickerNumber = sticker.match(/(\d{1,2})$/gi)?.[0] || "NOT_FOUND";
+  return parseInt(stickerNumber, 10);
 }
 
 export function isChroma(code: string) {
-  const n = suffixNum(code);
-  return n === 1 || n === 0 || prefixOf(code) === "FWC";
+  const number = numberOf(code);
+  const prefix = prefixOf(code);
+  if (prefix === "CC") {
+    return false;
+  }
+  return prefix === "FWC" || number === 1 || number === 0;
 }
 
 export function getStickerType(code: string): StickerType {
@@ -34,11 +39,9 @@ export function stickerGroupByType(codes: string[]) {
 
 export function groupByTeam(stickers: Inventory): StickerGroupByTeam[] {
   const teamsOrder = GROUPS.flatMap((g) => g.prefixes);
-  const teamIndex: Record<string, number> = Object.fromEntries([
-    ["00", 0],
-    ["FWC", 1],
-    ...teamsOrder.map((t, i) => [t, i + 2]),
-  ]);
+  const teamIndex: Record<string, number> = Object.fromEntries(
+    teamsOrder.map((t, i) => [t, i]),
+  );
   const stickerGroup: StickerGroupByTeam[] = [];
   for (const [code, qtd] of Object.entries(stickers)) {
     const team = prefixOf(code);
@@ -63,19 +66,8 @@ export function groupByGroup(
       teamGroup.push({ labelKey: group.labelKey, teams: sortedTeams });
     }
   }
-  const specials = byTeam.filter((sg) => {
-    const info = groupOf(sg.team);
-    return info.order < 0;
-  });
-  if (specials.length > 0) {
-    teamGroup.unshift({ labelKey: "specialLabel", teams: specials });
-  }
   return teamGroup;
 }
 
-export function countExtrasFromInventory(inventory: Inventory): number {
-  return Object.entries(inventory).reduce(
-    (count, [, quantity]) => count + quantity,
-    0,
-  );
-}
+export const countInventory = (inventory: Inventory): number =>
+  Object.keys(inventory)?.length || 0;

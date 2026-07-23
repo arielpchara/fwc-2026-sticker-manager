@@ -61,5 +61,6 @@ export type stickerPrefix = typeof PREFIX;
 export function maxStickers(prefix: string): number {
   if (prefix === "00") return 1;
   if (prefix === "FWC") return 19;
+  if (prefix === "CC") return 14;
   return 20;
 }

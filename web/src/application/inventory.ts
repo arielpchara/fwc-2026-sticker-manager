@@ -8,7 +8,7 @@ export function generateEmptyInventory(): Inventory {
     if (prefix === "00") max = 1;
     if (prefix === "FWC") max = 19;
     if (prefix === "CC") max = 14;
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= max; i++) {
       const code = `${prefix}${prefix !== "00" ? i : ""}`;
       inventory[code] = 0;
     }
