@@ -13,7 +13,7 @@ export default function CompareStickers() {
   const navigate = useNavigate();
   const { inventory, extraInventory } = useStickers();
   const { entries, saveEntry, deleteEntry } = useCompareHistory();
-  const [mode, setMode] = useState<"receive" | "give">("receive");
+  const [mode, setMode] = useState<"receive" | "offer">("receive");
   const [text, setText] = useState("");
   const [label, setLabel] = useState("");
   const [result, setResult] = useState<{
@@ -43,7 +43,7 @@ export default function CompareStickers() {
         text,
         savedAt: Date.now(),
         stickers: offer,
-        mode: "give",
+        mode: "offer",
       });
     }
   }
@@ -61,7 +61,7 @@ export default function CompareStickers() {
     }
   }
 
-  function toggleMode(m: "receive" | "give") {
+  function toggleMode(m: "receive" | "offer") {
     setMode(m);
     setResult(null);
   }
@@ -86,14 +86,14 @@ export default function CompareStickers() {
           </button>
           <button
             type="button"
-            onClick={() => toggleMode("give")}
+            onClick={() => toggleMode("offer")}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
-              mode === "give"
+              mode === "offer"
                 ? "bg-gold text-bg"
                 : "bg-surface text-muted hover:bg-surface-2"
             }`}
           >
-            {t("compareGiveTab")}
+            {t("compareOfferTab")}
           </button>
         </div>
 

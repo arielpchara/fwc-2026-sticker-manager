@@ -1,4 +1,4 @@
-export type CompareMode = "receive" | "give";
+export type CompareMode = "receive" | "offer";
 
 export interface CompareEntry {
   name: string;

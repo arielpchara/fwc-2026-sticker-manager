@@ -9,6 +9,7 @@ import { Inventory } from "../../type/sticker.js";
 import { MAX_STICKERS_PER_TEAM } from "../../constants/groups.js";
 import { getMaxStickerPerTeam } from "../../application/groupTools.js";
 import ProgressBar from "./ProgressBar.js";
+import { filterOnlyOwnedFromInventory } from "../../application/filterInventory.js";
 
 function teamName(
   prefix: string,
@@ -109,7 +110,10 @@ export default function GroupSticker({
                 {icon}
               </span>
               <span className="flex flex-wrap gap-1.5">
-                {getStickerList(team, stickers).map(([code]) => (
+                {getStickerList(
+                  team,
+                  filterOnlyOwnedFromInventory(stickers),
+                ).map(([code]) => (
                   <Sticker key={code} code={code} displayFlag={false} compact />
                 ))}
               </span>

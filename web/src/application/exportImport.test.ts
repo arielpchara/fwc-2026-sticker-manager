@@ -22,7 +22,7 @@ function makeFullState(): ExportableState {
           name: "trade1",
           trades: [
             {
-              give: ["BRA1"],
+              offer: ["BRA1"],
               receive: ["ARG3"],
               type: "normal",
               savedAt: 1700000000000,
@@ -78,7 +78,7 @@ describe("deserializeState", () => {
         compare: {
           entries: {
             "receive-a": { name: "a", text: "BRA1", stickers: ["BRA1"], mode: "receive", savedAt: 1 },
-            "give-b": { name: "b", text: "ARG3", stickers: ["ARG3"], mode: "give", savedAt: 2 },
+            "offer-b": { name: "b", text: "ARG3", stickers: ["ARG3"], mode: "offer", savedAt: 2 },
           },
         },
         trade: { trades: {} },
@@ -97,8 +97,8 @@ describe("deserializeState", () => {
             s2: {
               name: "s2",
               trades: [
-                { give: [null], receive: ["BRA1"], type: "chroma", savedAt: 200, key: "x" },
-                { give: ["BRA2"], receive: [null], type: "multi", savedAt: 300, key: "y" },
+                { offer: [null], receive: ["BRA1"], type: "chroma", savedAt: 200, key: "x" },
+                { offer: ["BRA2"], receive: [null], type: "multi", savedAt: 300, key: "y" },
               ],
               savedAt: 400,
               isLock: false,

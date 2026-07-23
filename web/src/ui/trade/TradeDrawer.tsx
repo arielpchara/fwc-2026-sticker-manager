@@ -16,16 +16,16 @@ export default function TradeDrawer() {
   const { entries } = useCompareHistory();
   const { trades: storedTrades, saveTrade } = useTrade();
 
-  const giveEntry = name ? entries[`give-${name}`] : undefined;
+  const offerEntry = name ? entries[`offer-${name}`] : undefined;
   const receiveEntry = name ? entries[`receive-${name}`] : undefined;
-  const give = giveEntry?.stickers ?? [];
+  const offer = offerEntry?.stickers ?? [];
   const receive = receiveEntry?.stickers ?? [];
   const stored = name ? storedTrades[name] : undefined;
 
   const trade = useMemo(() => {
     if (stored?.isLock) return stored.trades;
-    return give.length || receive.length ? trader(give, receive) : [];
-  }, [stored, give, receive]);
+    return offer.length || receive.length ? trader(offer, receive) : [];
+  }, [stored, offer, receive]);
 
   const handleChangeSticker = useCallback(
     (from: TradeBy, to: string[], mode: CompareMode) => {
@@ -34,7 +34,7 @@ export default function TradeDrawer() {
       if (idx === -1) return;
       const updated: TradeBy = {
         ...from,
-        ...(mode === "give" ? { give: to } : { receive: to }),
+        ...(mode === "offer" ? { offer: to } : { receive: to }),
       };
       const newTrades = updateTrade(trade, idx, updated);
       saveTrade(name, newTrades, true);

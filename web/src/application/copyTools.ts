@@ -16,8 +16,8 @@ function formatStickerTrade(code: string | null): string {
 
 function formatTrade(trade: TradeBy): string {
   const line = [];
-  trade.give.length > 0 &&
-    line.push(trade.give.map(formatStickerTrade).join(", "));
+  trade.offer.length > 0 &&
+    line.push(trade.offer.map(formatStickerTrade).join(", "));
   trade.receive.length > 0 &&
     line.push(trade.receive.map(formatStickerTrade).join(", "));
   return line.join(" <-> ");
@@ -43,7 +43,7 @@ export function messageMissingTrade(
   return [
     header,
     ...trade
-      .filter((t) => t.give.length === 0 && t.receive.length > 0)
+      .filter((t) => t.offer.length === 0 && t.receive.length > 0)
       .map(formatTrade)
       .filter((line) => line.length > 0),
     footer,
