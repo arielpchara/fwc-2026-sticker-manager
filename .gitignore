@@ -1,0 +1,7 @@
+node_modules/
+dist/
+data/
+docs/data/
+.env*
+.DS_Store
+web/image copy.png

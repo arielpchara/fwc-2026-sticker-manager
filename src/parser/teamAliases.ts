@@ -1,0 +1,143 @@
+import { normalize } from '../domain/sticker.js'
+
+const RAW_ALIASES: Record<string, string> = {
+  // Special / Capa
+  capa: 'FWC',
+  cover: 'FWC',
+  special: 'FWC',
+  fwc: 'FWC',
+  'fifa world cup': 'FWC',
+  'copa do mundo': 'FWC',
+  'capa do album': 'FWC',
+
+  // Teams - PT + EN + common variants (accents preserved here, normalized at runtime)
+  argélia: 'ALG',
+  algeria: 'ALG',
+  angola: 'ANG',
+  argentina: 'ARG',
+  austrália: 'AUS',
+  australia: 'AUS',
+  áustria: 'AUT',
+  austria: 'AUT',
+  bélgica: 'BEL',
+  belgium: 'BEL',
+  'bósnia e herzegovina': 'BIH',
+  'bosnia and herzegovina': 'BIH',
+  bosnia: 'BIH',
+  brasil: 'BRA',
+  brazil: 'BRA',
+  canadá: 'CAN',
+  canada: 'CAN',
+  'costa do marfim': 'CIV',
+  'ivory coast': 'CIV',
+  'côte d\'ivoire': 'CIV',
+  camarões: 'CMR',
+  cameroon: 'CMR',
+  'rd congo': 'COD',
+  'dr congo': 'COD',
+  congo: 'COD',
+  rdc: 'COD',
+  colômbia: 'COL',
+  colombia: 'COL',
+  'cabo verde': 'CPV',
+  'cape verde': 'CPV',
+  croácia: 'CRO',
+  croatia: 'CRO',
+  curaçao: 'CUW',
+  curacao: 'CUW',
+  'república tcheca': 'CZE',
+  'republica tcheca': 'CZE',
+  'czech republic': 'CZE',
+  czechia: 'CZE',
+  dinamarca: 'DEN',
+  denmark: 'DEN',
+  equador: 'ECU',
+  ecuador: 'ECU',
+  egito: 'EGY',
+  egypt: 'EGY',
+  inglaterra: 'ENG',
+  england: 'ENG',
+  espanha: 'ESP',
+  spain: 'ESP',
+  frança: 'FRA',
+  france: 'FRA',
+  alemanha: 'GER',
+  germany: 'GER',
+  gana: 'GHA',
+  ghana: 'GHA',
+  haiti: 'HAI',
+  irã: 'IRN',
+  iran: 'IRN',
+  iraque: 'IRQ',
+  iraq: 'IRQ',
+  jordânia: 'JOR',
+  jordan: 'JOR',
+  japão: 'JPN',
+  japan: 'JPN',
+  'coreia do sul': 'KOR',
+  'coréia do sul': 'KOR',
+  'south korea': 'KOR',
+  korea: 'KOR',
+  'arábia saudita': 'KSA',
+  'saudi arabia': 'KSA',
+  marrocos: 'MAR',
+  morocco: 'MAR',
+  méxico: 'MEX',
+  mexico: 'MEX',
+  'países baixos': 'NED',
+  holanda: 'NED',
+  netherlands: 'NED',
+  holland: 'NED',
+  noruega: 'NOR',
+  norway: 'NOR',
+  'nova zelândia': 'NZL',
+  'new zealand': 'NZL',
+  panamá: 'PAN',
+  panama: 'PAN',
+  paraguai: 'PAR',
+  paraguay: 'PAR',
+  portugal: 'POR',
+  catar: 'QAT',
+  qatar: 'QAT',
+  'áfrica do sul': 'RSA',
+  'south africa': 'RSA',
+  escócia: 'SCO',
+  scotland: 'SCO',
+  senegal: 'SEN',
+  suíça: 'SUI',
+  switzerland: 'SUI',
+  suécia: 'SWE',
+  sweden: 'SWE',
+  tunísia: 'TUN',
+  tunisia: 'TUN',
+  turquia: 'TUR',
+  turkey: 'TUR',
+  uruguai: 'URU',
+  uruguay: 'URU',
+  'estados unidos': 'USA',
+  'united states': 'USA',
+  eua: 'USA',
+  usa: 'USA',
+  uzbequistão: 'UZB',
+  uzbekistan: 'UZB',
+}
+
+function normalizeKey(s: string): string {
+  return normalize(s)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+}
+
+// Build normalized lookup map once
+const ALIASES: Record<string, string> = {}
+for (const [k, v] of Object.entries(RAW_ALIASES)) {
+  ALIASES[normalizeKey(k)] = v
+}
+
+export function resolveTeamPrefix(name: string): string | null {
+  const key = normalizeKey(name)
+  return ALIASES[key] ?? null
+}

@@ -1,0 +1,40 @@
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import stickerReducer from './stickerSlice.js'
+import compareReducer from './compareSlice.js'
+import tradeReducer from './tradeSlice.js'
+
+const stickerPersistConfig = {
+  key: 'sticker-trade',
+  storage,
+}
+
+const comparePersistConfig = {
+  key: 'sticker-trade-compare',
+  storage,
+}
+
+const tradePersistConfig = {
+  key: 'sticker-trade-trade',
+  storage,
+}
+
+const rootReducer = combineReducers({
+  sticker: persistReducer(stickerPersistConfig, stickerReducer),
+  compare: persistReducer(comparePersistConfig, compareReducer),
+  trade: persistReducer(tradePersistConfig, tradeReducer),
+})
+
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: { ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER] },
+    }),
+})
+
+export const persistor = persistStore(store)
+
+export type RootState = ReturnType<typeof rootReducer>
+export type AppDispatch = typeof store.dispatch

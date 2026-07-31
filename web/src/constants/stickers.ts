@@ -1,0 +1,66 @@
+export const TOTAL_STICKERS = 994;
+
+export const PREFIX = [
+  "FWC",
+  "ALG",
+  "ANG",
+  "ARG",
+  "AUS",
+  "AUT",
+  "BEL",
+  "BIH",
+  "BRA",
+  "CAN",
+  "CIV",
+  "CMR",
+  "COD",
+  "COL",
+  "CPV",
+  "CRO",
+  "CUW",
+  "CZE",
+  "DEN",
+  "ECU",
+  "EGY",
+  "ENG",
+  "ESP",
+  "FRA",
+  "GER",
+  "GHA",
+  "HAI",
+  "IRN",
+  "IRQ",
+  "JOR",
+  "JPN",
+  "KOR",
+  "KSA",
+  "MAR",
+  "MEX",
+  "NED",
+  "NOR",
+  "NZL",
+  "PAN",
+  "PAR",
+  "POR",
+  "QAT",
+  "RSA",
+  "SCO",
+  "SEN",
+  "SUI",
+  "SWE",
+  "TUN",
+  "TUR",
+  "URU",
+  "USA",
+  "UZB",
+  "CC",
+];
+
+export type stickerPrefix = typeof PREFIX;
+
+export function maxStickers(prefix: string): number {
+  if (prefix === "00") return 1;
+  if (prefix === "FWC") return 19;
+  if (prefix === "CC") return 14;
+  return 20;
+}

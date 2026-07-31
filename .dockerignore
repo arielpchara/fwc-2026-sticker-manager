@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/
+.opencode/
+docs/
+*.md
+*.test.ts
+.env*
+.DS_Store

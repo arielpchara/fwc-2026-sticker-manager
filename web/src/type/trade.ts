@@ -1,0 +1,23 @@
+import { StickerType } from "./sticker";
+
+export type TradeSticker = string | null;
+
+export interface TradeBy {
+  offer: TradeSticker[];
+  receive: TradeSticker[];
+  type: StickerType | "multi";
+  savedAt: number;
+  key: string;
+}
+
+export interface Trade {
+  name: string;
+  trades: TradeBy[];
+  savedAt: number;
+  isLock: boolean;
+  note?: string;
+}
+
+export interface TradeState {
+  trades: Record<string, Trade>;
+}

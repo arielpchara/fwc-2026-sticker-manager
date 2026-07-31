@@ -1,0 +1,37 @@
+name: sticker-trade
+displayName: Sticker Trade
+registry:
+  sticker-trade:
+    description: >
+      FIFA World Cup sticker trade tools. Parse sticker codes (e.g. BRA1,
+      ARG00, FWC3) from any app's plain text, track your own collection with
+      full history, and find out which stickers you can receive from a trade
+      partner.
+    title: Sticker Trade
+    type: server
+    image: sticker-trade:latest
+
+    tools:
+      - name: upload_own_stickers
+      - name: get_own_stickers
+      - name: compare_collection
+
+    # Persist own.json + dated history snapshots across container runs
+    volumes:
+      - "sticker-data:/data"
+
+    # DATA_DIR is already set in the Dockerfile; listed here for visibility
+    env:
+      - name: DATA_DIR
+        value: /data
+
+    metadata:
+      category: productivity
+      tags:
+        - fifa
+        - stickers
+        - trade
+        - world-cup
+      license: MIT License
+
+    source: https://github.com/pchara/figurinhas-da-copa-troca
