@@ -51,24 +51,35 @@ export default function CompareStickers() {
     }
   }
 
-  function handleReopen(entry: CompareEntry) {
-    setMode(entry.mode);
-    setLabel(entry.name);
-    setText(entry.text);
+  function refreshEntry(entry: CompareEntry): string[] {
     const stickers =
       entry.mode === "receive"
         ? findMissing(entry.text, inventory)
         : findOffer(entry.text, extraInventory);
-    setResult(
-      entry.mode === "receive"
-        ? { missing: stickers, offer: [], count: stickers.length }
-        : { missing: [], offer: stickers, count: stickers.length },
-    );
     saveEntry({
       ...entry,
       stickers,
       savedAt: Date.now(),
     });
+    return stickers;
+  }
+
+  function handleReopen(entry: CompareEntry) {
+    setMode(entry.mode);
+    setLabel(entry.name);
+    setText(entry.text);
+    const stickers = refreshEntry(entry);
+    setResult(
+      entry.mode === "receive"
+        ? { missing: stickers, offer: [], count: stickers.length }
+        : { missing: [], offer: stickers, count: stickers.length },
+    );
+  }
+
+  function handleRefreshAll() {
+    for (const entry of Object.values(entries)) {
+      refreshEntry(entry);
+    }
   }
 
   function toggleMode(m: "receive" | "offer") {
@@ -94,6 +105,7 @@ export default function CompareStickers() {
         navigate(`/compare/${label}`);
       }}
       onReopen={handleReopen}
+      onRefreshAll={handleRefreshAll}
       onDelete={deleteEntry}
     />
   );

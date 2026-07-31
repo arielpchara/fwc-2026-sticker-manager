@@ -4,6 +4,7 @@ import { useAppSelector } from "../../storage/hooks.js";
 import type { CompareEntry } from "../../type/compare.js";
 
 function CompareName({
+  index,
   name,
   entries,
   canTrade,
@@ -12,6 +13,7 @@ function CompareName({
   onReopen,
   onDelete,
 }: {
+  index: number;
   name: string;
   entries: CompareEntry[];
   canTrade: boolean;
@@ -25,6 +27,9 @@ function CompareName({
   return (
     <div className="rounded border border-border bg-surface py-1.5 px-2 space-y-1">
       <div className="flex items-center gap-1.5 min-w-0">
+        <span className="text-[10px] text-muted tabular-nums shrink-0 w-4">
+          {index}
+        </span>
         <span className="font-medium text-fg text-xs truncate">{name}</span>
         {hasNote ? (
           <span className="text-gold shrink-0" title={t("tradeNote")}>
@@ -114,11 +119,13 @@ export default function CompareHistory({
   entries = [],
   onTradeNavigate,
   onReopen,
+  onRefreshAll,
   onDelete,
 }: {
   entries: CompareEntry[];
   onTradeNavigate?: (label: string) => void;
   onReopen: (entry: CompareEntry) => void;
+  onRefreshAll?: () => void;
   onDelete: (id: string) => void;
 }) {
   const { t } = useLocale();
@@ -137,9 +144,10 @@ export default function CompareHistory({
         entries: list.sort((a, b) =>
           a.mode === b.mode ? 0 : a.mode === "receive" ? -1 : 1,
         ),
-        savedAt: Math.max(...list.map((e) => e.savedAt)),
       }))
-      .sort((a, b) => b.savedAt - a.savedAt);
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+      );
   }, [entries]);
 
   if (!entries || entries.length === 0) {
@@ -152,13 +160,42 @@ export default function CompareHistory({
 
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-muted">{t("historyTitle")}</p>
-      {groups.map((g) => (
+      <div className="flex items-center gap-1.5">
+        <p className="text-xs font-medium text-muted">{t("historyTitle")}</p>
+        {onRefreshAll && (
+          <button
+            type="button"
+            onClick={onRefreshAll}
+            className="text-muted hover:text-gold p-0.5 ml-auto"
+            title={t("historyRefreshAll")}
+            aria-label={t("historyRefreshAll")}
+          >
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+      {groups.map((g, i) => (
         <CompareName
           key={g.name}
+          index={i + 1}
           name={g.name}
           entries={g.entries}
-          canTrade={g.entries.some((e) => e.mode === "offer") && g.entries.some((e) => e.mode === "receive")}
+          canTrade={
+            g.entries.some((e) => e.mode === "offer") &&
+            g.entries.some((e) => e.mode === "receive")
+          }
           hasNote={!!(trades[g.name]?.note ?? "").trim()}
           onTradeNavigate={onTradeNavigate}
           onReopen={onReopen}
