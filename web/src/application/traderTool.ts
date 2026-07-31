@@ -1,9 +1,122 @@
 import { GROUPS } from "../constants/groups";
-import { TradeBy, TradeSticker } from "../type/trade";
+import type { CompareEntry } from "../type/compare";
+import { Trade, TradeBy, TradeSticker } from "../type/trade";
 import { isChroma, stickerGroupByType } from "./stickerTools";
 
 const notNull = (list: TradeSticker[]): string[] =>
   list.filter((code) => code !== null);
+
+export type SharedCodeMaps = {
+  offer: Map<string, string[]>;
+  receive: Map<string, string[]>;
+};
+
+export type PeerSideCodes = {
+  offer: string[];
+  receive: string[];
+};
+
+/** Append peer name under a sticker code (no duplicates). */
+export function addPeerToCode(
+  map: Map<string, string[]>,
+  code: string | null | undefined,
+  peerName: string,
+): void {
+  if (!code) return;
+  const list = map.get(code) ?? [];
+  if (!list.includes(peerName)) list.push(peerName);
+  map.set(code, list);
+}
+
+/** Unique peer names from compare entries and saved trades. */
+export function collectPeerNames(
+  compareEntries: Record<string, Pick<CompareEntry, "name">>,
+  allTrades: Record<string, unknown>,
+): string[] {
+  const names = new Set<string>();
+  for (const e of Object.values(compareEntries)) names.add(e.name);
+  for (const n of Object.keys(allTrades)) names.add(n);
+  return [...names];
+}
+
+/** Coerce offer/receive side to an array (legacy single value). */
+export function normalizeTradeSide(
+  side: TradeSticker[] | TradeSticker | undefined | null,
+): TradeSticker[] {
+  if (Array.isArray(side)) return side;
+  if (side != null) return [side];
+  return [];
+}
+
+/** Both sides have at least one non-null code. */
+export function isPairedTradeRow(row: {
+  offer?: TradeSticker[] | TradeSticker | null;
+  receive?: TradeSticker[] | TradeSticker | null;
+}): boolean {
+  return (
+    normalizeTradeSide(row?.offer).some(Boolean) &&
+    normalizeTradeSide(row?.receive).some(Boolean)
+  );
+}
+
+/** Non-null codes from paired locked trade rows. */
+export function codesFromLockedTrades(trades: TradeBy[]): PeerSideCodes {
+  const offer: string[] = [];
+  const receive: string[] = [];
+  for (const row of trades) {
+    if (!isPairedTradeRow(row)) continue;
+    for (const c of normalizeTradeSide(row.offer)) {
+      if (c) offer.push(c);
+    }
+    for (const c of normalizeTradeSide(row.receive)) {
+      if (c) receive.push(c);
+    }
+  }
+  return { offer, receive };
+}
+
+/**
+ * Stickers a peer is trading: locked complete rows win;
+ * else both compare sides when both non-empty.
+ */
+export function peerSharedCodes(
+  peerName: string,
+  compareEntries: Record<string, Pick<CompareEntry, "stickers">>,
+  trade: Pick<Trade, "isLock" | "trades"> | undefined,
+): PeerSideCodes | null {
+  if (trade?.isLock && trade.trades.length > 0) {
+    return codesFromLockedTrades(trade.trades);
+  }
+  const oStickers = compareEntries[`offer-${peerName}`]?.stickers;
+  const rStickers = compareEntries[`receive-${peerName}`]?.stickers;
+  if (
+    Array.isArray(oStickers) &&
+    oStickers.length > 0 &&
+    Array.isArray(rStickers) &&
+    rStickers.length > 0
+  ) {
+    return { offer: oStickers, receive: rStickers };
+  }
+  return null;
+}
+
+/** Map sticker code → peer names that also trade that code (excluding current). */
+export function collectShared(
+  currentName: string,
+  compareEntries: Record<string, Pick<CompareEntry, "name" | "stickers">>,
+  allTrades: Record<string, Pick<Trade, "isLock" | "trades">>,
+): SharedCodeMaps {
+  const offer = new Map<string, string[]>();
+  const receive = new Map<string, string[]>();
+  for (const peer of collectPeerNames(compareEntries, allTrades)) {
+    if (peer === currentName) continue;
+    const codes = peerSharedCodes(peer, compareEntries, allTrades[peer]);
+    if (!codes) continue;
+    for (const c of codes.offer) addPeerToCode(offer, c, peer);
+    for (const c of codes.receive) addPeerToCode(receive, c, peer);
+  }
+  return { offer, receive };
+}
 
 function shuffleStickers(codes: string[]) {
   const shuffled = [...codes];

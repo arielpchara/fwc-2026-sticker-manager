@@ -4,6 +4,7 @@ import { flagOf } from "../../constants/flags.js";
 import Sticker from "../common/Sticker.js";
 import type { TradeBy } from "../../type/trade.js";
 import {
+  collectShared,
   countOfferTradedStickers,
   countReceiveTradedStickers,
   filterCompleteTrades,
@@ -118,57 +119,6 @@ function TradeNote({
       )}
     </>
   );
-}
-
-function collectShared(
-  currentName: string,
-  compareEntries: Record<string, { name: string; stickers: string[]; mode: string }>,
-  allTrades: Record<string, { name: string; trades: TradeBy[]; isLock: boolean }>,
-): { offer: Map<string, string[]>; receive: Map<string, string[]> } {
-  const offer = new Map<string, string[]>();
-  const receive = new Map<string, string[]>();
-  const add = (map: Map<string, string[]>, code: string | null | undefined, n: string) => {
-    if (!code) return;
-    const list = map.get(code) ?? [];
-    if (!list.includes(n)) list.push(n);
-    map.set(code, list);
-  };
-  const names = new Set<string>();
-  for (const e of Object.values(compareEntries)) names.add(e.name);
-  for (const n of Object.keys(allTrades)) names.add(n);
-  for (const n of names) {
-    if (n === currentName) continue;
-    const locked = allTrades[n];
-    const oStickers = compareEntries[`offer-${n}`]?.stickers;
-    const rStickers = compareEntries[`receive-${n}`]?.stickers;
-
-    if (locked?.isLock && locked.trades.length > 0) {
-      for (const row of locked.trades) {
-        const offers = Array.isArray(row?.offer)
-          ? row.offer
-          : row?.offer != null
-            ? [row.offer]
-            : [];
-        const receives = Array.isArray(row?.receive)
-          ? row.receive
-          : row?.receive != null
-            ? [row.receive]
-            : [];
-        if (!offers.some(Boolean) || !receives.some(Boolean)) continue;
-        for (const c of offers) add(offer, c, n);
-        for (const c of receives) add(receive, c, n);
-      }
-    } else if (
-      Array.isArray(oStickers) &&
-      oStickers.length > 0 &&
-      Array.isArray(rStickers) &&
-      rStickers.length > 0
-    ) {
-      for (const c of oStickers) add(offer, c, n);
-      for (const c of rStickers) add(receive, c, n);
-    }
-  }
-  return { offer, receive };
 }
 
 function SharedSticker({
