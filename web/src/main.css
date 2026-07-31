@@ -22,6 +22,13 @@ html, body {
   font-weight: 300;
 }
 
+/* iOS zooms focused fields under 16px — keep form text at body size */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+textarea,
+select {
+  font-size: 16px !important;
+}
+
 .sticker-glass {
   position: relative;
   overflow: visible;
