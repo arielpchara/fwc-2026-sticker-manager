@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { messageMissing } from "../../application/copyTools.js";
 import {
   countFiltered,
@@ -36,6 +36,25 @@ export default function MainPage() {
   const [layout, setLayout] = useState<LayoutMode>("group");
   const [compact, setCompact] = useState(false);
   const [sort, setSort] = useState<TeamSort>(null);
+  const [searchStuck, setSearchStuck] = useState(false);
+  const searchSentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = searchSentinelRef.current;
+    if (!el) return;
+    let root: Element | null = el.parentElement;
+    while (root) {
+      const { overflowY } = getComputedStyle(root);
+      if (overflowY === "auto" || overflowY === "scroll") break;
+      root = root.parentElement;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => setSearchStuck(!entry.isIntersecting),
+      { root, threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const active = hasActiveFilters(filters);
   const hideMissing = hasActiveFiltersHideMissing(filters);
@@ -82,14 +101,22 @@ export default function MainPage() {
   return (
     <MainLayout>
       <Body>
-        <AlbumSearch
-          filters={filters}
-          onChange={setFilters}
-          sort={sort}
-          onSortChange={setSort}
-          totalInv={TOTAL_STICKERS}
-          filteredCount={filteredCount}
-        />
+        <div ref={searchSentinelRef} className="h-px w-full" aria-hidden />
+        <div
+          className={`sticky top-0 z-30 -mx-4 px-4 py-3 mb-2 bg-bg/95 backdrop-blur-sm border-b border-border transition-shadow ${
+            searchStuck ? "shadow-md shadow-black/40" : ""
+          }`}
+        >
+          <AlbumSearch
+            filters={filters}
+            onChange={setFilters}
+            sort={sort}
+            onSortChange={setSort}
+            totalInv={TOTAL_STICKERS}
+            filteredCount={filteredCount}
+            hideCount={searchStuck}
+          />
+        </div>
         <CopyButton text={copyText} />
 
         <div className="mb-6">

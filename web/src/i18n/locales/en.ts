@@ -1,5 +1,5 @@
 const en = {
-  appTitle: "Cup 2026 — Sticker Trade",
+  appTitle: "FWC26 - Trader",
   btnHome: "Home",
   btnOwn: "Update Stickers",
   btnExtras: "Extras",

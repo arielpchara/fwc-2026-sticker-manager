@@ -1,7 +1,7 @@
 import type { Translations } from "./en.js";
 
 const pt: Translations = {
-  appTitle: "Copa 2026 — Troca de Figurinhas",
+  appTitle: "FWC26 - Trader",
   btnHome: "Inicio",
   btnOwn: "Atualizar Figurinhas",
   btnExtras: "Repetidas",

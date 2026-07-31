@@ -12,6 +12,7 @@ export default function AlbumSearch({
   sort,
   onSortChange,
   filteredCount,
+  hideCount = false,
 }: {
   filters: InventoryFilters;
   onChange: (next: InventoryFilters) => void;
@@ -19,6 +20,7 @@ export default function AlbumSearch({
   onSortChange: (v: TeamSort) => void;
   totalInv: number;
   filteredCount: number;
+  hideCount?: boolean;
 }) {
   const { t } = useLocale();
   const { query, missing, extras, groups, teams } = filters;
@@ -52,7 +54,7 @@ export default function AlbumSearch({
   };
 
   return (
-    <div className="space-y-2 mb-6">
+    <div className="space-y-2">
       <StickerSuggestInput
         value={query}
         onChange={(e) => onChange({ ...filters, query: e.target.value })}
@@ -97,33 +99,37 @@ export default function AlbumSearch({
         <TeamSortSelect value={sort} onChange={onSortChange} />
       </div>
 
-      <div className="text-xs text-muted flex flex-wrap items-center gap-2">
-        <span>
-          {t("searchStatus", {
-            total: TOTAL_STICKERS,
-            filtered: filteredCount,
-          })}
-        </span>
-        {chips.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((c) => (
-              <span
-                key={c.key}
-                className="inline-flex items-center gap-1 bg-gold-soft text-gold px-2 py-0.5 rounded-full text-[10px]"
-              >
-                {c.label}
-                <button
-                  onClick={() => removeChip(c.key)}
-                  className="hover:text-fg"
-                  aria-label="remove filter"
+      {(chips.length > 0 || !hideCount) && (
+        <div className="text-xs text-muted flex flex-wrap items-center gap-2">
+          {!hideCount && (
+            <span>
+              {t("searchStatus", {
+                total: TOTAL_STICKERS,
+                filtered: filteredCount,
+              })}
+            </span>
+          )}
+          {chips.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {chips.map((c) => (
+                <span
+                  key={c.key}
+                  className="inline-flex items-center gap-1 bg-gold-soft text-gold px-2 py-0.5 rounded-full text-[10px]"
                 >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
+                  {c.label}
+                  <button
+                    onClick={() => removeChip(c.key)}
+                    className="hover:text-fg"
+                    aria-label="remove filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
