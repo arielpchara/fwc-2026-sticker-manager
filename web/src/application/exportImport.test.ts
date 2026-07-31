@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { serializeState, deserializeState, type ExportableState } from "./exportImport.js";
+import {
+  serializeState,
+  deserializeState,
+  byteLength,
+  formatBytes,
+  type ExportableState,
+} from "./exportImport.js";
 import { compress } from "./compress.js";
 
 function makeFullState(): ExportableState {
@@ -44,6 +50,22 @@ function emptyState(): ExportableState {
     trade: { trades: {} },
   };
 }
+
+describe("formatBytes", () => {
+  it("formats bytes and kilobytes", () => {
+    expect(formatBytes(0)).toBe("0 B");
+    expect(formatBytes(842)).toBe("842 B");
+    expect(formatBytes(1024)).toBe("1.0 KB");
+    expect(formatBytes(12_400)).toBe("12 KB");
+  });
+});
+
+describe("byteLength", () => {
+  it("counts utf-8 bytes", () => {
+    expect(byteLength("abc")).toBe(3);
+    expect(byteLength("á")).toBe(2);
+  });
+});
 
 describe("serializeState", () => {
   it("produces a base64-encoded compressed string", async () => {
