@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLocale } from "../../i18n/index.js";
 import type { Translations } from "../../i18n/locales/en.js";
-import Modal from "./Modal.js";
+import BottomSheet from "./BottomSheet.js";
 import { ParseStickers } from "../own/ParseStickers.js";
 import ImportExportDrawer from "../own/ImportExportDrawer.js";
 import LangSelector from "./LangSelector.js";
@@ -138,7 +138,7 @@ export default function BottomNav() {
   return (
     <>
       <nav
-        className="md:hidden shrink-0 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
+        className="md:hidden relative z-50 shrink-0 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)]"
         aria-label="Main"
       >
         <ul className="grid grid-cols-5 h-14">
@@ -172,14 +172,14 @@ export default function BottomNav() {
           </li>
         </ul>
       </nav>
-      <Modal
+      <BottomSheet
         open={dialog !== null}
         onClose={() => setDialog(null)}
         title={open ? t(open.titleKey) : undefined}
       >
         {dialog === "own" && <ParseStickers />}
         {dialog === "import-export" && <ImportExportDrawer />}
-      </Modal>
+      </BottomSheet>
     </>
   );
 }
