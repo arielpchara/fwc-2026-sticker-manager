@@ -16,7 +16,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
         <div className="flex-1 min-w-0 flex justify-center">
           <AlbumProgress compact={compact} />
         </div>
-        <div className="flex-1 min-w-0 flex justify-end">
+        <div className="hidden md:flex flex-1 min-w-0 justify-end">
           <Menu />
         </div>
       </div>
