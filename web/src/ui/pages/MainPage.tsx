@@ -100,26 +100,28 @@ export default function MainPage() {
 
   return (
     <MainLayout>
-      <Body>
-        <div ref={searchSentinelRef} className="h-px w-full" aria-hidden />
-        <div
-          className={`sticky top-0 z-30 -mx-4 px-4 py-3 mb-2 bg-bg/95 backdrop-blur-sm border-b border-border transition-shadow ${
-            searchStuck ? "shadow-md shadow-black/40" : ""
-          }`}
-        >
-          <AlbumSearch
-            filters={filters}
-            onChange={setFilters}
-            sort={sort}
-            onSortChange={setSort}
-            totalInv={TOTAL_STICKERS}
-            filteredCount={filteredCount}
-            hideCount={searchStuck}
-          />
+      <Body className="!pt-2 !pb-8 !space-y-4">
+        <div>
+          <div ref={searchSentinelRef} className="h-px w-full" aria-hidden />
+          <div
+            className={`sticky top-0 z-30 -mx-4 px-4 py-2 bg-bg/95 backdrop-blur-sm border-b border-border transition-shadow ${
+              searchStuck ? "shadow-md shadow-black/40" : "border-transparent"
+            }`}
+          >
+            <AlbumSearch
+              filters={filters}
+              onChange={setFilters}
+              sort={sort}
+              onSortChange={setSort}
+              totalInv={TOTAL_STICKERS}
+              filteredCount={filteredCount}
+              hideCount={searchStuck}
+            />
+          </div>
         </div>
         <CopyButton text={copyText} />
 
-        <div className="mb-6">
+        <div>
           <DisplayMode
             layout={layout}
             onLayout={setLayout}

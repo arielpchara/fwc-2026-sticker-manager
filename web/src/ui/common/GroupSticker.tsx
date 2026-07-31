@@ -195,7 +195,7 @@ export default function GroupSticker({
                 />
               </span>
             </summary>
-            <div className="grid grid-cols-10 p-2 border-t border-border gap-2">
+            <div className="grid grid-cols-5 md:grid-cols-10 p-2 border-t border-border gap-1.5 md:gap-2">
               {getStickerList(team, stickers).map(([code, qdy]) => (
                 <Sticker
                   key={code}

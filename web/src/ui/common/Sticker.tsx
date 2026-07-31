@@ -1,5 +1,9 @@
 import React from "react";
-import { isChroma, prefixOf } from "../../application/stickerTools.js";
+import {
+  isChroma,
+  numberOf,
+  prefixOf,
+} from "../../application/stickerTools.js";
 import { flagOf, colorOf, secondaryColorOf } from "../../constants/flags.js";
 
 interface StickerProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -8,6 +12,12 @@ interface StickerProps extends React.HTMLAttributes<HTMLSpanElement> {
   qty?: number;
   compact?: boolean;
   full?: boolean;
+}
+
+function numberLabel(code: string | null): string {
+  if (!code) return "--";
+  const n = numberOf(code);
+  return Number.isFinite(n) ? String(n) : "--";
 }
 
 export default function Sticker({
@@ -21,17 +31,16 @@ export default function Sticker({
   const prefix = code ? prefixOf(code) : "00";
   const chroma = code ? isChroma(code) : false;
   const isMissing = qty === 0;
+  const team = (prefix || "??").toUpperCase();
+  const num = numberLabel(code);
+  const displayCode = (code || "----").toUpperCase();
+  const isZeroZero = displayCode === "00";
 
   const baseColor = isMissing
     ? "#8a8580"
     : prefix
       ? colorOf(prefix)
       : "#b4b4b4";
-  const displayCode = (code || "----").toUpperCase();
-
-  const baseClasses = compact
-    ? "px-1.5 py-0.5 text-[11px] tracking-wider"
-    : "px-4 py-2 text-sm tracking-wider";
 
   const glassClass = chroma ? "sticker-glass chroma" : "sticker-glass";
 
@@ -52,7 +61,9 @@ export default function Sticker({
   return (
     <span
       {...rest}
-      className={`inline-flex items-center gap-1 rounded-md text-fg uppercase leading-none select-none overflow-visible ${isMissing && "missing"} ${baseClasses} ${full ? "w-full h-full justify-center" : ""} ${glassClass}`}
+      className={`inline-flex rounded-md text-fg uppercase leading-none select-none overflow-visible ${isMissing ? "missing" : ""} ${glassClass} ${
+        full ? "w-full h-full justify-center" : ""
+      } flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 md:flex-row md:gap-1 md:px-4 md:py-2`}
       style={{
         background: isMissing
           ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"
@@ -60,14 +71,29 @@ export default function Sticker({
       }}
     >
       {displayFlag && (
-        <span
-          className={`leading-none opacity-90 font-semibold ${compact ? "text-xs" : "text-base"}`}
-        >
+        <span className="leading-none opacity-90 font-semibold text-xs md:text-base">
           {flagOf(prefix)}
         </span>
       )}
+
+      {/* mobile: team over number (00 = big number only) */}
+      <span className="relative z-10 flex flex-col items-center md:hidden">
+        {!isZeroZero && (
+          <span className="text-[10px] font-semibold tracking-[0.12em] opacity-90">
+            {team}
+          </span>
+        )}
+        <span
+          className="text-sm font-black tracking-wide"
+          style={{ fontWeight: 700 }}
+        >
+          {isZeroZero ? "00" : num}
+        </span>
+      </span>
+
+      {/* desktop: full code */}
       <span
-        className="relative z-10 tracking-[0.08em] font-black"
+        className="relative z-10 hidden md:inline tracking-[0.08em] font-black text-sm"
         style={{ fontWeight: 500 }}
       >
         {displayCode}
