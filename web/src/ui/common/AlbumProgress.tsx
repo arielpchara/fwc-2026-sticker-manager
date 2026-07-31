@@ -7,7 +7,7 @@ import {
   filterOnlyExtrasFromInventory,
   filterOnlyOwnedFromInventory,
 } from "../../application/filterInventory.js";
-import { countInventory } from "../../application/stickerTools.js";
+import { countInventory, sumInventory } from "../../application/stickerTools.js";
 
 export default function AlbumProgress({ compact = false }: { compact?: boolean }) {
   const { t } = useLocale();
@@ -18,7 +18,7 @@ export default function AlbumProgress({ compact = false }: { compact?: boolean }
   );
   const missing = TOTAL_STICKERS - myStickersCount;
   const myExtrasCount = useMemo(
-    () => countInventory(filterOnlyExtrasFromInventory(inventory)),
+    () => sumInventory(filterOnlyExtrasFromInventory(inventory)),
     [inventory],
   );
   return (

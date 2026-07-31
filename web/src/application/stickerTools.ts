@@ -71,3 +71,6 @@ export function groupByGroup(
 
 export const countInventory = (inventory: Inventory): number =>
   Object.keys(inventory)?.length || 0;
+
+export const sumInventory = (inventory: Inventory): number =>
+  Object.values(inventory).reduce((n, q) => n + q, 0);
