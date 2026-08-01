@@ -20,6 +20,7 @@ import type { LayoutMode } from "../common/DisplayMode.js";
 import DisplayMode from "../common/DisplayMode.js";
 import GroupSticker from "../common/GroupSticker.js";
 import MainLayout from "../common/MainLayout.js";
+import StickerActionDialog from "../common/StickerActionDialog.js";
 import { TOTAL_STICKERS } from "../../constants/stickers.js";
 
 export default function MainPage() {
@@ -37,7 +38,12 @@ export default function MainPage() {
   const [compact, setCompact] = useState(false);
   const [sort, setSort] = useState<TeamSort>(null);
   const [searchStuck, setSearchStuck] = useState(false);
+  const [actionCode, setActionCode] = useState<string | null>(null);
   const searchSentinelRef = useRef<HTMLDivElement>(null);
+
+  const openStickerAction = useCallback((code: string) => {
+    setActionCode(code);
+  }, []);
 
   useEffect(() => {
     const el = searchSentinelRef.current;
@@ -139,6 +145,7 @@ export default function MainPage() {
               mode={stickerMode}
               showMissing={!hideMissing}
               includeZero={filters.missing}
+              onStickerClick={openStickerAction}
             />
           )
         ) : sortedByGroup.length === 0 ? (
@@ -154,10 +161,17 @@ export default function MainPage() {
                 showMissing={!hideMissing}
                 mode={stickerMode}
                 includeZero={filters.missing}
+                onStickerClick={openStickerAction}
               />
             </section>
           ))
         )}
+
+        <StickerActionDialog
+          code={actionCode}
+          open={actionCode !== null}
+          onClose={() => setActionCode(null)}
+        />
       </Body>
     </MainLayout>
   );

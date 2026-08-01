@@ -32,6 +32,11 @@ const stickerSlice = createSlice({
         state.inventory[code] += count;
       }
     },
+    setCount(state, action: PayloadAction<{ code: string; count: number }>) {
+      const { code, count } = action.payload;
+      if (state.inventory[code] === undefined) return;
+      state.inventory[code] = Math.max(0, Math.floor(count));
+    },
     clear(state) {
       state.inventory = generateEmptyInventory();
     },

@@ -26,6 +26,7 @@ export default function Sticker({
   qty,
   compact,
   full,
+  className = "",
   ...rest
 }: StickerProps) {
   const prefix = code ? prefixOf(code) : "00";
@@ -43,10 +44,13 @@ export default function Sticker({
       : "#b4b4b4";
 
   const glassClass = chroma ? "sticker-glass chroma" : "sticker-glass";
+  const clickableClass = rest.onClick ? "cursor-pointer active:scale-95 transition-transform" : "";
 
   if (compact) {
     return (
       <span
+        {...rest}
+        className={`${clickableClass} ${className}`.trim()}
         style={{
           borderColor: baseColor,
           borderBottomWidth: 1,
@@ -63,7 +67,7 @@ export default function Sticker({
       {...rest}
       className={`inline-flex rounded-md text-fg uppercase leading-none select-none overflow-visible ${isMissing ? "missing" : ""} ${glassClass} ${
         full ? "w-full h-full justify-center" : ""
-      } flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 md:flex-row md:gap-1 md:px-4 md:py-2`}
+      } flex-col items-center justify-center gap-0.5 px-1.5 py-1.5 md:flex-row md:gap-1 md:px-4 md:py-2 ${clickableClass} ${className}`.trim()}
       style={{
         background: isMissing
           ? "linear-gradient(145deg, #4e4a49 0%, #8b8681 100%)"

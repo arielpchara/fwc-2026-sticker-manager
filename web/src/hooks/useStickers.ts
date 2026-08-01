@@ -45,12 +45,53 @@ export function useStickers() {
     [dispatch],
   );
 
+  const incrementSticker = useCallback(
+    (code: string, by = 1) => {
+      dispatch(stickerActions.increment({ [code]: by }));
+    },
+    [dispatch],
+  );
+
+  const decrementSticker = useCallback(
+    (code: string, by = 1) => {
+      dispatch(stickerActions.decrement({ [code]: by }));
+    },
+    [dispatch],
+  );
+
+  const setStickerCount = useCallback(
+    (code: string, count: number) => {
+      dispatch(stickerActions.setCount({ code, count }));
+    },
+    [dispatch],
+  );
+
+  const removeExtras = useCallback(
+    (code: string) => {
+      const qty = inventory[code] ?? 0;
+      if (qty > 1) dispatch(stickerActions.setCount({ code, count: 1 }));
+    },
+    [dispatch, inventory],
+  );
+
+  const removeAll = useCallback(
+    (code: string) => {
+      dispatch(stickerActions.setCount({ code, count: 0 }));
+    },
+    [dispatch],
+  );
+
   return {
     inventory,
     extraInventory,
     overwriteInventory,
     increaseInventory,
     subtractInventory,
+    incrementSticker,
+    decrementSticker,
+    setStickerCount,
+    removeExtras,
+    removeAll,
     stickers: Object.keys(inventory).sort(),
   };
 }

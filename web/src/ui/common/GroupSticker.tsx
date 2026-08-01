@@ -28,6 +28,7 @@ interface GroupStickerProps {
   showMissing?: boolean;
   /** compact: show qty===0 (missing filter) instead of owned-only */
   includeZero?: boolean;
+  onStickerClick?: (code: string) => void;
 }
 
 function createAllStickerList(
@@ -60,6 +61,7 @@ export default function GroupSticker({
   mode = "regular",
   showMissing = false,
   includeZero = false,
+  onStickerClick,
 }: GroupStickerProps) {
   const { t } = useLocale();
 
@@ -122,6 +124,11 @@ export default function GroupSticker({
                     code={code}
                     displayFlag={false}
                     compact
+                    onClick={
+                      onStickerClick
+                        ? () => onStickerClick(code)
+                        : undefined
+                    }
                   />
                 ))}
               </span>
@@ -203,6 +210,9 @@ export default function GroupSticker({
                   full
                   qty={qdy ?? 0}
                   displayFlag={displayFlag}
+                  onClick={
+                    onStickerClick ? () => onStickerClick(code) : undefined
+                  }
                 />
               ))}
             </div>
