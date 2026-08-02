@@ -86,6 +86,8 @@ const pt: Translations = {
   specialGroupLabel: "Especiais",
   extrasFilter: "Só repetidas",
   missingFilter: "Faltando",
+  emblemFilter: "Só emblemas (…1)",
+  filterMore: "Mais",
   filterGroup: "Grupo",
   filterTeam: "Seleção",
   clearAll: "Clique para limpar tudo",

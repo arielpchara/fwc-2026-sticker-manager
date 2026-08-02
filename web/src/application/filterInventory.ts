@@ -1,14 +1,29 @@
 import type { Inventory } from "../type/sticker.js";
 import { GROUPS, PREFIX_TO_GROUP } from "../constants/groups.js";
 import { maxStickers } from "../constants/stickers.js";
+import { numberOf, prefixOf } from "./stickerTools.js";
 
 export type InventoryFilters = {
   query: string;
   missing: boolean;
   extras: boolean;
+  emblem: boolean;
   groups: string[];
   teams: string[];
 };
+
+export function isEmblemCode(code: string): boolean {
+  const prefix = prefixOf(code);
+  if (prefix === "CC" || prefix === "FWC" || prefix === "00") return false;
+  return numberOf(code) === 1;
+}
+
+function applyEmblemFilter(result: Inventory, emblem: boolean): Inventory {
+  if (!emblem) return result;
+  return Object.fromEntries(
+    Object.entries(result).filter(([code]) => isEmblemCode(code)),
+  );
+}
 
 export function allAlbumCodes(): string[] {
   const codes: string[] = [];
@@ -65,7 +80,7 @@ export function filterInventory(
         result[code] = 0;
       }
     }
-    return result;
+    return applyEmblemFilter(result, filters.emblem);
   }
 
   if (filters.extras) {
@@ -78,7 +93,7 @@ export function filterInventory(
         result[code] = qty;
       }
     }
-    return result;
+    return applyEmblemFilter(result, filters.emblem);
   }
 
   // only query or no filters
@@ -91,7 +106,7 @@ export function filterInventory(
         result[code] = qty;
       }
     }
-    return result;
+    return applyEmblemFilter(result, filters.emblem);
   }
 
   // group/team only
@@ -101,7 +116,11 @@ export function filterInventory(
         result[code] = qty;
       }
     }
-    return result;
+    return applyEmblemFilter(result, filters.emblem);
+  }
+
+  if (filters.emblem) {
+    return applyEmblemFilter({ ...inv }, true);
   }
 
   return { ...inv };
@@ -116,6 +135,7 @@ export function hasActiveFilters(filters: InventoryFilters): boolean {
     filters.query.trim() ||
     filters.missing ||
     filters.extras ||
+    filters.emblem ||
     filters.groups.length ||
     filters.teams.length,
   );
@@ -124,7 +144,12 @@ export function hasActiveFilters(filters: InventoryFilters): boolean {
 export function hasActiveFiltersHideMissing(
   filters: InventoryFilters,
 ): boolean {
-  return Boolean(filters.query.trim() || filters.missing || filters.extras);
+  return Boolean(
+    filters.query.trim() ||
+    filters.missing ||
+    filters.extras ||
+    filters.emblem,
+  );
 }
 
 export function filterOnlyExtrasFromInventory(inventory: Inventory): Inventory {

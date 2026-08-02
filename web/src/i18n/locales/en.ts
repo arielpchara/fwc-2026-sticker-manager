@@ -84,6 +84,8 @@ const en = {
   specialGroupLabel: "Special",
   extrasFilter: "Extras only",
   missingFilter: "Missing",
+  emblemFilter: "Emblems only (…1)",
+  filterMore: "More",
   filterGroup: "Group",
   filterTeam: "Team",
   clearAll: "Click to unselect all",

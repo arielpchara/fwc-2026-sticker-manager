@@ -32,6 +32,7 @@ export default function MainPage() {
     query: "",
     missing: false,
     extras: false,
+    emblem: false,
     groups: [],
     teams: [],
   });

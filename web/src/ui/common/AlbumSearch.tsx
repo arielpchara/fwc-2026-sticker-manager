@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useLocale } from "../../i18n/index.js";
 import StickerSuggestInput from "./StickerSuggestInput.js";
 import { GroupMultiSelect, TeamMultiSelect } from "./MultiSelectChip.js";
@@ -5,6 +6,62 @@ import TeamSortSelect from "./TeamSortSelect.js";
 import type { InventoryFilters } from "../../application/filterInventory.js";
 import type { TeamSort } from "../../application/sortTeams.js";
 import { TOTAL_STICKERS } from "../../constants/stickers.js";
+
+function ExtraFiltersMenu({
+  filters,
+  onChange,
+}: {
+  filters: InventoryFilters;
+  onChange: (next: InventoryFilters) => void;
+}) {
+  const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const active = filters.emblem;
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={`px-2.5 py-1 text-xs font-medium rounded-full border transition ${
+          active
+            ? "bg-gold text-bg border-gold"
+            : "bg-surface text-muted border-border hover:border-gold"
+        }`}
+      >
+        {t("filterMore")}
+        {active ? " (1)" : ""} ▾
+      </button>
+      {open && (
+        <div className="absolute left-0 mt-1 z-50 bg-surface border border-border rounded-lg shadow-lg w-56 py-1">
+          <label className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-surface-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={filters.emblem}
+              onChange={() =>
+                onChange({ ...filters, emblem: !filters.emblem })
+              }
+              className="accent-gold"
+            />
+            <span>{t("emblemFilter")}</span>
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AlbumSearch({
   filters,
@@ -23,12 +80,13 @@ export default function AlbumSearch({
   hideCount?: boolean;
 }) {
   const { t } = useLocale();
-  const { query, missing, extras, groups, teams } = filters;
+  const { query, missing, extras, emblem, groups, teams } = filters;
 
   const chips: { key: string; label: string }[] = [];
   if (query.trim()) chips.push({ key: "query", label: query.trim() });
   if (missing) chips.push({ key: "missing", label: t("missingFilter") });
   if (extras) chips.push({ key: "extras", label: t("extrasFilter") });
+  if (emblem) chips.push({ key: "emblem", label: t("emblemFilter") });
   for (const g of groups) {
     const groupLabel = t(g as never) || g;
     const filterLabel = t("filterGroup") || "Group";
@@ -43,6 +101,7 @@ export default function AlbumSearch({
     if (key === "query") onChange({ ...filters, query: "" });
     if (key === "missing") onChange({ ...filters, missing: false });
     if (key === "extras") onChange({ ...filters, extras: false });
+    if (key === "emblem") onChange({ ...filters, emblem: false });
     if (key.startsWith("group:")) {
       const g = key.slice(6);
       onChange({ ...filters, groups: groups.filter((x) => x !== g) });
@@ -95,6 +154,7 @@ export default function AlbumSearch({
             selected={teams}
             onChange={(t) => onChange({ ...filters, teams: t })}
           />
+          <ExtraFiltersMenu filters={filters} onChange={onChange} />
         </div>
         <TeamSortSelect value={sort} onChange={onSortChange} />
       </div>
