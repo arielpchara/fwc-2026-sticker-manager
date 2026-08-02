@@ -18,6 +18,7 @@ import Body from "../common/Body.js";
 import CopyButton from "../common/CopyButton.js";
 import type { LayoutMode } from "../common/DisplayMode.js";
 import DisplayMode from "../common/DisplayMode.js";
+import FindMissingOverlay from "../common/FindMissingOverlay.js";
 import GroupSticker from "../common/GroupSticker.js";
 import MainLayout from "../common/MainLayout.js";
 import StickerActionDialog from "../common/StickerActionDialog.js";
@@ -39,6 +40,7 @@ export default function MainPage() {
   const [sort, setSort] = useState<TeamSort>(null);
   const [searchStuck, setSearchStuck] = useState(false);
   const [actionCode, setActionCode] = useState<string | null>(null);
+  const [findOpen, setFindOpen] = useState(false);
   const searchSentinelRef = useRef<HTMLDivElement>(null);
 
   const openStickerAction = useCallback((code: string) => {
@@ -133,6 +135,7 @@ export default function MainPage() {
             onLayout={setLayout}
             compact={compact}
             onCompact={setCompact}
+            onFind={() => setFindOpen(true)}
           />
         </div>
 
@@ -171,6 +174,13 @@ export default function MainPage() {
           code={actionCode}
           open={actionCode !== null}
           onClose={() => setActionCode(null)}
+        />
+
+        <FindMissingOverlay
+          open={findOpen}
+          onClose={() => setFindOpen(false)}
+          inventory={inventory}
+          filters={filters}
         />
       </Body>
     </MainLayout>

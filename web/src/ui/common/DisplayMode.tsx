@@ -7,11 +7,13 @@ export default function DisplayMode({
   onLayout,
   compact,
   onCompact,
+  onFind,
 }: {
   layout: LayoutMode
   onLayout: (mode: LayoutMode) => void
   compact: boolean
   onCompact: (v: boolean) => void
+  onFind?: () => void
 }) {
   const { t } = useLocale()
 
@@ -45,6 +47,14 @@ export default function DisplayMode({
       >
         {t('displayCompact')}
       </button>
+      {onFind && (
+        <button
+          onClick={onFind}
+          className="px-2.5 py-1 text-xs font-medium rounded-full border transition bg-surface text-muted border-border hover:border-gold hover:text-gold"
+        >
+          {t('displayFind')}
+        </button>
+      )}
     </div>
   )
 }
