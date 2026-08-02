@@ -44,7 +44,8 @@ export default function ImportExportDrawer() {
       .then((out) => {
         if (!cancelled) setExportSize(formatBytes(byteLength(out)));
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("[export] size preview failed", err);
         if (!cancelled) setExportSize(null);
       });
     return () => {
@@ -56,7 +57,8 @@ export default function ImportExportDrawer() {
     setExporting(true);
     try {
       return await serializeState(state);
-    } catch {
+    } catch (err) {
+      console.error("[export] serialize failed", err);
       setMessage({ type: "error", text: t("exportError") });
       return "";
     } finally {
@@ -75,7 +77,8 @@ export default function ImportExportDrawer() {
       a.download = "sticker-trade-backup.txt";
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (err) {
+      console.error("[export] download failed", err);
       setMessage({ type: "error", text: t("exportError") });
     } finally {
       setExporting(false);
@@ -90,7 +93,8 @@ export default function ImportExportDrawer() {
       dispatch(replaceTrades(restored.trade.trades));
       setImportText("");
       setMessage({ type: "ok", text: t("importSuccess") });
-    } catch {
+    } catch (err) {
+      console.error("[import] restore failed", err);
       setMessage({ type: "error", text: t("importError") });
     }
   }

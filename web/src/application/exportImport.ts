@@ -53,8 +53,18 @@ export async function deserializeState(data: string): Promise<ExportableState> {
     throw new Error("Invalid or corrupted data");
   }
 
-  if (!isRecord(parsed.sticker) || !isRecord(parsed.sticker.inv)) {
-    throw new Error("Missing or invalid 'sticker.inv'");
+  if (!isRecord(parsed.sticker)) {
+    throw new Error("Missing or invalid 'sticker'");
+  }
+
+  const inventory =
+    isRecord(parsed.sticker.inventory)
+      ? parsed.sticker.inventory
+      : isRecord(parsed.sticker.inv)
+        ? parsed.sticker.inv
+        : null;
+  if (!inventory) {
+    throw new Error("Missing or invalid 'sticker.inventory'");
   }
 
   if (!isRecord(parsed.compare) || !isRecord(parsed.compare.entries)) {
@@ -65,5 +75,9 @@ export async function deserializeState(data: string): Promise<ExportableState> {
     throw new Error("Missing or invalid 'trade.trades'");
   }
 
-  return parsed as unknown as ExportableState;
+  return {
+    sticker: { inventory: inventory as Inventory },
+    compare: { entries: parsed.compare.entries as ExportableState["compare"]["entries"] },
+    trade: { trades: parsed.trade.trades as ExportableState["trade"]["trades"] },
+  };
 }

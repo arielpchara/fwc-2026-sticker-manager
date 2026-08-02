@@ -10,7 +10,7 @@ import { compress } from "./compress.js";
 
 function makeFullState(): ExportableState {
   return {
-    sticker: { inv: { BRA1: 1, BRA2: 2, ARG3: 1, MEX5: 1, "00": 1 } },
+    sticker: { inventory: { BRA1: 1, BRA2: 2, ARG3: 1, MEX5: 1, "00": 1 } },
     compare: {
       entries: {
         "receive-joao": {
@@ -45,7 +45,7 @@ function makeFullState(): ExportableState {
 
 function emptyState(): ExportableState {
   return {
-    sticker: { inv: {} },
+    sticker: { inventory: {} },
     compare: { entries: {} },
     trade: { trades: {} },
   };
@@ -96,7 +96,7 @@ describe("deserializeState", () => {
   describe("valid data", () => {
     it("restores state with many compare entries", async () => {
       const state: ExportableState = {
-        sticker: { inv: { BRA1: 1 } },
+        sticker: { inventory: { BRA1: 1 } },
         compare: {
           entries: {
             "receive-a": { name: "a", text: "BRA1", stickers: ["BRA1"], mode: "receive", savedAt: 1 },
@@ -111,7 +111,7 @@ describe("deserializeState", () => {
 
     it("restores state with many trade sessions", async () => {
       const state: ExportableState = {
-        sticker: { inv: { BRA1: 1, BRA2: 2 } },
+        sticker: { inventory: { BRA1: 1, BRA2: 2 } },
         compare: { entries: {} },
         trade: {
           trades: {
@@ -154,31 +154,43 @@ describe("deserializeState", () => {
 
     it("throws when sticker key is missing", async () => {
       const bad = await compress('{"compare":{"entries":{}},"trade":{"trades":{}}}');
-      await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'sticker.inv'");
+      await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'sticker'");
     });
 
     it("throws when compare key is missing", async () => {
-      const bad = await compress('{"sticker":{"inv":{}},"trade":{"trades":{}}}');
+      const bad = await compress('{"sticker":{"inventory":{}},"trade":{"trades":{}}}');
       await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'compare.entries'");
     });
 
     it("throws when trade key is missing", async () => {
-      const bad = await compress('{"sticker":{"inv":{}},"compare":{"entries":{}}}');
+      const bad = await compress('{"sticker":{"inventory":{}},"compare":{"entries":{}}}');
       await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'trade.trades'");
     });
 
-    it("throws when sticker.inv is not an object", async () => {
-      const bad = await compress('{"sticker":{"inv":"invalid"},"compare":{"entries":{}},"trade":{"trades":{}}}');
-      await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'sticker.inv'");
+    it("throws when sticker.inventory is not an object", async () => {
+      const bad = await compress('{"sticker":{"inventory":"invalid"},"compare":{"entries":{}},"trade":{"trades":{}}}');
+      await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'sticker.inventory'");
+    });
+
+    it("accepts legacy sticker.inv key", async () => {
+      const payload = await compress(
+        JSON.stringify({
+          sticker: { inv: { BRA1: 1 } },
+          compare: { entries: {} },
+          trade: { trades: {} },
+        }),
+      );
+      const restored = await deserializeState(payload);
+      expect(restored.sticker.inventory).toEqual({ BRA1: 1 });
     });
 
     it("throws when compare.entries is not an object", async () => {
-      const bad = await compress('{"sticker":{"inv":{}},"compare":{"entries":[]},"trade":{"trades":{}}}');
+      const bad = await compress('{"sticker":{"inventory":{}},"compare":{"entries":[]},"trade":{"trades":{}}}');
       await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'compare.entries'");
     });
 
     it("throws when trade.trades is not an object", async () => {
-      const bad = await compress('{"sticker":{"inv":{}},"compare":{"entries":{}},"trade":{"trades":null}}');
+      const bad = await compress('{"sticker":{"inventory":{}},"compare":{"entries":{}},"trade":{"trades":null}}');
       await expect(deserializeState(bad)).rejects.toThrow("Missing or invalid 'trade.trades'");
     });
 
