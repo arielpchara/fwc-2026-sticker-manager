@@ -38,7 +38,7 @@ export default function Modal({
     <dialog
       ref={ref}
       onClick={handleBackdrop}
-      className="backdrop:bg-black/40 backdrop:backdrop-blur-sm bg-surface rounded-xl shadow-xl max-w-lg w-full p-0 border-0 m-auto fixed inset-0 open:flex open:flex-col max-h-[90dvh]"
+      className="backdrop:bg-black/40 backdrop:backdrop-blur-sm bg-surface rounded-xl shadow-xl max-w-2xl w-full p-0 border-0 m-auto fixed inset-0 open:flex open:flex-col max-h-[90dvh]"
     >
       {title != null && (
         <div className="flex items-center justify-between p-5 border-b border-border shrink-0">

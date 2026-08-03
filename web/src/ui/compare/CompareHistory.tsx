@@ -1,7 +1,34 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { useLocale } from "../../i18n/index.js";
 import { useAppSelector } from "../../storage/hooks.js";
 import type { CompareEntry } from "../../type/compare.js";
+
+const iconBtn =
+  "inline-flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-surface-2 text-muted hover:text-gold hover:border-gold shrink-0 transition";
+
+function IconBtn({
+  onClick,
+  title,
+  danger,
+  children,
+}: {
+  onClick: () => void;
+  title: string;
+  danger?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className={`${iconBtn} ${danger ? "hover:text-red-400 hover:border-red-500/50" : ""}`}
+    >
+      {children}
+    </button>
+  );
+}
 
 function CompareName({
   index,
@@ -25,12 +52,14 @@ function CompareName({
   const { t } = useLocale();
 
   return (
-    <div className="rounded border border-border bg-surface py-1.5 px-2 space-y-1">
-      <div className="flex items-center gap-1.5 min-w-0">
+    <div className="rounded-lg border border-border bg-surface overflow-hidden">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-border min-w-0">
         <span className="text-[10px] text-muted tabular-nums shrink-0 w-4">
           {index}
         </span>
-        <span className="font-medium text-fg text-xs truncate">{name}</span>
+        <span className="font-medium text-fg text-sm truncate min-w-0 flex-1">
+          {name}
+        </span>
         {hasNote ? (
           <span className="text-gold shrink-0" title={t("tradeNote")}>
             <svg
@@ -48,69 +77,89 @@ function CompareName({
             </svg>
           </span>
         ) : null}
-        {canTrade && onTradeNavigate ? (
-          <button
-            onClick={() => onTradeNavigate(name)}
-            className="text-muted hover:text-gold p-0.5 ml-auto text-xs truncate"
-            title="Trade"
-          >
-            {t("tradeWith", { name })}
-          </button>
-        ) : null}
-      </div>
-      {entries.map((entry) => (
-        <div
-          key={entry.mode}
-          className="flex items-center gap-1.5 text-xs text-muted min-w-0"
-        >
-          <span
-            className={`font-bold shrink-0 ${entry.mode === "receive" ? "text-gold" : "text-copper"}`}
-          >
-            {entry.mode === "receive" ? "↓" : "↑"}
-          </span>
-          <span className="shrink-0">
-            {t("historyMissing", { n: entry.stickers.length })}
-          </span>
-          <button
-            onClick={() => onReopen(entry)}
-            className="text-muted hover:text-gold p-0.5 ml-auto"
-            title={t("historyReopen")}
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <div className="flex items-center gap-1.5 shrink-0">
+          {canTrade && onTradeNavigate ? (
+            <IconBtn
+              onClick={() => onTradeNavigate(name)}
+              title={t("tradeWith", { name })}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => onDelete(entry.mode + "-" + entry.name)}
-            className="text-muted hover:text-red-500 p-0.5"
-            title={t("historyDelete")}
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4"
+                />
+              </svg>
+            </IconBtn>
+          ) : null}
         </div>
-      ))}
+      </div>
+      <div className="divide-y divide-border">
+        {entries.map((entry) => (
+          <div
+            key={entry.mode}
+            className="flex items-center gap-2 px-3 py-2 text-xs text-muted min-w-0"
+          >
+            <span
+              className={`font-bold shrink-0 w-4 text-center ${entry.mode === "receive" ? "text-gold" : "text-copper"}`}
+            >
+              {entry.mode === "receive" ? "↓" : "↑"}
+            </span>
+            <span className="min-w-0 flex-1 truncate">
+              {entry.mode === "receive"
+                ? t("compareReceiveTab")
+                : t("compareOfferTab")}
+              {" · "}
+              {t("historyMissing", { n: entry.stickers.length })}
+            </span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <IconBtn
+                onClick={() => onReopen(entry)}
+                title={t("historyReopen")}
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+              </IconBtn>
+              <IconBtn
+                onClick={() => onDelete(entry.mode + "-" + entry.name)}
+                title={t("historyDelete")}
+                danger
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </IconBtn>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -160,16 +209,12 @@ export default function CompareHistory({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <p className="text-xs font-medium text-muted">{t("historyTitle")}</p>
+      <div className="flex items-center gap-2">
+        <p className="text-xs font-medium text-muted flex-1">
+          {t("historyTitle")}
+        </p>
         {onRefreshAll && (
-          <button
-            type="button"
-            onClick={onRefreshAll}
-            className="text-muted hover:text-gold p-0.5 ml-auto"
-            title={t("historyRefreshAll")}
-            aria-label={t("historyRefreshAll")}
-          >
+          <IconBtn onClick={onRefreshAll} title={t("historyRefreshAll")}>
             <svg
               className="w-3.5 h-3.5"
               fill="none"
@@ -183,7 +228,7 @@ export default function CompareHistory({
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-          </button>
+          </IconBtn>
         )}
       </div>
       {groups.map((g, i) => (
